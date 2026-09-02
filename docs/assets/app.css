@@ -1,0 +1,124 @@
+/* 52 Woodland flood board — shared styles */
+/* palette aligned to the Chicago project (navy #003087 / blue #2563eb / gold / etc.) */
+:root{
+  --paper:#f0f4f8; --card:#ffffff; --ink:#1a2332; --mute:#64748b; --rule:#e2e8f0;
+  --navy:#003087; --water:#2563eb; --water-soft:#dbe7fb;
+  --amber:#d97706; --orange:#f97316; --red:#dc2626;
+  --quiet:#64748b; --green:#22c55e; --gold:#FFB300; --gold-dark:#c77f0a;
+  --shadow:0 1px 2px rgba(16,35,46,.06),0 2px 8px rgba(16,35,46,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0e1826; --card:#152438; --ink:#e6edf5; --mute:#94a6bd; --rule:#26374d;
+    --navy:#12294f; --water:#5b9bf0; --water-soft:#1a2c44;
+    --amber:#e0a33e; --orange:#f08a4b; --red:#ef5350;
+    --quiet:#8496ab; --green:#4ecb8a; --gold:#e8b73f; --gold-dark:#e0a838;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 2px 10px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-feature-settings:"tnum";-webkit-text-size-adjust:100%}
+body{margin:0;line-height:1.4}
+a{color:var(--gold-dark);font-weight:500}
+
+/* header / nav — navy top bar, gold accents (matches the training site) */
+header.top{position:sticky;top:0;z-index:20;background:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.top-in{max-width:860px;margin-inline:auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:1.05rem;margin-right:auto;white-space:nowrap;color:#fff}
+.brand small{color:rgba(255,255,255,.7);font-weight:400}
+nav.tabs{display:flex;gap:2px;flex-wrap:wrap}
+nav.tabs a{color:rgba(255,255,255,.85);text-decoration:none;font-size:.92rem;padding:6px 12px;border-radius:8px;font-weight:600}
+nav.tabs a:hover{background:rgba(255,255,255,.14);color:#fff}
+nav.tabs a.active{background:var(--gold);color:var(--navy)}
+.tierchip{font-size:.8rem;font-weight:600;color:#fff;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.tierchip.quiet{background:var(--quiet)} .tierchip.watch{background:var(--water)}
+.tierchip.prepare{background:var(--amber)} .tierchip.act{background:var(--red)}
+
+main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
+.updated{color:var(--mute);font-size:.85rem;margin:0 0 14px}
+
+/* banner tier (dashboard) */
+.tier{color:#fff;padding:16px 18px;border-radius:14px;margin:0 0 20px}
+.tier b{display:block;font-size:1.7rem;font-weight:600;line-height:1.1;margin-bottom:4px}
+.tier.quiet{background:var(--quiet)} .tier.watch{background:var(--water)}
+.tier.prepare{background:var(--amber)} .tier.act{background:var(--red)}
+
+/* cards — navy header strip with gold text (matches the training site) */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);
+  padding:0 16px 14px;margin:0 0 16px;overflow:hidden}
+.card > h2{font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);
+  background:var(--navy);margin:0 -16px 14px;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card > h2 .sub{font-weight:400;text-transform:none;letter-spacing:0;font-size:.8rem;color:rgba(255,255,255,.8)}
+.card > h2 .sub a{color:var(--gold)}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.cards2{grid-template-columns:1fr}}
+
+/* stat tiles */
+.tiles{display:grid;gap:10px 14px}
+.tiles.c2{grid-template-columns:1fr 1fr} .tiles.c3{grid-template-columns:1fr 1fr 1fr}
+.tiles.c4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:640px){.tiles.c4{grid-template-columns:1fr 1fr}.tiles.c3{grid-template-columns:1fr 1fr}}
+.tile{padding:2px 0}
+.tile .v{font-size:1.5rem;font-weight:600;line-height:1.05}
+.tile .v small{font-size:.8rem;font-weight:400;color:var(--mute);margin-left:3px}
+.tile .k{font-size:.8rem;color:var(--mute);margin-top:1px}
+.tile.big .v{font-size:2rem}
+/* smaller "sub-text" tiles (trailing windows shown beneath the primary now/max) */
+.tile.sm .v{font-size:1.05rem;font-weight:600}
+.tile.sm .v small{font-size:.7rem}
+.tile.sm .k{font-size:.74rem}
+/* proper sentence-case: capitalise the first letter of every stat/row label */
+.tile .k::first-letter,.row>span:first-child::first-letter{text-transform:uppercase}
+
+/* rows */
+.row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rule)}
+.row:last-child{border-bottom:0}
+.row .v{font-size:1.15rem;font-weight:600}
+.row .u,.u{font-size:.82rem;color:var(--mute);margin-left:3px;font-weight:400}
+.k{color:var(--mute)}
+
+.note{color:var(--mute);font-size:.85rem;margin:10px 0 0}
+.secondary{color:var(--mute);font-size:.9rem;border-top:1px solid var(--rule);margin-top:14px;padding-top:10px}
+.secondary b{color:var(--ink);font-weight:600}
+.err{color:var(--red);font-size:.85rem;margin-top:8px}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;
+  background:var(--water-soft);color:var(--water)}
+
+/* forecast bars */
+.bars{display:flex;align-items:flex-end;gap:1px;height:80px;border-bottom:1px solid var(--rule)}
+.bars i{flex:1;background:var(--water);min-width:2px;display:block;border-radius:2px 2px 0 0}
+.bars i.day{outline:1px solid var(--rule)}
+.axis{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mute);margin-top:4px}
+
+/* charts */
+.chartbox{position:relative;width:100%;height:300px}
+.chartbox.short{height:220px}
+svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--mute);margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* alerts */
+.alert{padding:9px 0;border-bottom:1px solid var(--rule)}
+.alert:last-child{border-bottom:0}
+.alert b{font-weight:600} .alert span{color:var(--mute);font-size:.88rem;display:block;margin-top:2px}
+
+/* radar embed */
+#windy{width:100%;height:480px;border:1px solid var(--rule);border-radius:12px;display:block}
+@media (max-width:640px){#windy{height:380px}}
+
+ul.links{padding-left:1.1em;margin:0} ul.links li{margin:5px 0}
+
+/* flood-stage list (creek page) — clean, left-aligned, bulleted */
+ul.stages{list-style:none;padding:0;margin:6px 0 0}
+ul.stages li{display:flex;gap:9px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--rule);font-size:.9rem}
+ul.stages li:last-child{border-bottom:0}
+ul.stages .dot{width:9px;height:9px;border-radius:50%;flex:none;align-self:center}
+ul.stages .lvl{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:52px}
+ul.stages .act{color:var(--mute)}
+ul.stages a{font-size:.85rem}
+
+/* wind arrow */
+.windrose{display:inline-block;transition:transform .3s}

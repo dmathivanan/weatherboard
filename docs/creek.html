@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>52 Weatherboard — Creek</title>
+<link rel="stylesheet" href="assets/app.css?v=6">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="updated" id="updated">Loading…</div>
+
+  <section class="card">
+    <h2>Creek stage — past 12 hours</h2>
+    <div class="chartbox"><canvas id="creekChart"></canvas></div>
+    <div class="legend">
+      <span><i style="background:var(--water)"></i>San Anselmo at Bridge St (downtown)</span>
+      <span><i style="background:var(--ink)"></i>Corte Madera at Ross (downstream)</span>
+    </div>
+    <p class="note" id="chartnote"></p>
+  </section>
+
+  <div class="cards2">
+    <section class="card">
+      <h2>San Anselmo — Bridge St <span class="sub" id="sasrc"></span></h2>
+      <div class="tiles c2">
+        <div class="tile big"><div class="v" id="sanow">–<small>ft</small></div><div class="k">Now</div></div>
+        <div class="tile big"><div class="v" id="samax">–<small>ft</small></div><div class="k">Max today</div></div>
+      </div>
+      <div class="tiles c2" style="margin-top:10px">
+        <div class="tile"><div class="v" id="sa1">–<small>ft</small></div><div class="k">1 h ago</div></div>
+        <div class="tile"><div class="v" id="sa6">–<small>ft</small></div><div class="k">6 h ago</div></div>
+      </div>
+      <p class="note" id="sapeak"></p>
+      <div class="secondary" id="townstages"></div>
+    </section>
+
+    <section class="card">
+      <h2>Corte Madera at Ross <span class="sub">NWS CMDC1 · USGS</span></h2>
+      <div class="tiles c2">
+        <div class="tile big"><div class="v" id="rossnow">–<small>ft</small></div><div class="k">stage now</div></div>
+        <div class="tile big"><div class="v" id="rossflow">–<small>cfs</small></div><div class="k">flow (USGS)</div></div>
+      </div>
+      <div class="tiles c2" style="margin-top:10px">
+        <div class="tile"><div class="v" id="rosspeak">–<small>ft</small></div><div class="k">NWS forecast peak</div></div>
+        <div class="tile"><div class="v" id="rossaction">–<small>ft</small></div><div class="k">action stage</div></div>
+      </div>
+      <p class="note" id="rosspeaknote"></p>
+      <div class="secondary" id="rossnote"></div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/app.js?v=6"></script>
+<script>
+// merge two [{t,v}] sources, dedupe by minute, sort, window to N hours
+function mergeSeries(a, b, hours) {
+  const since = Date.now() - hours * 3600e3, map = new Map();
+  for (const p of [...a, ...b]) if (p.v != null && p.t >= since) map.set(Math.round(p.t / 60000), p);
+  return [...map.values()].sort((x, y) => x.t - y.t);
+}
+// plugin: draw Bridge St flood-stage lines that fall within the y-range
+function stageLinesPlugin(lines) {
+  return {
+    id: "stageLines",
+    afterDatasetsDraw(chart) {
+      const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+      ctx.save();
+      for (const ln of lines) {
+        if (ln.ft < y.min || ln.ft > y.max) continue;
+        const yy = y.getPixelForValue(ln.ft);
+        ctx.beginPath(); ctx.setLineDash(ln.stage >= 5 ? [] : [5, 3]);
+        ctx.strokeStyle = ln.color; ctx.lineWidth = 1.25;
+        ctx.moveTo(left, yy); ctx.lineTo(right, yy); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = ln.color; ctx.font = "11px -apple-system,'Segoe UI',Roboto,sans-serif";
+        ctx.textAlign = "right"; ctx.fillText(`${ln.ft} ft · Stage ${ln.stage} ${ln.action}`, right - 4, yy - 3);
+      }
+      ctx.restore();
+    }
+  };
+}
+
+boot("creek", (latest, history) => {
+  const b = latest.bridge_street || {}, n = latest.nwps || {}, u = latest.usgs || {};
+  const css = getComputedStyle(document.documentElement);
+  const water = css.getPropertyValue('--water').trim(), ink = css.getPropertyValue('--ink').trim();
+  const mute = css.getPropertyValue('--mute').trim(), grid = css.getPropertyValue('--rule').trim();
+
+  // SA: merge NWPS series + poller history for best density; Ross: NWPS observed + history
+  const sa = mergeSeries(toPoints(b.series, "t", "stage"), toPoints(history, "ts", "bridge_stage_ft"), 12);
+  const ross = mergeSeries(toPoints(n.observed, "t", "stage"), toPoints(history, "ts", "nwps_stage_ft"), 12);
+
+  const stages = (b.town_stages && b.town_stages.lines) || [];
+  const allV = [...sa, ...ross].map(p => p.v);
+  const yMax = allV.length ? Math.max(Math.max(...allV) * 1.25, 2) : 5;
+
+  if (sa.length + ross.length >= 2) {
+    Chart.getChart($("creekChart"))?.destroy();   // allow re-render on auto-refresh
+    new Chart($("creekChart"), {
+      type: "line",
+      data: { datasets: [
+        { label: "San Anselmo (Bridge St)", data: sa.map(p => ({ x: p.t, y: p.v })), borderColor: water, backgroundColor: water + "22", borderWidth: 2, pointRadius: 0, tension: .25, fill: true, spanGaps: true },
+        { label: "Corte Madera (Ross)", data: ross.map(p => ({ x: p.t, y: p.v })), borderColor: ink, borderWidth: 1.75, pointRadius: 0, tension: .25, borderDash: [4, 3], spanGaps: true },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, animation: false, parsing: false,
+        interaction: { mode: "nearest", intersect: false },
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: {
+            title: items => new Date(items[0].parsed.x).toLocaleString("en-US", clockOpts),
+            label: c => `${c.dataset.label}: ${c.parsed.y} ft` } } },
+        scales: {
+          x: { type: "linear", min: Date.now() - 12 * 3600e3, max: Date.now(),
+               ticks: { color: mute, maxRotation: 0, autoSkip: true, maxTicksLimit: 7,
+                        callback: v => new Date(v).toLocaleTimeString("en-US", timeOpts) }, grid: { color: grid } },
+          y: { beginAtZero: true, max: yMax, ticks: { color: mute }, grid: { color: grid },
+               title: { display: true, text: "stage (ft)", color: mute } } } },
+      plugins: [stageLinesPlugin(stages)],
+    });
+    $("chartnote").textContent = "Two separate gauges with different zero datums — compare the shape of each rise, not the absolute heights. Bridge St flood stages shown when the creek is high enough to bring them into view.";
+  } else {
+    $("chartnote").textContent = "Not enough recent gauge data to chart yet — San Anselmo reports on change (sparsely when the creek is flat, every few minutes during storms).";
+  }
+
+  const cfs = v => v == null ? "–" : fmt(v, v < 10 ? 2 : 0);  // small dry-season flows need decimals
+
+  // SA detail
+  $("sasrc").textContent = (b.source || "").replace("nwps:", "NWS ").replace("onerain:", "OneRain ");
+  $("sanow").innerHTML = fmt(b.stage_ft) + "<small>ft</small>";
+  $("samax").innerHTML = fmt(maxToday(sa) ?? b.stage_ft) + "<small>ft</small>";
+  $("sa1").innerHTML = fmt(valueAgo(sa, 1)) + "<small>ft</small>";
+  $("sa6").innerHTML = fmt(valueAgo(sa, 6)) + "<small>ft</small>";
+
+  // peak language: today's observed peak + NWS crest forecast (SBSC1)
+  const saMx = maxTodayInfo(sa);
+  const saFc = peakInfo(toPoints(b.forecast, "t", "stage"));
+  let sap = saMx ? `Peaked at ${fmt(saMx.v)} ft at ${hhmm(saMx.t)} today.` : "";
+  sap += saFc ? ` NWS forecasts a crest of ${fmt(saFc.v)} ft at ${hhmm(saFc.t)}.`
+              : " No NWS crest forecast issued right now (only during expected storms).";
+  $("sapeak").textContent = sap;
+
+  // Town flood stages — one bulleted line each: "Stage 2  6.5 ft: Notify public"
+  $("townstages").innerHTML =
+    "<b>Town flood stages</b>" +
+    "<ul class='stages'>" +
+    stages.map(s => `<li><span class="dot" style="background:${s.color}"></span>` +
+      `<span><b>Stage ${s.stage} · ${s.ft} ft</b>: ${s.action}${s.note ? " (" + s.note + ")" : ""}</span></li>`).join("") +
+    "</ul>" +
+    `<a href="${b.url || "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge"}" target="_blank" rel="noopener">Town gauge →</a>`;
+
+  // Ross detail
+  const rc = n.categories || {};
+  $("rossnow").innerHTML = fmt(n.latest_stage_ft ?? u.stage_ft) + "<small>ft</small>";
+  $("rossflow").innerHTML = cfs(u.flow_cfs) + "<small>cfs</small>";
+  $("rosspeak").innerHTML = fmt(n.forecast_peak_ft, 1) + "<small>ft</small>";
+  $("rossaction").innerHTML = fmt(rc.action, 0) + "<small>ft</small>";
+  const rossFc = peakInfo(toPoints(n.forecast, "t", "stage"));
+  $("rosspeaknote").textContent = rossFc
+    ? `NWS forecasts a crest of ${fmt(rossFc.v)} ft at ${hhmm(rossFc.t)}.`
+    : "No NWS crest forecast issued right now.";
+  const rossCats = [
+    { label: "Action", ft: rc.action, desc: "monitor", color: "#d97706" },
+    { label: "Minor", ft: rc.minor, desc: "minor flooding", color: "#f97316" },
+    { label: "Moderate", ft: rc.moderate, desc: "moderate flooding", color: "#dc2626" },
+    { label: "Major", ft: rc.major, desc: "major flooding", color: "#7f1d1d" },
+  ].filter(c => c.ft != null);
+  $("rossnote").innerHTML =
+    "<b>NWS flood stages</b>" +
+    "<ul class='stages'>" +
+    rossCats.map(c => `<li><span class="dot" style="background:${c.color}"></span>` +
+      `<span><b>${c.label} · ${c.ft} ft</b>: ${c.desc}</span></li>`).join("") +
+    "</ul>" +
+    "<span class='k'>Summer baseflow runs a fraction of a cfs.</span>";
+});
+</script>
+</body>
+</html>

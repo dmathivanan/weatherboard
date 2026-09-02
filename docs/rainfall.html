@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>52 Weatherboard — Rainfall</title>
+<link rel="stylesheet" href="assets/app.css?v=6">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="updated" id="updated">Loading…</div>
+
+  <section class="card">
+    <h2>Rainfall now <span class="sub" id="rdev"></span></h2>
+    <div class="tiles c2">
+      <div class="tile big"><div class="v" id="rrate">–<small>in/hr</small></div><div class="k">rate now</div></div>
+      <div class="tile big"><div class="v" id="rmax">–<small>in/hr</small></div><div class="k">max rate today</div></div>
+    </div>
+    <div class="tiles c3" style="margin-top:12px">
+      <div class="tile"><div class="v" id="r1">–<small>in</small></div><div class="k">last 1 h</div></div>
+      <div class="tile"><div class="v" id="r6">–<small>in</small></div><div class="k">last 6 h</div></div>
+      <div class="tile"><div class="v" id="r24">–<small>in</small></div><div class="k">last 24 h</div></div>
+    </div>
+    <div class="tiles c3" style="margin-top:12px">
+      <div class="tile"><div class="v" id="rev">–<small>in</small></div><div class="k">this storm</div></div>
+      <div class="tile"><div class="v" id="rday">–<small>in</small></div><div class="k">today (Ambient)</div></div>
+      <div class="tile"><div class="v" id="rweek">–<small>in</small></div><div class="k">7-day antecedent</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Observed rain rate <span class="sub">last 24 h · station gauge</span></h2>
+    <div class="chartbox short"><canvas id="rateChart"></canvas></div>
+    <p class="note" id="obsnote"></p>
+  </section>
+
+  <section class="card">
+    <h2>Forecast rain <span class="sub">next 72 h · Open-Meteo</span></h2>
+    <div class="bars" id="bars"></div>
+    <div class="axis" id="axis"></div>
+    <div class="tiles c4" style="margin-top:14px">
+      <div class="tile"><div class="v" id="q24">–<small>in</small></div><div class="k">next 24 h</div></div>
+      <div class="tile"><div class="v" id="q72">–<small>in</small></div><div class="k">next 72 h</div></div>
+      <div class="tile"><div class="v" id="q7">–<small>in</small></div><div class="k">next 7 days</div></div>
+      <div class="tile"><div class="v" id="qpk">–<small>in/hr</small></div><div class="k">peak rate 24 h</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>NWS gridded QPF <span class="sub">api.weather.gov</span></h2>
+    <div id="qpfrows"></div>
+  </section>
+</main>
+
+<script src="assets/app.js?v=6"></script>
+<script>
+function lineChart(id, labels, data, color, unit) {
+  Chart.getChart($(id))?.destroy();   // allow re-render on auto-refresh
+  const css = getComputedStyle(document.documentElement);
+  const ink = css.getPropertyValue('--mute').trim(), grid = css.getPropertyValue('--rule').trim();
+  return new Chart($(id), {
+    type: "line",
+    data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color + "22",
+      borderWidth: 2, pointRadius: 0, tension: .25, fill: true, spanGaps: true }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.parsed.y} ${unit}` } } },
+      scales: {
+        x: { ticks: { color: ink, maxRotation: 0, autoSkip: true, maxTicksLimit: 7 }, grid: { color: grid } },
+        y: { beginAtZero: true, ticks: { color: ink }, grid: { color: grid }, title: { display: true, text: unit, color: ink } } } }
+  });
+}
+
+boot("rainfall", (latest, history) => {
+  const a = latest.ambient || {}, om = latest.open_meteo || {};
+  $("rdev").textContent = a.device || "";
+
+  const rain = toPoints(history, "ts", "rain_rate_inhr");
+  const rin = v => fmt(v ?? 0, 2);           // rain amounts: show 0.00, never a dash, when dry
+  $("rrate").innerHTML = rin(a.rain_rate_inhr) + "<small>in/hr</small>";
+  $("rmax").innerHTML = rin(Math.max(maxToday(rain) ?? 0, a.rain_rate_inhr ?? 0)) + "<small>in/hr</small>";
+  $("r1").innerHTML = rin(integrateInches(rain, 1)) + "<small>in</small>";
+  $("r6").innerHTML = rin(integrateInches(rain, 6)) + "<small>in</small>";
+  $("r24").innerHTML = rin(integrateInches(rain, 24) ?? a.rain_24h_in) + "<small>in</small>";
+  $("rev").innerHTML = rin(a.rain_event_in) + "<small>in</small>";
+  $("rday").innerHTML = rin(a.rain_daily_in) + "<small>in</small>";
+  $("rweek").innerHTML = rin((latest.derived || {}).rain_7d_in) + "<small>in</small>";
+
+  // observed rate chart (last 24 h)
+  const w = windowPoints(history, "ts", "rain_rate_inhr", 24);
+  if (w.length >= 2) {
+    lineChart("rateChart", w.map(p => new Date(p.t).toLocaleString("en-US", { timeZone: TZ, hour: "numeric" })),
+      w.map(p => p.v), getComputedStyle(document.documentElement).getPropertyValue('--water').trim(), "in/hr");
+    $("obsnote").textContent = "";
+  } else {
+    $("obsnote").textContent = "Not enough history yet — the poller records one point every 15 minutes; this fills in over the coming hours.";
+  }
+
+  // forecast bars
+  if (om.hourly) {
+    const nowH = new Date().toLocaleString("sv-SE", { timeZone: TZ }).slice(0, 13) + ":00";
+    const h = om.hourly.filter(x => x.t >= nowH).slice(0, 72);
+    const max = Math.max(0.15, ...h.map(x => x.in));
+    $("bars").innerHTML = h.map(x => `<i title="${x.t} · ${x.in} in · ${x.prob}%" class="${x.t.endsWith('T00:00') ? 'day' : ''}" style="height:${(x.in / max) * 100}%"></i>`).join("");
+    const days = [...new Set(h.map(x => x.t.slice(0, 10)))];
+    $("axis").innerHTML = days.map(d => `<span>${new Date(d + "T12:00").toLocaleDateString("en-US", { weekday: "short" })}</span>`).join("");
+    $("q24").innerHTML = fmt(om.qpf_24h_in) + "<small>in</small>";
+    $("q72").innerHTML = fmt(om.qpf_72h_in) + "<small>in</small>";
+    $("q7").innerHTML = fmt(om.qpf_7d_in) + "<small>in</small>";
+    $("qpk").innerHTML = fmt(om.peak_rate_next_24h) + "<small>in/hr</small>";
+  }
+
+  // NWS gridded QPF (6-h buckets with any precip)
+  const qp = ((latest.nws || {}).qpf_periods || []).filter(p => p.in > 0).slice(0, 12);
+  $("qpfrows").innerHTML = qp.length
+    ? qp.map(p => `<div class="row"><span class="k">${new Date(p.t).toLocaleString("en-US", clockOpts)} · ${p.dur.replace("PT","").toLowerCase()}</span><span><span class="v">${fmt(p.in)}</span><span class="u">in</span></span></div>`).join("")
+    : `<p class="note">No measurable precipitation in the NWS grid forecast.</p>`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "site_name": "52 Woodland",
+  "lat": 37.9745,
+  "lon": -122.5625,
+  "timezone": "America/Los_Angeles",
+
+  "usgs_site": "11460000",
+  "nwps_gauge": "CMDC1",
+  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
+
+  "bridge_street": {
+    "_note": "San Anselmo Creek at Bridge Street = Marin OneRain 'FS 19' (site 38036) = NWS/NWPS 'SBSC1'. Same gauge/datum; flood cats action 11.3 / minor 13.3 / moderate 16.3 / major 17.8 ft.",
+    "nwps_lid": "SBSC1",
+    "onerain_host": "marin.onerain.com",
+    "onerain_site_id": 16807,
+    "onerain_device_id": 5,
+    "onerain_device_uuid": "30b998de-0ca7-49ad-b3fd-426f97ba0b24",
+    "town_stages": {
+      "_note": "Town of San Anselmo 'Emergency Procedures in Event of Winter Storms and Flooding', 2013 staff report (sananselmo.gov ArchiveCenter Item/3152). Five operational stages on the downtown Station 19 / Bridge St gauge. Stage 1 is a pre-storm forecast condition with no creek level. 13 ft = water reaches the building at 730 San Anselmo Ave.",
+      "stage1_note": "Large storms forecast + ground saturated: alert merchants, stage sand & bags, first staff alert",
+      "lines": [
+        {"stage": 2, "ft": 6.5,   "action": "Notify public", "color": "#64748b"},
+        {"stage": 3, "ft": 8.14,  "action": "Prep flood gates", "color": "#d97706"},
+        {"stage": 4, "ft": 11.14, "action": "Consider evacuation", "color": "#f97316"},
+        {"stage": 5, "ft": 13,    "action": "Flood horn", "note": "water at 730 SA Ave", "color": "#dc2626"}
+      ]
+    }
+  },
+
+  "sump": {
+    "_note": "Two PumpFuse PF03 units (ESP32/Espressif), identified on the LAN by MAC (kept out of this public repo). The PF03 exposes NO local API: the reachable unit had zero open TCP ports (full 1-1024 + IoT scan), no mDNS/Bonjour advert, no Tuya broadcast; the manufacturer confirms cloud-only operation. So there is nothing to poll locally today. Set each pump's 'url' to a JSON endpoint once one exists - a future PF03 local REST endpoint, or a bridge (Home Assistant, an MQTT->HTTP shim, or a cloud export). Env overrides: SUMP_PRIMARY_URL, SUMP_BACKUP_URL. Empty url = disabled. PumpFuse is energy-based (no pit-level sensor); it reports on/off, watts, runtime, cycles, gallons.",
+    "pumps": [
+      {"name": "primary", "label": "Primary - Zoeller 1 HP", "hp": 1.0, "gpm": 40, "url": ""},
+      {"name": "backup", "label": "Backup - 3/4 HP", "hp": 0.75, "gpm": 30, "url": ""}
+    ]
+  },
+
+  "thresholds": {
+    "_note": "Starter values only. Recalibrate after each storm from docs/data/history.csv.",
+    "watch_qpf_72h_in": 3.0,
+    "prepare_qpf_24h_in": 2.0,
+    "act_rain_rate_inhr": 0.75,
+    "act_rain_1h_in": 0.6,
+    "sump_prepare_duty_pct": 50,
+    "sump_act_duty_pct": 80,
+    "antecedent_7d_in_wet": 3.0
+  }
+}

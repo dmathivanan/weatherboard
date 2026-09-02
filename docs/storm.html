@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>52 Weatherboard — Storm</title>
+<link rel="stylesheet" href="assets/app.css?v=6">
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <div class="updated" id="updated">Loading…</div>
+
+  <section class="card">
+    <h2>Live radar <span class="sub">Windy · radar &amp; nowcast · zoom + scrub the timeline</span></h2>
+    <iframe id="windy" title="Windy interactive radar"
+      src="https://embed.windy.com/embed2.html?lat=37.9745&lon=-122.5625&detailLat=37.9745&detailLon=-122.5625&zoom=9&level=surface&overlay=radar&product=radar&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1"></iframe>
+    <p class="note">Interactive: pinch/scroll to zoom to the neighborhood, drag the bottom timeline to replay the last few hours, and use Windy's layer menu to switch <b>Radar</b> → <b>Rain (forecast)</b> for a futurecast of where cells are heading. The marker is 52 Woodland (94960).</p>
+  </section>
+
+  <div class="cards2">
+    <section class="card">
+      <h2>NWS alerts <span class="sub" id="alertcount"></span></h2>
+      <div id="alerts">None active.</div>
+    </section>
+
+    <section class="card">
+      <h2>Storm outlook</h2>
+      <div class="tiles c2">
+        <div class="tile big"><div class="v" id="q24">–<small>in</small></div><div class="k">Forecast rain, next 24 h</div></div>
+        <div class="tile big"><div class="v" id="q72">–<small>in</small></div><div class="k">Next 72 h</div></div>
+      </div>
+      <div class="tiles c2" style="margin-top:10px">
+        <div class="tile"><div class="v" id="qpk">–<small>in/hr</small></div><div class="k">Peak rate, 24 h</div></div>
+        <div class="tile"><div class="v" id="tierv">–</div><div class="k">Current tier</div></div>
+      </div>
+      <p class="note" id="reasons"></p>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Deeper looks</h2>
+    <ul class="links">
+      <li><a href="https://radar.weather.gov/station/KMUX/standard" target="_blank" rel="noopener">NWS radar — KMUX (San Francisco / Bay Area)</a></li>
+      <li><a href="https://forecast.weather.gov/MapClick.php?lat=37.9745&lon=-122.5625" target="_blank" rel="noopener">NWS point forecast — 52 Woodland</a></li>
+      <li><a href="https://www.wunderground.com/precipitation/us/ca/novato/94960" target="_blank" rel="noopener">Weather Underground — radar &amp; precipitation forecast (94960)</a></li>
+      <li><a href="https://cw3e.ucsd.edu/" target="_blank" rel="noopener">CW3E — atmospheric-river outlook (NOAA / Scripps)</a></li>
+      <li><a href="https://www.nbcbayarea.com/weather/" target="_blank" rel="noopener">NBC Bay Area — Futurecast &amp; microclimate forecast</a></li>
+      <li><a href="https://www.windy.com/-Rain-thunder/rain?37.974,-122.562,9" target="_blank" rel="noopener">Windy — full radar &amp; storm trajectory</a></li>
+      <li><a href="https://web.radarscope.app" target="_blank" rel="noopener">RadarScope (web) — needs your Pro Tier II login; not embeddable</a></li>
+    </ul>
+  </section>
+</main>
+
+<script src="assets/app.js?v=6"></script>
+<script>
+boot("storm", (latest) => {
+  const om = latest.open_meteo || {};
+  const rin = v => fmt(v ?? 0, 2);
+  $("q24").innerHTML = rin(om.qpf_24h_in) + "<small>in</small>";
+  $("q72").innerHTML = rin(om.qpf_72h_in) + "<small>in</small>";
+  $("qpk").innerHTML = rin(om.peak_rate_next_24h) + "<small>in/hr</small>";
+  $("tierv").textContent = TIER_LABEL[latest.tier] || latest.tier;
+  $("reasons").textContent = latest.reasons && latest.reasons.length
+    ? latest.reasons.join(" · ") : "No flood signals in observations or the 3-day forecast.";
+
+  const al = (latest.nws || {}).alerts || [];
+  $("alertcount").textContent = al.length ? al.length + " active" : "";
+  $("alerts").innerHTML = al.length
+    ? al.map(x => `<div class="alert"><b>${x.event}</b><span>${x.headline || ""}${x.ends ? " · until " + new Date(x.ends).toLocaleString("en-US", clockOpts) : ""}</span></div>`).join("")
+    : "None active for this point.";
+});
+</script>
+</body>
+</html>

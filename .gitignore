@@ -1,0 +1,11 @@
+# Secrets — never commit
+.env
+ambientweather.env.txt
+
+# Personal bulk data — kept local, not in the public repo
+# (raw Ambient/PumpFuse exports + winter creek pull; used for offline calibration)
+imports/*.csv
+
+# Python
+__pycache__/
+*.pyc
