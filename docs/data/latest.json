@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-03T21:42:57+00:00",
+ "generated_utc": "2026-09-03T23:32:41+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -14,28 +14,28 @@
   "antecedent_7d_in_wet": 3.0
  },
  "ambient": {
-  "observed_utc": "2026-09-03T21:42:00.000Z",
-  "rain_rate_inhr": 0,
-  "rain_event_in": 0,
-  "rain_24h_in": 0,
-  "rain_daily_in": 0,
-  "rain_weekly_in": 0.01,
-  "rain_monthly_in": 0.01,
-  "baro_inhg": 29.923,
-  "temp_f": 68.2,
-  "feels_like_f": 68.57,
-  "dew_point_f": 62.49,
-  "humidity_pct": 82,
+  "observed_utc": "2026-09-03T23:31:00.000Z",
+  "rain_rate_inhr": 0.05,
+  "rain_event_in": 0.01,
+  "rain_24h_in": 0.01,
+  "rain_daily_in": 0.01,
+  "rain_weekly_in": 0.02,
+  "rain_monthly_in": 0.02,
+  "baro_inhg": 29.902,
+  "temp_f": 68.9,
+  "feels_like_f": 69.39,
+  "dew_point_f": 63.52,
+  "humidity_pct": 83,
   "wind_mph": 1.12,
-  "wind_gust_mph": 1.57,
-  "wind_dir_deg": 136,
+  "wind_gust_mph": 2.46,
+  "wind_dir_deg": 12,
   "wind_max_daily_gust_mph": 10.07,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.31,
-  "observed": "2026-09-03T13:30:00.000-07:00",
-  "stage_ft": 4.24
+  "flow_cfs": 0.41,
+  "observed": "2026-09-03T15:30:00.000-07:00",
+  "stage_ft": 4.25
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -46,38 +46,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-02T20:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T21:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T21:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T21:30:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T21:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T22:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T22:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T22:30:00Z",
-    "stage": 4.23
-   },
    {
     "t": "2026-09-02T22:45:00Z",
     "stage": 4.23
@@ -429,10 +397,42 @@
    {
     "t": "2026-09-03T20:30:00Z",
     "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T20:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T21:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T21:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T21:30:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T21:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-03T22:00:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T22:15:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T22:30:00Z",
+    "stage": 4.25
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.24,
+  "latest_stage_ft": 4.25,
   "forecast_peak_ft": null
  },
  "nws": {
@@ -677,42 +677,42 @@
    {
     "t": "2026-09-03T15:00",
     "in": 0.043,
-    "prob": 29
+    "prob": 22
    },
    {
     "t": "2026-09-03T16:00",
-    "in": 0.055,
-    "prob": 27
+    "in": 0.016,
+    "prob": 25
    },
    {
     "t": "2026-09-03T17:00",
-    "in": 0,
-    "prob": 17
+    "in": 0.028,
+    "prob": 16
    },
    {
     "t": "2026-09-03T18:00",
-    "in": 0,
-    "prob": 10
+    "in": 0.016,
+    "prob": 7
    },
    {
     "t": "2026-09-03T19:00",
     "in": 0,
-    "prob": 7
+    "prob": 4
    },
    {
     "t": "2026-09-03T20:00",
     "in": 0,
-    "prob": 5
+    "prob": 1
    },
    {
     "t": "2026-09-03T21:00",
     "in": 0,
-    "prob": 2
+    "prob": 1
    },
    {
     "t": "2026-09-03T22:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-03T23:00",
@@ -727,27 +727,27 @@
    {
     "t": "2026-09-04T01:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T02:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T03:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T04:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T05:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T06:00",
@@ -762,12 +762,12 @@
    {
     "t": "2026-09-04T08:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T09:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-04T10:00",
@@ -827,12 +827,12 @@
    {
     "t": "2026-09-04T21:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-04T22:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-04T23:00",
@@ -852,12 +852,12 @@
    {
     "t": "2026-09-05T02:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-05T03:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-05T04:00",
@@ -1984,7 +1984,7 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_7d_in": 0.01,
+  "rain_7d_in": 0.02,
   "sump_duty_pct": null
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
