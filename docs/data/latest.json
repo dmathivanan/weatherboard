@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-03T23:32:41+00:00",
+ "generated_utc": "2026-09-04T01:22:15+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -14,27 +14,27 @@
   "antecedent_7d_in_wet": 3.0
  },
  "ambient": {
-  "observed_utc": "2026-09-03T23:31:00.000Z",
-  "rain_rate_inhr": 0.05,
-  "rain_event_in": 0.01,
-  "rain_24h_in": 0.01,
-  "rain_daily_in": 0.01,
-  "rain_weekly_in": 0.02,
-  "rain_monthly_in": 0.02,
-  "baro_inhg": 29.902,
-  "temp_f": 68.9,
-  "feels_like_f": 69.39,
-  "dew_point_f": 63.52,
-  "humidity_pct": 83,
-  "wind_mph": 1.12,
-  "wind_gust_mph": 2.46,
-  "wind_dir_deg": 12,
+  "observed_utc": "2026-09-04T01:21:00.000Z",
+  "rain_rate_inhr": 0.02,
+  "rain_event_in": 0.12,
+  "rain_24h_in": 0.12,
+  "rain_daily_in": 0.12,
+  "rain_weekly_in": 0.13,
+  "rain_monthly_in": 0.13,
+  "baro_inhg": 29.89,
+  "temp_f": 63.5,
+  "feels_like_f": 63.5,
+  "dew_point_f": 61.74,
+  "humidity_pct": 94,
+  "wind_mph": 2.46,
+  "wind_gust_mph": 4.03,
+  "wind_dir_deg": 355,
   "wind_max_daily_gust_mph": 10.07,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.41,
-  "observed": "2026-09-03T15:30:00.000-07:00",
+  "observed": "2026-09-03T17:30:00.000-07:00",
   "stage_ft": 4.25
  },
  "nwps": {
@@ -46,38 +46,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-02T22:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T23:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T23:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T23:30:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-02T23:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-03T00:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-03T00:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-03T00:30:00Z",
-    "stage": 4.23
-   },
    {
     "t": "2026-09-03T00:45:00Z",
     "stage": 4.23
@@ -429,6 +397,38 @@
    {
     "t": "2026-09-03T22:30:00Z",
     "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T22:45:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T23:00:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T23:15:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T23:30:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-03T23:45:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-04T00:00:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-04T00:15:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-04T00:30:00Z",
+    "stage": 4.25
    }
   ],
   "forecast": [],
@@ -681,18 +681,18 @@
    },
    {
     "t": "2026-09-03T16:00",
-    "in": 0.016,
+    "in": 0,
     "prob": 25
    },
    {
     "t": "2026-09-03T17:00",
-    "in": 0.028,
-    "prob": 16
+    "in": 0,
+    "prob": 11
    },
    {
     "t": "2026-09-03T18:00",
-    "in": 0.016,
-    "prob": 7
+    "in": 0,
+    "prob": 6
    },
    {
     "t": "2026-09-03T19:00",
@@ -862,12 +862,12 @@
    {
     "t": "2026-09-05T04:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-05T05:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-05T06:00",
@@ -1984,7 +1984,7 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_7d_in": 0.02,
+  "rain_7d_in": 0.13,
   "sump_duty_pct": null
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
