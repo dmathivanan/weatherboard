@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-05T17:29:21+00:00",
+ "generated_utc": "2026-09-05T19:22:20+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -14,28 +14,28 @@
   "antecedent_7d_in_wet": 3.0
  },
  "ambient": {
-  "observed_utc": "2026-09-05T17:28:00.000Z",
+  "observed_utc": "2026-09-05T19:21:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0.14,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.979,
-  "temp_f": 71.8,
-  "feels_like_f": 71.64,
-  "dew_point_f": 58.51,
-  "humidity_pct": 63,
-  "wind_mph": 1.57,
-  "wind_gust_mph": 2.24,
-  "wind_dir_deg": 302,
-  "wind_max_daily_gust_mph": 5.37,
+  "baro_inhg": 29.961,
+  "temp_f": 77.2,
+  "feels_like_f": 77.16,
+  "dew_point_f": 59.25,
+  "humidity_pct": 54,
+  "wind_mph": 2.91,
+  "wind_gust_mph": 7.38,
+  "wind_dir_deg": 150,
+  "wind_max_daily_gust_mph": 7.38,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.31,
-  "observed": "2026-09-05T09:30:00.000-07:00",
-  "stage_ft": 4.24
+  "flow_cfs": 0.41,
+  "observed": "2026-09-05T11:30:00.000-07:00",
+  "stage_ft": 4.25
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -46,22 +46,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-04T16:45:00Z",
-    "stage": 4.28
-   },
-   {
-    "t": "2026-09-04T17:00:00Z",
-    "stage": 4.28
-   },
-   {
-    "t": "2026-09-04T17:15:00Z",
-    "stage": 4.28
-   },
-   {
-    "t": "2026-09-04T17:30:00Z",
-    "stage": 4.28
-   },
    {
     "t": "2026-09-04T17:45:00Z",
     "stage": 4.28
@@ -429,6 +413,22 @@
    {
     "t": "2026-09-05T16:30:00Z",
     "stage": 4.24
+   },
+   {
+    "t": "2026-09-05T16:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-05T17:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-05T17:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-05T17:30:00Z",
+    "stage": 4.24
    }
   ],
   "forecast": [],
@@ -437,11 +437,6 @@
  },
  "nws": {
   "qpf_periods": [
-   {
-    "t": "2026-09-05T09:00:00+00:00",
-    "dur": "PT3H",
-    "in": 0.0
-   },
    {
     "t": "2026-09-05T12:00:00+00:00",
     "dur": "PT6H",
@@ -515,7 +510,7 @@
    {
     "t": "2026-09-09T00:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.02
+    "in": 0.0
    },
    {
     "t": "2026-09-09T06:00:00+00:00",
@@ -550,12 +545,12 @@
    {
     "t": "2026-09-10T18:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.0
+    "in": 0.01
    },
    {
     "t": "2026-09-11T00:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.02
+    "in": 0.0
    },
    {
     "t": "2026-09-11T06:00:00+00:00",
