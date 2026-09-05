@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-04T22:48:32+00:00",
+ "generated_utc": "2026-09-05T00:37:49+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -14,27 +14,27 @@
   "antecedent_7d_in_wet": 3.0
  },
  "ambient": {
-  "observed_utc": "2026-09-04T22:47:00.000Z",
+  "observed_utc": "2026-09-05T00:37:00.000Z",
   "rain_rate_inhr": 0,
-  "rain_event_in": 0.13,
+  "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0.14,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.935,
-  "temp_f": 79.3,
-  "feels_like_f": 78.95,
-  "dew_point_f": 54.84,
-  "humidity_pct": 43,
-  "wind_mph": 1.57,
-  "wind_gust_mph": 4.47,
-  "wind_dir_deg": 256,
-  "wind_max_daily_gust_mph": 10.29,
+  "baro_inhg": 29.94,
+  "temp_f": 71.4,
+  "feels_like_f": 70.78,
+  "dew_point_f": 53.88,
+  "humidity_pct": 54,
+  "wind_mph": 2.24,
+  "wind_gust_mph": 3.36,
+  "wind_dir_deg": 258,
+  "wind_max_daily_gust_mph": 10.51,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.65,
-  "observed": "2026-09-04T15:30:00.000-07:00",
+  "observed": "2026-09-04T16:30:00.000-07:00",
   "stage_ft": 4.27
  },
  "nwps": {
@@ -46,38 +46,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-03T21:45:00Z",
-    "stage": 4.24
-   },
-   {
-    "t": "2026-09-03T22:00:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T22:15:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T22:30:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T22:45:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T23:00:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T23:15:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-03T23:30:00Z",
-    "stage": 4.25
-   },
    {
     "t": "2026-09-03T23:45:00Z",
     "stage": 4.25
@@ -429,10 +397,42 @@
    {
     "t": "2026-09-04T21:30:00Z",
     "stage": 4.28
+   },
+   {
+    "t": "2026-09-04T21:45:00Z",
+    "stage": 4.28
+   },
+   {
+    "t": "2026-09-04T22:00:00Z",
+    "stage": 4.28
+   },
+   {
+    "t": "2026-09-04T22:15:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-04T22:30:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-04T22:45:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-04T23:00:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-04T23:15:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-04T23:30:00Z",
+    "stage": 4.27
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.28,
+  "latest_stage_ft": 4.27,
   "forecast_peak_ft": null
  },
  "nws": {
@@ -1418,17 +1418,17 @@
    },
    {
     "t": "2026-09-10T18:00",
-    "in": 0,
+    "in": 0.004,
     "prob": 4
    },
    {
     "t": "2026-09-10T19:00",
-    "in": 0,
+    "in": 0.004,
     "prob": 4
    },
    {
     "t": "2026-09-10T20:00",
-    "in": 0,
+    "in": 0.004,
     "prob": 4
    },
    {
@@ -1449,7 +1449,7 @@
   ],
   "qpf_24h_in": 0,
   "qpf_72h_in": 0,
-  "qpf_7d_in": 0,
+  "qpf_7d_in": 0.01,
   "peak_rate_next_24h": 0
  },
  "sump": null,
