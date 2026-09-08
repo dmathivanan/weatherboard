@@ -14,6 +14,7 @@ const PAGES = [
   { id: "rainfall",  href: "rainfall.html", label: "Rainfall" },
   { id: "creek",     href: "creek.html",    label: "Creek" },
   { id: "storm",     href: "storm.html",    label: "Storm" },
+  { id: "report",    href: "report.html",   label: "Report" },
 ];
 const TIER_LABEL = { quiet: "Quiet", watch: "Watch", prepare: "Prepare", act: "Act now",
                      emergency: "EMERGENCY" };
