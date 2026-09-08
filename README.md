@@ -115,6 +115,34 @@ storms, sparse when flat); the peak was 7.38 ft on 2026-01-06, well below the
 13.3-ft minor-flood stage. Note it only covers the Nov–Apr window, while the
 Ambient export runs through the following summer, so join on the overlap.
 
+## Pump capacity is a derived number, not a measured one
+
+The 84 GPM used throughout `analysis/` is the **nameplate** figure for the Zoeller
+N140, and it is pending measurement. Two independent lines of evidence support
+it, and one assumption could invalidate both.
+
+**Geometry.** A 36-inch pit holds 4.4064 gal per inch of depth, so for this pit
+
+```
+delivered GPM = float_differential_in x 18.885   (~ x19)
+```
+
+At the assumed 4.5 in float differential that is **84.98 GPM**, within 1.2% of
+nameplate.
+
+**Run duration.** For a pit of drawdown volume V, `duration = V/(Qp - Qin)`, so
+the shortest run is the dry-pit case `dur_min = V/Qp`. The shortest run in 3,674
+records is 14 s, which puts V at 19.6 gal against the 19.83 gal the geometry
+gives. The same identity makes `stress = 1 - 14/duration` equal to `Qin/Qp` -
+fractional pump capacity - which is what `analysis/stress_model.py` is built on.
+
+**The catch:** `float_differential_in` is recorded in `config.json` as *assumed,
+not measured*. Delivered GPM scales linearly with it, so a differential of 4.0 in
+means 75.5 GPM and 3.0 in means 56.7 GPM. Every inflow, gallons-pumped and stress
+figure in `analysis/` moves with it, and so do the alert thresholds derived from
+them. Measuring the actual float travel is the single highest-value calibration
+left; until then treat 84 GPM as provisional.
+
 ## Sump adapter
 
 `fetch_sump()` in `poller.py` is a placeholder that reads a JSON endpoint

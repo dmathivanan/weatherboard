@@ -237,7 +237,10 @@ def fetch_sump():
         if not legacy:
             raise RuntimeError("no sump endpoint configured (PumpFuse PF03 has no "
                                "local API; set sump.pumps[].url or SUMP_URL)")
-        pumps_cfg = [{"name": "primary", "label": "Primary", "hp": 1.0, "gpm": 40, "url": legacy}]
+        # GPM comes from the primary_pump spec block, never a literal here:
+        # a stale hardcoded 40 silently halves every inflow number downstream.
+        pumps_cfg = [{"name": "primary", "label": "Primary", "spec": "primary_pump",
+                      "gpm": CFG.get("primary_pump", {}).get("rated_gpm"), "url": legacy}]
 
     env_url = {"primary": os.environ.get("SUMP_PRIMARY_URL"),
                "backup": os.environ.get("SUMP_BACKUP_URL")}

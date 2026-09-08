@@ -9,3 +9,6 @@ imports/*.csv
 # Python
 __pycache__/
 *.pyc
+
+# Raw API responses, re-fetched on demand by the analysis scripts
+analysis/cache/

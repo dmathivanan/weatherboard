@@ -1,0 +1,73 @@
+==============================================================================
+LAYER 0 — TIMELINE BUILD REPORT
+==============================================================================
+window        : 2025-11-01 00:00:00+00:00  ->  2026-04-30 23:50:00+00:00
+grid          : 10 min UTC, 26,064 rows (180 days)
+inflow basis  : runtime x 84 GPM (config primary_pump.rated_gpm)
+
+------------------------------------------------------------------------------
+RESOLUTION PER SOURCE
+------------------------------------------------------------------------------
+source              native   rows/runs  how it lands on the 10-min grid
+Ambient              5 min      95,810  5 min -> 2 obs per bin. Genuine 10-min resolution.
+PumpFuse             event       3,664  one row per run, 1 s stamps -> exact per-bin totals. Genuine.
+USGS 11460000       15 min      20,319  15 min -> most bins hold no reading; interpolated between.
+Bridge Street        event       1,029  ~4-15 min in storms, 720 min when flat. Effectively 30 min+ off-storm.
+
+  PumpFuse and Bridge Street are event sources: 'native' is not a sampling
+  rate. For PumpFuse a gap means the pump did not run. For Bridge Street the
+  gauge reports on change, so it self-densifies exactly when it matters.
+
+  Effective resolution is per source AND per period, not global:
+    USGS         : 67% of bins hold a real reading (15-min native on a 10-min grid)
+    Bridge Street: 3.9% of bins hold a real reading overall
+                   median distance to a real reading: 143 min  (p90 317 min)
+                   during wet periods (24-h rain > 0.25 in, 16% of window):
+                     15.6% of bins real, median distance 27 min
+                   when dry: median distance 173 min
+
+------------------------------------------------------------------------------
+RAINFALL RECONSTRUCTION (Ambient cumulative counters)
+------------------------------------------------------------------------------
+  Daily Rain  resets handled :    59  (local midnight)
+  Event Rain  resets handled :    28  (dry-spell reset)
+  Yearly Rain resets handled :     1  (Jan 1)
+  suspect steps zeroed       :     0  (> 0.5 in per 5 min)
+
+  season total from Daily  counter :    35.56 in   <- primary
+  season total from Yearly counter :    35.78 in   <- independent check
+  season total from Event  counter :    35.58 in
+  Daily vs Yearly disagreement     :     0.22 in  (0.61%)
+  window rain (Nov-Apr)            :    34.47 in
+
+------------------------------------------------------------------------------
+GAPS LONGER THAN 1 HOUR (in the source's own observations)
+------------------------------------------------------------------------------
+  Ambient           1 gaps > 1 h
+                    2025-11-18 12:55 -> 2025-11-18 14:34  (   1.6 h)
+  PumpFuse        184 gaps  (a gap here means 'pump did not run', not missing data)
+  Bridge Street   510 gaps > 1 h
+                    2026-02-28 19:32 -> 2026-03-02 07:32  (  36.0 h)
+                    2025-11-03 07:32 -> 2025-11-04 07:32  (  24.0 h)
+                    2026-03-23 19:32 -> 2026-03-24 19:32  (  24.0 h)
+                    2025-11-20 17:54 -> 2025-11-21 07:32  (  13.6 h)
+                    2025-11-15 19:32 -> 2025-11-16 07:33  (  12.0 h)
+                    2025-11-01 07:32 -> 2025-11-01 19:32  (  12.0 h)
+                    ... and 504 shorter ones
+  USGS              3 gaps > 1 h
+                    2026-02-22 06:30 -> 2026-02-22 08:00  (   1.5 h)
+                    2026-02-20 22:15 -> 2026-02-20 23:30  (   1.2 h)
+                    2026-02-22 03:45 -> 2026-02-22 05:00  (   1.2 h)
+
+------------------------------------------------------------------------------
+COVERAGE / SANITY
+------------------------------------------------------------------------------
+  bins with any Ambient obs   : 100.0%
+  bins with a pump run        :   7.5%   (3,553 runs, 83,208 gal)
+  peak 10-min rain            :  0.26 in
+  peak 1-h rain               :  0.65 in
+  peak 24-h rain              :  3.19 in
+  peak Bridge Street stage    :  7.38 ft on 2026-01-06 00:10 UTC  (observed, not interpolated)
+  peak Ross stage / flow      : 12.12 ft / 1,640 cfs
+  peak sump inflow (10-min)   : 49.70 GPM avg-over-bin
+  max API / season total      :  8.33 / 34.78 in
