@@ -12,3 +12,8 @@ __pycache__/
 
 # Raw API responses, re-fetched on demand by the analysis scripts
 analysis/cache/
+
+# MRMS store and the copied ecCodes binary — both regenerable
+nowcast/mrms.sqlite
+nowcast/lib/
+nowcast/tmp/
