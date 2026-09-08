@@ -15,7 +15,8 @@ const PAGES = [
   { id: "creek",     href: "creek.html",    label: "Creek" },
   { id: "storm",     href: "storm.html",    label: "Storm" },
 ];
-const TIER_LABEL = { quiet: "Quiet", watch: "Watch", prepare: "Prepare", act: "Act now" };
+const TIER_LABEL = { quiet: "Quiet", watch: "Watch", prepare: "Prepare", act: "Act now",
+                     emergency: "EMERGENCY" };
 
 const $ = id => document.getElementById(id);
 const fmt = (v, d = 2) => (v == null || v === "" || isNaN(v)) ? "–" : Number(v).toFixed(d);
@@ -83,6 +84,25 @@ let _latest = null, _history = [], _render = null, _liveAt = null, _liveErrs = {
 function merge(base, live) {
   const out = Object.assign({}, base, live.data);
   out.derived = base.derived;                 // history-only, never live
+
+  /* Creek forecast: rain already on the ground comes from the poller's history
+     (the browser cannot difference the station's counters), but the rain still
+     to come is refetched live, so the number moves between polls. */
+  const cp = base.creek_predictor;
+  if (cp && out.derived && out.derived.rain_6h_in != null && out.derived.api != null) {
+    const hourly = (out.open_meteo || {}).hourly || [];
+    const now = Date.now();
+    const next6 = hourly
+      .filter(x => { const t = Date.parse(x.t); return t >= now && t < now + 6 * 3600e3; })
+      .reduce((a, x) => a + (x.in || 0), 0);
+    const r6 = out.derived.rain_6h_in + next6;
+    const pt = cp.intercept + cp.coef_r6h_in * r6 + cp.coef_api * out.derived.api;
+    out.creek_forecast = { point_ft: Math.round(pt * 100) / 100,
+                           lo_ft: Math.round((pt - cp.band_95_ft) * 100) / 100,
+                           hi_ft: Math.round((pt + cp.band_95_ft) * 100) / 100,
+                           horizon_h: 6, r2: cp.r2 };
+  }
+
   const t = evaluateTier(out);
   out.tier = t.tier;
   out.reasons = t.reasons;

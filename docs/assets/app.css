@@ -35,6 +35,7 @@ nav.tabs a.active{background:var(--gold);color:var(--navy)}
 .tierchip{font-size:.8rem;font-weight:600;color:#fff;padding:4px 10px;border-radius:999px;white-space:nowrap}
 .tierchip.quiet{background:var(--quiet)} .tierchip.watch{background:var(--water)}
 .tierchip.prepare{background:var(--amber)} .tierchip.act{background:var(--red)}
+.tierchip.emergency{background:#7f1d1d;box-shadow:0 0 0 2px #fca5a5}
 
 main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
 .updated{color:var(--mute);font-size:.85rem;margin:0 0 14px}
@@ -53,6 +54,14 @@ main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
 .tier b{display:block;font-size:1.7rem;font-weight:600;line-height:1.1;margin-bottom:4px}
 .tier.quiet{background:var(--quiet)} .tier.watch{background:var(--water)}
 .tier.prepare{background:var(--amber)} .tier.act{background:var(--red)}
+.tier.emergency{background:#7f1d1d}
+
+/* creek forecast card: point estimate plus its uncertainty band */
+.fcast{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.fcast .pt{font-size:2rem;font-weight:700;line-height:1}
+.fcast .band{color:var(--mute);font-size:.9rem}
+.fcast .horizon{color:var(--mute);font-size:.8rem}
+.notifyline{color:var(--amber);font-weight:600}
 
 /* cards — navy header strip with gold text (matches the training site) */
 .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);

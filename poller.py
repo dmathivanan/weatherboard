@@ -52,6 +52,14 @@ HISTORY_COLS = [
     "creek_stage_ft", "creek_flow_cfs", "nwps_stage_ft", "bridge_stage_ft",
     "sump_level", "sump_runtime_min", "sump_cycles", "sump_duty_pct",
     "qpf_24h_in", "qpf_72h_in", "tier",
+    # Multi-model QPF logged hourly for a spring skill comparison. Last winter
+    # Open-Meteo's blend captured only 75% of observed rain at a day's lead and
+    # 50% at three days, so we log the competitors side by side before trusting
+    # any of them: see analysis/report.md.
+    "qpf_nws_24h_in", "qpf_nws_72h_in",
+    "qpf_cnrfc_6h_in", "qpf_cnrfc_24h_in",
+    "qpf_ecmwf_24h_in", "qpf_gfs_24h_in", "qpf_hrrr_6h_in",
+    "ar_category", "nws_flood_watch",
 ]
 
 
@@ -183,6 +191,7 @@ def fetch_open_meteo():
     future = [x for x in hourly if x["t"] >= now_local] or hourly
     return {
         "hourly": hourly,
+        "qpf_next_6h_in": round(sum(x["in"] for x in future[:6]), 3),
         "qpf_24h_in": round(sum(x["in"] for x in future[:24]), 2),
         "qpf_72h_in": round(sum(x["in"] for x in future[:72]), 2),
         "qpf_7d_in": round(sum(x["in"] for x in future), 2),
@@ -396,7 +405,8 @@ def fnum(x):
 def derive_from_history(hist, ambient, sump):
     """Rolling values the feeds don't give directly."""
     now = datetime.now(timezone.utc)
-    out = {"rain_1h_in": None, "rain_7d_in": None, "sump_duty_pct": None}
+    out = {"rain_1h_in": None, "rain_6h_in": None, "rain_7d_in": None,
+           "api": None, "sump_duty_pct": None}
 
     def rows_since(hours):
         cut = (now - timedelta(hours=hours)).isoformat()
@@ -416,6 +426,33 @@ def derive_from_history(hist, ambient, sump):
     if ambient:
         out["rain_7d_in"] = ambient.get("rain_weekly_in")
 
+    # 6-hour rain drives the creek predictor (Layer 3A: it carries roughly three
+    # times the weight of the 3-hour window). Same counter-difference trick.
+    if ambient and ambient.get("rain_event_in") is not None:
+        last_6 = rows_since(6)
+        if last_6:
+            prev = fnum(last_6[0].get("rain_event_in"))
+            cur = ambient["rain_event_in"]
+            if prev is not None and cur >= prev:
+                out["rain_6h_in"] = round(cur - prev, 3)
+
+    # Antecedent precipitation index, 0.9/day decay, rebuilt from history rows.
+    # Beats the raw 7-day total: Layer 3A gave it a standardized weight of 0.32.
+    if hist:
+        acc, prev_t = 0.0, None
+        for r in hist[-2016:]:                     # ~3 weeks at 15-min cadence
+            try:
+                t = datetime.fromisoformat(r["ts_utc"])
+            except Exception:  # noqa: BLE001
+                continue
+            inc = fnum(r.get("rain_1h_in")) or 0.0
+            if prev_t is not None:
+                days = max((t - prev_t).total_seconds() / 86400, 0)
+                acc *= 0.9 ** days
+            acc += inc / 4.0 if inc else 0.0       # 15-min row holds a 1-h total
+            prev_t = t
+        out["api"] = round(acc, 3)
+
     # Sump duty cycle over the last hour from cumulative runtime.
     if sump and sump.get("runtime_min") is not None:
         last_hr = rows_since(1)
@@ -430,8 +467,126 @@ def derive_from_history(hist, ambient, sump):
 
 # ---------------------------------------------------------------- rules
 
-def evaluate(ambient, usgs, nwps, nws, om, sump, derived, bridge=None):
-    """Returns (tier, reasons). Tiers: quiet < watch < prepare < act."""
+
+# ---------------------------------------------------------------- forecast sources
+# Logged hourly so next spring we can rank them. Each is isolated by safe().
+
+def _sum_nws_qpf(qpf_periods, hours):
+    """Sum NWS gridded QPF over the next `hours` from now."""
+    if not qpf_periods:
+        return None
+    now = datetime.now(timezone.utc)
+    cut = now + timedelta(hours=hours)
+    tot = 0.0
+    for p in qpf_periods:
+        try:
+            t = datetime.fromisoformat(p["t"].replace("Z", "+00:00"))
+        except Exception:  # noqa: BLE001
+            continue
+        if now - timedelta(hours=6) <= t <= cut:
+            tot += p.get("in") or 0
+    return round(tot, 3)
+
+
+def fetch_cw3e_ar():
+    """CW3E atmospheric-river outlook, North Bay / Bay Area landfall category.
+
+    CW3E publishes the AR Scale outlook as a JSON summary alongside its graphics.
+    There is no documented stable API, so this is best-effort: it looks for a
+    Bay Area / North Bay entry and returns its AR category (1-5). A miss returns
+    category None rather than raising, because Watch has two other triggers.
+    """
+    url = "https://cw3e.ucsd.edu/wp-content/uploads/AR_Scale/ar_scale_summary.json"
+    r = requests.get(url, headers=UA, timeout=20)
+    if r.status_code != 200:
+        raise RuntimeError(f"cw3e {r.status_code}")
+    j = r.json()
+    best = None
+    def walk(o):
+        nonlocal best
+        if isinstance(o, dict):
+            blob = json.dumps(o)[:400].lower()
+            if any(k in blob for k in ("north bay", "bay area", "san francisco", "bodega")):
+                for key in ("ar_scale", "category", "ar_cat", "scale"):
+                    v = o.get(key)
+                    if isinstance(v, (int, float)) and 0 <= v <= 5:
+                        best = max(best or 0, int(v))
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(j)
+    return {"ar_category": best, "source": url}
+
+
+def fetch_cnrfc_qpf():
+    """CNRFC 6-hourly QPF for the Ross Valley forecast point.
+
+    The California-Nevada River Forecast Center publishes gridded QPF; the
+    per-point CSV is the stable public surface. Returns 6 h and 24 h totals.
+    """
+    url = ("https://www.cnrfc.noaa.gov/restricted/graphicalRVF_csv.php"
+           f"?id={CFG.get('cnrfc_point', 'CMDC1')}")
+    r = requests.get(url, headers=UA, timeout=25)
+    if r.status_code != 200 or not r.text.strip():
+        raise RuntimeError(f"cnrfc {r.status_code}")
+    vals = [float(x) for x in re.findall(r"(?<![\d.])(\d+\.\d+)(?![\d.])", r.text)[:8]]
+    if not vals:
+        raise RuntimeError("cnrfc: no numeric QPF parsed")
+    return {"qpf_6h_in": round(vals[0], 3),
+            "qpf_24h_in": round(sum(vals[:4]), 3), "source": url}
+
+
+def fetch_model_qpf():
+    """Open-Meteo per-model precipitation: ECMWF, GFS and HRRR side by side."""
+    out = {}
+    for key, model, hours in (("ecmwf", "ecmwf_ifs025", 24),
+                              ("gfs", "gfs_seamless", 24),
+                              ("hrrr", "ncep_hrrr_conus", 6)):
+        try:
+            j = get("https://api.open-meteo.com/v1/forecast", params={
+                "latitude": LAT, "longitude": LON, "models": model,
+                "hourly": "precipitation", "precipitation_unit": "inch",
+                "timezone": "UTC", "forecast_days": 2})
+            pr = [x or 0 for x in j["hourly"]["precipitation"][:hours]]
+            out[f"qpf_{key}_{hours}h_in"] = round(sum(pr), 3)
+        except Exception as e:  # noqa: BLE001
+            out[f"qpf_{key}_{hours}h_in"] = None
+            out.setdefault("errors", {})[key] = f"{type(e).__name__}: {e}"[:120]
+    return out
+
+
+TIER_ORDER = ["quiet", "watch", "prepare", "act", "emergency"]
+
+
+def predict_bridge_ft(rain_6h_in, api, qpf_next_6h_in):
+    """Layer 3A live predictor: where Bridge Street is heading in ~6 hours.
+
+    Rain already on the ground plus rain still expected, weighted by how wet the
+    catchment already is. Fitted on the rising limb only (n=349, R2 0.838,
+    residual sd 0.55 ft). Returns (point_estimate, lo, hi) or None.
+    """
+    cp = CFG.get("creek_predictor")
+    if cp is None or rain_6h_in is None or api is None:
+        return None
+    r6 = rain_6h_in + (qpf_next_6h_in or 0)
+    pt = cp["intercept"] + cp["coef_r6h_in"] * r6 + cp["coef_api"] * api
+    band = cp["band_95_ft"]
+    return round(pt, 2), round(pt - band, 2), round(pt + band, 2)
+
+
+def evaluate(ambient, usgs, nwps, nws, om, sump, derived, bridge=None,
+             ar=None, runs=None):
+    """Returns (tier, reasons) on quiet < watch < prepare < act < emergency.
+
+    Rebuilt from the winter 2025-26 replay (analysis/report.md). The old rules
+    fired nothing at all on 8 of 15 storms including the largest; these reached
+    Act on the same storm 63 hours before its peak. Season-to-date rain was
+    dropped - it added nothing in any layer tested.
+    """
+    T = CFG["tiers"]
+    BIAS = CFG.get("qpf_bias", {"lead_24h": 1.0, "lead_72h": 1.0})
     reasons, level = [], 0
 
     def raise_to(n, why):
@@ -439,61 +594,71 @@ def evaluate(ambient, usgs, nwps, nws, om, sump, derived, bridge=None):
         level = max(level, n)
         reasons.append(why)
 
-    alerts = [a["event"].lower() for a in (nws or {}).get("alerts", []) if a.get("event")]
-    if any("flood warning" in a or "flash flood" in a for a in alerts):
-        raise_to(3, "NWS flood warning in effect")
-    elif any("flood watch" in a for a in alerts):
-        raise_to(2, "NWS flood watch in effect")
+    # Open-Meteo runs dry here; correct before comparing to any threshold.
+    q24 = (om or {}).get("qpf_24h_in")
+    q72 = (om or {}).get("qpf_72h_in")
+    q24c = round(q24 * BIAS["lead_24h"], 2) if q24 is not None else None
+    q72c = round(q72 * BIAS["lead_72h"], 2) if q72 is not None else None
 
-    if om:
-        if om["qpf_24h_in"] >= TH["prepare_qpf_24h_in"]:
-            raise_to(2, f'{om["qpf_24h_in"]}" forecast next 24h')
-        elif om["qpf_72h_in"] >= TH["watch_qpf_72h_in"]:
-            raise_to(1, f'{om["qpf_72h_in"]}" forecast next 72h')
+    ross = (usgs or {}).get("stage_ft")
+    if ross is None:
+        ross = (nwps or {}).get("latest_stage_ft")
+    bft = (bridge or {}).get("stage_ft")
+    alerts = [a.get("event", "").lower() for a in (nws or {}).get("alerts", [])]
 
-    if ambient:
-        rr = ambient.get("rain_rate_inhr") or 0
-        if rr >= TH["act_rain_rate_inhr"]:
-            raise_to(3, f'rain rate {rr}"/hr')
-        r1 = derived.get("rain_1h_in")
-        if r1 is not None and r1 >= TH["act_rain_1h_in"]:
-            raise_to(3, f'{r1}" in the last hour')
+    # ---- watch ----------------------------------------------------------
+    cat = (ar or {}).get("ar_category")
+    if cat is not None and cat >= T["watch"]["cw3e_ar_category_min"]:
+        raise_to(1, f"CW3E AR scale {cat} forecast for the North Bay")
+    if T["watch"].get("nws_flood_watch") and any("flood watch" in a for a in alerts):
+        raise_to(1, "NWS Flood Watch in effect")
+    if q72c is not None and q72c >= T["watch"]["qpf_72h_corrected_in"]:
+        raise_to(1, f'{q72c}" forecast next 72h (bias-corrected)')
 
-    duty = derived.get("sump_duty_pct")
-    if duty is not None:
-        if duty >= TH["sump_act_duty_pct"]:
-            raise_to(3, f"sump running {duty}% of the hour")
-        elif duty >= TH["sump_prepare_duty_pct"]:
-            raise_to(2, f"sump running {duty}% of the hour")
+    # ---- prepare --------------------------------------------------------
+    P = T["prepare"]
+    if q24c is not None and q24c >= P["qpf_24h_corrected_in"]:
+        raise_to(2, f'{q24c}" forecast next 24h (bias-corrected)')
+    bw = P["bridge_ft_with_rain"]
+    if bft is not None and q24c is not None and bft >= bw["bridge_ft"]             and q24c >= bw["qpf_24h_corrected_in"]:
+        raise_to(2, f'Bridge St {bft} ft with {q24c}" more forecast')
+    if ross is not None and ross >= P["ross_ft"]:
+        raise_to(2, f"Ross gauge {ross} ft")
+    longest = max((r.get("duration_s") or 0) for r in (runs or [])) if runs else 0
+    if longest >= P["sump_run_s"]:
+        raise_to(2, f"sump run {longest:.0f} s")
 
-    # Backup pump running at all is an Act-tier signal on its own (v2 design):
-    # the primary only fails over to the 3/4 HP backup when it can't keep up.
+    # ---- act ------------------------------------------------------------
+    A = T["act"]
+    if ross is not None and ross >= A["ross_ft"]:
+        raise_to(3, f"Ross gauge {ross} ft (Town notify line maps to "
+                    f"{CFG['ross_to_bridge']['notify_line_ross_ft']} ft)")
+    pred = predict_bridge_ft((derived or {}).get("rain_6h_in"),
+                             (derived or {}).get("api"),
+                             (om or {}).get("qpf_next_6h_in"))
+    if pred and pred[0] >= A["predicted_bridge_ft"]:
+        raise_to(3, f"Bridge St predicted {pred[0]} ft in ~6 h "
+                    f"({pred[1]}-{pred[2]} ft)")
+    if longest >= A["sump_run_s"]:
+        raise_to(3, f"sump run {longest:.0f} s = "
+                    f"{100*(1-14/longest):.0f}% of pump capacity")
+    # three consecutive lengthening runs, the third long enough to matter
+    if runs and len(runs) >= 3:
+        d = [r.get("duration_s") or 0 for r in runs[-3:]]
+        if d[0] < d[1] < d[2] and d[2] >= A.get("sump_increasing_min_final_s", 25):
+            raise_to(3, f"sump runs lengthening {d[0]:.0f}->{d[1]:.0f}->{d[2]:.0f} s")
+
+    # ---- emergency ------------------------------------------------------
+    E = T["emergency"]
     for pump in (sump or {}).get("pumps", []):
         if pump.get("name") == "backup" and pump.get("on"):
-            raise_to(3, "backup pump running (primary being overwhelmed)")
+            raise_to(4, "BACKUP PUMP RUNNING - primary is being overwhelmed")
+    if longest >= E["primary_run_no_stop_s"]:
+        raise_to(4, f"primary running {longest:.0f} s without stopping")
+    if ross is not None and ross >= E["ross_ft"]:
+        raise_to(4, f"Ross gauge {ross} ft - above NWS action stage")
 
-    if nwps and nwps.get("latest_stage_ft") is not None:
-        st, cats = nwps["latest_stage_ft"], nwps.get("categories", {})
-        if cats.get("minor") and st >= cats["minor"]:
-            raise_to(3, f"Ross gauge {st} ft, above minor flood stage")
-        elif cats.get("action") and st >= cats["action"]:
-            raise_to(2, f"Ross gauge {st} ft, above action stage")
-        pk = nwps.get("forecast_peak_ft")
-        if pk and cats.get("action") and pk >= cats["action"]:
-            raise_to(max(level, 1), f"NWS forecasts Ross gauge to {pk} ft")
-
-    # Bridge Street (downtown San Anselmo) - the gauge that floods first.
-    if bridge and bridge.get("stage_ft") is not None:
-        st, cats = bridge["stage_ft"], bridge.get("categories", {})
-        if cats.get("minor") and st >= cats["minor"]:
-            raise_to(3, f"Bridge Street gauge {st} ft, above minor flood stage")
-        elif cats.get("action") and st >= cats["action"]:
-            raise_to(2, f"Bridge Street gauge {st} ft, above action stage")
-        pk = bridge.get("forecast_peak_ft")
-        if pk and cats.get("action") and pk >= cats["action"]:
-            raise_to(max(level, 1), f"NWS forecasts Bridge Street to {pk} ft")
-
-    return ["quiet", "watch", "prepare", "act"][level], reasons
+    return TIER_ORDER[level], reasons
 
 
 def pushover(title, msg, priority=0):
@@ -516,11 +681,18 @@ def main():
     om, errors["open_meteo"] = safe(fetch_open_meteo)
     sump, errors["sump"] = safe(fetch_sump)
     bridge, errors["bridge_street"] = safe(fetch_bridge_street)
+    ar, errors["cw3e"] = safe(fetch_cw3e_ar)
+    cnrfc, errors["cnrfc"] = safe(fetch_cnrfc_qpf)
+    models, errors["model_qpf"] = safe(fetch_model_qpf)
     errors = {k: v for k, v in errors.items() if v}
 
     hist = read_history()
     derived = derive_from_history(hist, ambient, sump)
-    tier, reasons = evaluate(ambient, usgs, nwps, nws, om, sump, derived, bridge)
+    runs = (sump or {}).get("recent_runs") or []
+    tier, reasons = evaluate(ambient, usgs, nwps, nws, om, sump, derived, bridge,
+                             ar=ar, runs=runs)
+    pred = predict_bridge_ft(derived.get("rain_6h_in"), derived.get("api"),
+                             (om or {}).get("qpf_next_6h_in"))
 
     now = datetime.now(timezone.utc).replace(microsecond=0)
     row = {
@@ -540,6 +712,17 @@ def main():
         "qpf_24h_in": (om or {}).get("qpf_24h_in"),
         "qpf_72h_in": (om or {}).get("qpf_72h_in"),
         "tier": tier,
+        # Rival forecasts, logged every run so spring can rank them.
+        "qpf_nws_24h_in": _sum_nws_qpf((nws or {}).get("qpf_periods"), 24),
+        "qpf_nws_72h_in": _sum_nws_qpf((nws or {}).get("qpf_periods"), 72),
+        "qpf_cnrfc_6h_in": (cnrfc or {}).get("qpf_6h_in"),
+        "qpf_cnrfc_24h_in": (cnrfc or {}).get("qpf_24h_in"),
+        "qpf_ecmwf_24h_in": (models or {}).get("qpf_ecmwf_24h_in"),
+        "qpf_gfs_24h_in": (models or {}).get("qpf_gfs_24h_in"),
+        "qpf_hrrr_6h_in": (models or {}).get("qpf_hrrr_6h_in"),
+        "ar_category": (ar or {}).get("ar_category"),
+        "nws_flood_watch": int(any("flood watch" in (a.get("event") or "").lower()
+                                   for a in (nws or {}).get("alerts", []))),
     }
     append_history(row)
 
@@ -548,6 +731,13 @@ def main():
         "site": CFG["site_name"],
         "tier": tier, "reasons": reasons,
         "thresholds": TH,
+        "tiers": CFG["tiers"],
+        "creek_forecast": ({"point_ft": pred[0], "lo_ft": pred[1], "hi_ft": pred[2],
+                            "horizon_h": 6, "r2": CFG["creek_predictor"]["r2"]}
+                           if pred else None),
+        "ross_to_bridge": CFG["ross_to_bridge"],
+        "creek_predictor": CFG["creek_predictor"],
+        "cw3e": ar, "cnrfc": cnrfc, "model_qpf": models,
         "ambient": ambient, "usgs": usgs, "nwps": nwps, "nws": nws,
         "open_meteo": om, "sump": sump, "bridge_street": bridge, "derived": derived,
         "bridge_street_gauge_url": CFG["bridge_street_gauge_url"],
@@ -558,12 +748,17 @@ def main():
     # Alert only when the tier changes.
     state_p = DATA / "state.json"
     prev = json.loads(state_p.read_text()).get("tier") if state_p.exists() else "quiet"
-    order = ["quiet", "watch", "prepare", "act"]
+    order = TIER_ORDER
+    if tier not in order:
+        tier = "quiet"
+    if prev not in order:
+        prev = "quiet"
     if tier != prev:
         up = order.index(tier) > order.index(prev)
         pushover(f"Floodboard: {tier.upper()}",
                  ("; ".join(reasons) or "conditions eased"),
-                 priority=1 if tier == "act" else 0 if up else -1)
+                 priority=2 if tier == "emergency" else 1 if tier == "act"
+                 else 0 if up else -1)
     state_p.write_text(json.dumps({"tier": tier, "changed_utc": now.isoformat()}))
 
     print(f"{now.isoformat()} tier={tier} reasons={reasons} errors={errors}")

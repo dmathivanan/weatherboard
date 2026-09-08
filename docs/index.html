@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>52 Weatherboard — Dashboard</title>
-<link rel="stylesheet" href="assets/app.css?v=8">
+<link rel="stylesheet" href="assets/app.css?v=9">
 </head>
 <body>
 <header class="top"></header>
@@ -67,11 +67,22 @@
       </div>
       <div class="secondary" id="creeknote">–</div>
     </section>
+
+    <!-- Creek forecast -->
+    <section class="card">
+      <h2>Creek expected in 6 h <span class="sub" id="fcastsrc"></span></h2>
+      <div class="fcast">
+        <span class="pt" id="fcastpt">–<small>ft</small></span>
+        <span class="band" id="fcastband">–</span>
+      </div>
+      <div class="horizon" id="fcasthow">–</div>
+      <div class="secondary" id="rossmarker">–</div>
+    </section>
   </div>
 </main>
 
-<script src="assets/live.js?v=8"></script>
-<script src="assets/app.js?v=8"></script>
+<script src="assets/live.js?v=9"></script>
+<script src="assets/app.js?v=9"></script>
 <script>
 boot("dashboard", (latest, history) => {
   const a = latest.ambient || {}, b = latest.bridge_street || {}, n = latest.nwps || {}, u = latest.usgs || {}, s = latest.sump || {};
@@ -121,6 +132,36 @@ boot("dashboard", (latest, history) => {
   $("c1").innerHTML   = fmt(valueAgo(sa, 1)) + "<small>ft</small>";
   $("c6").innerHTML   = fmt(valueAgo(sa, 6)) + "<small>ft</small>";
   $("cmax").innerHTML = fmt(maxToday(sa) ?? b.stage_ft) + "<small>ft</small>";
+  // Creek forecast: Layer 3A predictor, with the Ross notify marker beside it.
+  const cf = latest.creek_forecast, rtb = latest.ross_to_bridge || {};
+  if (cf && cf.point_ft != null) {
+    $("fcastpt").innerHTML = fmt(cf.point_ft) + "<small>ft</small>";
+    $("fcastband").textContent = `95% band ${fmt(cf.lo_ft)} – ${fmt(cf.hi_ft)} ft`;
+    $("fcastsrc").textContent = `R² ${cf.r2}`;
+    $("fcasthow").textContent =
+      "From rain already fallen in the last 6 h plus rain still forecast, "
+      + "weighted by how wet the ground already is.";
+  } else {
+    $("fcastpt").innerHTML = "–<small>ft</small>";
+    $("fcastband").textContent = "";
+    $("fcasthow").textContent = "Needs 6 h of rain history and a forecast; "
+      + "fills in once the poller has both.";
+  }
+  // Ross marker: the Town's 6.5 ft notify line expressed on the gauge that is
+  // actually real-time. This mapping is inside its fitted range; the flood
+  // lines are not, so only this one is shown.
+  const rn = rtb.notify_line_ross_ft, rb = rtb.notify_line_band_ft || [];
+  const rossNow = n.latest_stage_ft ?? u.stage_ft;
+  if (rn != null) {
+    const away = rossNow != null ? (rn - rossNow) : null;
+    $("rossmarker").innerHTML =
+      `<span class="notifyline">Town notify line</span> = Ross <b>${fmt(rn,2)}</b> ft`
+      + (rb.length ? ` <span class="u">(${fmt(rb[0],2)}–${fmt(rb[1],2)})</span>` : "")
+      + (away != null
+          ? ` · now <b>${fmt(rossNow)}</b> ft, <b>${fmt(away)}</b> ft below`
+          : "");
+  }
+
   $("creeknote").innerHTML =
     `Ross Creek (downstream): <b>${fmt(n.latest_stage_ft ?? u.stage_ft)}</b> ft` +
     (u.flow_cfs != null ? ` · <b>${fmt(u.flow_cfs, u.flow_cfs < 10 ? 2 : 0)}</b> cfs` : "");
