@@ -2,6 +2,13 @@
 const TZ = "America/Los_Angeles";
 const SITE = { lat: 37.9745, lon: -122.5625, zip: "94960", name: "San Anselmo" };
 
+/* Optional proxy for the one feed that cannot be read from the browser: Ambient
+   needs an account key, and a public page cannot hold one. Leave it empty and
+   the weather card falls back to the committed file (as stale as the last poll);
+   point it at a proxy returning poller.py's ambient shape and it goes live too.
+   Every other feed is fetched directly by live.js and needs nothing here. */
+const AMBIENT_PROXY_URL = "";
+
 const PAGES = [
   { id: "dashboard", href: "index.html",   label: "Dashboard" },
   { id: "rainfall",  href: "rainfall.html", label: "Rainfall" },
@@ -27,6 +34,8 @@ function renderHeader(active) {
        <span class="brand">52 Weatherboard</span>
        <nav class="tabs">${PAGES.map(p =>
          `<a href="${p.href}"${p.id === active ? ' class="active"' : ''}>${p.label}</a>`).join("")}</nav>
+       <button class="refresh" id="refreshbtn"
+          title="Re-read the live gauges and forecast">Refresh</button>
        <span class="tierchip quiet" id="tierchip">–</span>
      </div>`;
 }
@@ -52,32 +61,102 @@ async function loadHistory() {
   }).filter(o => !isNaN(o.ts));
 }
 
-/* boot: render header, load data, run page callback, stamp time, handle errors.
-   Auto-refreshes the data every 5 min so the board stays live without a manual
-   reload; the poller itself commits fresh data every ~15 min. */
+/* boot / refresh.
+
+   Two layers, deliberately:
+     - the committed latest.json is the baseline. It carries what only the
+       archive can produce (history rollups, sump counters) and acts as the
+       fallback for anything the browser cannot reach.
+     - live.js fetches the gauges, alerts and forecast straight from the source
+       on every load and every Refresh, then the tier is recomputed from those
+       live values so the banner can never lag the numbers under it.
+
+   The poller keeps running on its own erratic schedule; nothing on screen waits
+   for it any more. */
 const REFRESH_MS = 5 * 60 * 1000;
+const STALE_MIN = 30;                 // committed-only data older than this is flagged
+let _latest = null, _history = [], _render = null, _liveAt = null, _liveErrs = {};
+
+/* Overlay live feeds on the committed baseline and re-derive the tier. Feeds
+   that failed simply keep their committed values, so a dead upstream degrades
+   one card instead of the page. */
+function merge(base, live) {
+  const out = Object.assign({}, base, live.data);
+  out.derived = base.derived;                 // history-only, never live
+  const t = evaluateTier(out);
+  out.tier = t.tier;
+  out.reasons = t.reasons;
+  return out;
+}
+
+function stamp(note) {
+  const el = $("updated"); if (!el || !_latest) return;
+  const bits = [];
+  const liveKeys = ["usgs", "nwps", "bridge_street", "nws", "open_meteo"]
+    .filter(k => !_liveErrs[k]).length;
+
+  if (_liveAt && liveKeys) {
+    bits.push("Live " + new Date(_liveAt).toLocaleString("en-US", clockOpts));
+    // The creek gauges report on change, so name the observation age rather than
+    // implying the fetch time is the reading time.
+    const obs = (_latest.bridge_street || {}).observed;
+    if (obs) {
+      const m = Math.round((Date.now() - Date.parse(obs)) / 60000);
+      bits.push("gauge reading " + (m < 60 ? m + " min" : (m / 60).toFixed(1) + " h") + " old");
+    }
+  }
+
+  // The weather card only lags when there is no Ambient proxy configured.
+  if (!AMBIENT_PROXY_URL || _liveErrs.ambient) {
+    const t = new Date(_latest.generated_utc);
+    const ageMin = Math.round((Date.now() - t.getTime()) / 60000);
+    const stale = ageMin >= STALE_MIN;
+    el.classList.toggle("stale", stale);
+    bits.push("station from last poll " +
+      (ageMin < 60 ? ageMin + " min" : (ageMin / 60).toFixed(1) + " h") + " ago");
+  } else {
+    el.classList.remove("stale");
+  }
+
+  const failed = Object.keys(_liveErrs);
+  if (failed.length) bits.push("feeds down: " + failed.join(", "));
+  if (note) bits.push(note);
+  el.textContent = bits.join(" · ");
+}
+
+async function paint() {
+  setTierChip(_latest.tier);
+  await _render(_latest, _history);
+  stamp();
+}
+
 async function boot(pageId, cb) {
   renderHeader(pageId);
-  async function refresh() {
+  _render = cb;
+  const btn = $("refreshbtn");
+  if (btn) btn.addEventListener("click", () => pull(true));
+
+  async function pull(manual) {
+    if (btn) { btn.disabled = true; btn.textContent = manual ? "Refreshing…" : "Refresh"; }
     try {
-      const latest = await loadLatest();
-      const history = await loadHistory().catch(() => []);
-      setTierChip(latest.tier);
-      if ($("updated")) {
-        const t = new Date(latest.generated_utc);
-        $("updated").textContent = "Updated " + t.toLocaleString("en-US", clockOpts) +
-          " · auto-refreshes every 5 min" +
-          (latest.errors && Object.keys(latest.errors).length
-            ? " · feeds down: " + Object.keys(latest.errors).join(", ") : "");
-      }
-      await cb(latest, history);
+      const base = await loadLatest();
+      _history = await loadHistory().catch(() => []);
+      const live = await fetchLiveFeeds(base);
+      _liveErrs = live.errors;
+      _liveAt = Object.keys(live.data).length ? live.at : null;
+      _latest = merge(base, live);
+      await paint();
     } catch (e) {
       if ($("updated")) $("updated").textContent = "Could not load data: " + e;
       console.error(e);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Refresh"; }
     }
   }
-  await refresh();
-  setInterval(refresh, REFRESH_MS);
+
+  await pull(false);
+  setInterval(() => pull(false), REFRESH_MS);
+  setInterval(() => stamp(), 60000);   // keep the stated ages honest between pulls
 }
 
 /* ---- generic time-series rollups ----

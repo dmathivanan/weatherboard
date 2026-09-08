@@ -38,6 +38,15 @@ nav.tabs a.active{background:var(--gold);color:var(--navy)}
 
 main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
 .updated{color:var(--mute);font-size:.85rem;margin:0 0 14px}
+.updated.stale{color:var(--amber);font-weight:500}
+
+/* header Refresh button — sits between the tabs and the tier chip */
+.refresh{font:inherit;font-size:.85rem;font-weight:600;color:var(--navy);background:var(--gold);
+  border:0;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap;
+  transition:background .15s,opacity .15s}
+.refresh:hover:not(:disabled){background:#ffc633}
+.refresh:disabled{opacity:.65;cursor:default}
+.refresh:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
 /* banner tier (dashboard) */
 .tier{color:#fff;padding:16px 18px;border-radius:14px;margin:0 0 20px}

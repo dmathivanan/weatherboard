@@ -1,0 +1,8 @@
+name = "weatherboard-ambient"
+main = "ambient.js"
+compatibility_date = "2025-09-01"
+
+# No bindings needed — the short response cache uses the built-in colo cache.
+# Secrets are set out of band, never in this file:
+#   npx wrangler secret put AMBIENT_APP_KEY
+#   npx wrangler secret put AMBIENT_API_KEY

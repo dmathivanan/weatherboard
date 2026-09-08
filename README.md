@@ -1,12 +1,37 @@
 # 52 Woodland flood board
 
-A cloud-only flood monitor: GitHub Actions polls every 15 minutes, commits the
-data to this repo, and GitHub Pages serves the dashboard. No hardware at home.
+A cloud-only flood monitor served by GitHub Pages. No hardware at home.
+
+Data arrives in two layers:
+
+- **Live** — the browser fetches the creek gauges, NWS alerts and the forecast
+  straight from the source on every load and every Refresh (`assets/live.js`),
+  and recomputes the tier from those values. Nothing on screen waits for a poll.
+- **Archive** — GitHub Actions runs `poller.py` and commits `docs/data/`. It
+  supplies what only history can produce (rain/sump rollups) and backstops any
+  live feed that fails.
+
+The split exists because `schedule:` in Actions is best-effort. The workflow asks
+for every 15 minutes; measured over 40 consecutive commits the median gap was
+**170 minutes** and not one gap was under 20. Every run succeeded — GitHub simply
+does not fire the cron most of the time. That cadence is fine for an archive and
+useless for a board you check during a storm, hence the live layer.
+
+Two caveats worth knowing:
+
+- **Ambient (DMATStation) is not live.** It needs an account key, which cannot
+  ship in a public page, so the weather card comes from the last commit. Set
+  `AMBIENT_PROXY_URL` in `assets/app.js` to a proxy returning `fetch_ambient()`'s
+  shape to make it live too.
+- **The creek gauges cap their own freshness.** They report on change, so in dry
+  weather the newest NWPS reading can be a couple of hours old. Polling harder
+  does not help; the header states the reading's real age.
 
 ## Dashboard pages
 
-`docs/` is a small multi-page site (shared `assets/app.css` + `assets/app.js`),
-all reading the same `data/latest.json` and `data/history.csv`:
+`docs/` is a small multi-page site (shared `assets/app.css`, `assets/live.js` and
+`assets/app.js`). Each page reads `data/latest.json` and `data/history.csv` as
+its baseline, then `live.js` overlays the feeds it can fetch directly:
 
 - **index.html** — Dashboard: current weather, rainfall rollups, sump activity,
   creek summary.
