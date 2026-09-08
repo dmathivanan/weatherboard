@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-07T22:42:26+00:00",
+ "generated_utc": "2026-09-08T00:42:01+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -14,28 +14,28 @@
   "antecedent_7d_in_wet": 3.0
  },
  "ambient": {
-  "observed_utc": "2026-09-07T22:42:00.000Z",
+  "observed_utc": "2026-09-08T00:41:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.914,
-  "temp_f": 90.9,
-  "feels_like_f": 87.94,
-  "dew_point_f": 50.17,
-  "humidity_pct": 25,
-  "wind_mph": 2.01,
-  "wind_gust_mph": 3.8,
-  "wind_dir_deg": 163,
-  "wind_max_daily_gust_mph": 7.16,
+  "baro_inhg": 29.893,
+  "temp_f": 84.7,
+  "feels_like_f": 83.67,
+  "dew_point_f": 56.25,
+  "humidity_pct": 38,
+  "wind_mph": 4.47,
+  "wind_gust_mph": 5.59,
+  "wind_dir_deg": 306,
+  "wind_max_daily_gust_mph": 7.38,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.16,
-  "observed": "2026-09-07T14:30:00.000-07:00",
-  "stage_ft": 4.22
+  "flow_cfs": 0.1,
+  "observed": "2026-09-07T16:30:00.000-07:00",
+  "stage_ft": 4.21
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -46,38 +46,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-06T19:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T20:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T20:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T20:30:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T20:45:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T21:00:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T21:15:00Z",
-    "stage": 4.23
-   },
-   {
-    "t": "2026-09-06T21:30:00Z",
-    "stage": 4.23
-   },
    {
     "t": "2026-09-06T21:45:00Z",
     "stage": 4.23
@@ -429,10 +397,42 @@
    {
     "t": "2026-09-07T21:30:00Z",
     "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T21:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T22:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T22:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T22:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T22:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T23:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-07T23:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-07T23:30:00Z",
+    "stage": 4.21
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.22,
+  "latest_stage_ft": 4.21,
   "forecast_peak_ft": null
  },
  "nws": {
@@ -829,7 +829,7 @@
    {
     "t": "2026-09-08T20:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-08T21:00",
@@ -864,12 +864,12 @@
    {
     "t": "2026-09-09T03:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-09T04:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-09T05:00",
