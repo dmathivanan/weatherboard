@@ -1,41 +1,110 @@
 {
- "generated_utc": "2026-09-08T17:59:39+00:00",
+ "generated_utc": "2026-09-08T21:03:07+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
  "thresholds": {
-  "_note": "Starter values only. Recalibrate after each storm from docs/data/history.csv.",
+  "_note": "SUPERSEDED by the 'tiers' block below, kept only so old history.csv rows stay interpretable. Replayed against winter 2025-26 these rules fired nothing at all on 8 of 15 storms, including the largest (5.54 in, Bridge St 7.38 ft). See analysis/report.md.",
+  "_status": "retired 2026-09-08",
   "watch_qpf_72h_in": 3.0,
   "prepare_qpf_24h_in": 2.0,
   "act_rain_rate_inhr": 0.75,
   "act_rain_1h_in": 0.6,
   "sump_prepare_duty_pct": 50,
-  "sump_act_duty_pct": 80,
-  "antecedent_7d_in_wet": 3.0
+  "sump_act_duty_pct": 80
+ },
+ "tiers": {
+  "_note": "Rebuilt 2026-09-08 from the winter 2025-26 replay. Ordered quiet < watch < prepare < act < emergency; the highest satisfied rule wins. 'ross_ft' is USGS 11460000 stage, 'bridge_ft' is San Anselmo at Bridge St, 'run_s' is a single primary-pump run length. QPF terms are already bias-corrected by qpf_bias.",
+  "watch": {
+   "cw3e_ar_category_min": 1,
+   "nws_flood_watch": true,
+   "qpf_72h_corrected_in": 3.0
+  },
+  "prepare": {
+   "qpf_24h_corrected_in": 2.0,
+   "bridge_ft_with_rain": {
+    "bridge_ft": 3.0,
+    "qpf_24h_corrected_in": 1.0
+   },
+   "ross_ft": 9.0,
+   "sump_run_s": 35
+  },
+  "act": {
+   "ross_ft": 11.0,
+   "predicted_bridge_ft": 6.5,
+   "sump_run_s": 93,
+   "sump_increasing_runs": 3,
+   "sump_increasing_min_final_s": 25,
+   "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm."
+  },
+  "emergency": {
+   "backup_pump_start": true,
+   "primary_run_no_stop_s": 180,
+   "ross_ft": 15.0
+  }
+ },
+ "creek_forecast": {
+  "point_ft": 0.87,
+  "lo_ft": -0.21,
+  "hi_ft": 1.95,
+  "horizon_h": 6,
+  "r2": 0.838
+ },
+ "ross_to_bridge": {
+  "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
+  "slope": 0.767,
+  "intercept": -1.9568,
+  "fitted_ross_range_ft": [
+   4.54,
+   12.12
+  ],
+  "notify_line_ross_ft": 11.03,
+  "notify_line_band_ft": [
+   10.74,
+   11.32
+  ],
+  "flood_horn_ross_ft": 19.5,
+  "flood_horn_extrapolation": "1.61x beyond fitted range - not trustworthy"
+ },
+ "creek_predictor": {
+  "_note": "Layer 3A, Bridge Street stage on the rising limb only (n=349 observed readings). Used by the Act tier: feed r6h_in = observed last-6h rain + bias-corrected next-6h QPF, and api = current antecedent index. Season-to-date was dropped - it added +0.005 R2 across every layer tested.",
+  "intercept": 0.8725,
+  "coef_r6h_in": 2.0903,
+  "coef_api": 0.2895,
+  "r2": 0.838,
+  "residual_sd_ft": 0.5498,
+  "band_95_ft": 1.078
+ },
+ "cw3e": null,
+ "cnrfc": null,
+ "model_qpf": {
+  "qpf_ecmwf_24h_in": 0,
+  "qpf_gfs_24h_in": 0,
+  "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-08T17:59:00.000Z",
+  "observed_utc": "2026-09-08T21:02:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.994,
-  "temp_f": 86,
-  "feels_like_f": 84.34,
-  "dew_point_f": 54.33,
-  "humidity_pct": 34,
-  "wind_mph": 2.91,
-  "wind_gust_mph": 3.36,
-  "wind_dir_deg": 163,
-  "wind_max_daily_gust_mph": 4.7,
+  "baro_inhg": 29.958,
+  "temp_f": 94.8,
+  "feels_like_f": 92.21,
+  "dew_point_f": 52.33,
+  "humidity_pct": 24,
+  "wind_mph": 2.24,
+  "wind_gust_mph": 3.13,
+  "wind_dir_deg": 177,
+  "wind_max_daily_gust_mph": 8.72,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.52,
-  "observed": "2026-09-08T10:30:00.000-07:00",
-  "stage_ft": 4.26
+  "flow_cfs": 0.23,
+  "observed": "2026-09-08T13:30:00.000-07:00",
+  "stage_ft": 4.23
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -46,54 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-07T16:45:00Z",
-    "stage": 4.27
-   },
-   {
-    "t": "2026-09-07T17:00:00Z",
-    "stage": 4.27
-   },
-   {
-    "t": "2026-09-07T17:15:00Z",
-    "stage": 4.26
-   },
-   {
-    "t": "2026-09-07T17:30:00Z",
-    "stage": 4.26
-   },
-   {
-    "t": "2026-09-07T17:45:00Z",
-    "stage": 4.26
-   },
-   {
-    "t": "2026-09-07T18:00:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-07T18:15:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-07T18:30:00Z",
-    "stage": 4.25
-   },
-   {
-    "t": "2026-09-07T18:45:00Z",
-    "stage": 4.24
-   },
-   {
-    "t": "2026-09-07T19:00:00Z",
-    "stage": 4.24
-   },
-   {
-    "t": "2026-09-07T19:15:00Z",
-    "stage": 4.24
-   },
-   {
-    "t": "2026-09-07T19:30:00Z",
-    "stage": 4.23
-   },
    {
     "t": "2026-09-07T19:45:00Z",
     "stage": 4.23
@@ -429,22 +450,65 @@
    {
     "t": "2026-09-08T16:30:00Z",
     "stage": 4.27
+   },
+   {
+    "t": "2026-09-08T16:45:00Z",
+    "stage": 4.27
+   },
+   {
+    "t": "2026-09-08T17:00:00Z",
+    "stage": 4.26
+   },
+   {
+    "t": "2026-09-08T17:15:00Z",
+    "stage": 4.26
+   },
+   {
+    "t": "2026-09-08T17:30:00Z",
+    "stage": 4.26
+   },
+   {
+    "t": "2026-09-08T17:45:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-08T18:00:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-08T18:15:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-08T18:30:00Z",
+    "stage": 4.25
+   },
+   {
+    "t": "2026-09-08T18:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-08T19:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-08T19:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-09-08T19:30:00Z",
+    "stage": 4.24
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.27,
+  "latest_stage_ft": 4.24,
   "forecast_peak_ft": null
  },
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-09-08T09:00:00+00:00",
-    "dur": "PT3H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-09-08T12:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-09-08T13:00:00+00:00",
+    "dur": "PT5H",
     "in": 0.0
    },
    {
@@ -600,16 +664,16 @@
   ],
   "alerts": [
    {
+    "event": "Heat Advisory",
+    "severity": "Moderate",
+    "headline": "Heat Advisory issued September 8 at 1:15PM PDT until September 10 at 10:00PM PDT by NWS San Francisco CA",
+    "ends": "2026-09-10T22:00:00-07:00"
+   },
+   {
     "event": "Coastal Flood Advisory",
     "severity": "Minor",
     "headline": "Coastal Flood Advisory issued September 8 at 9:03AM PDT until September 10 at 1:00AM PDT by NWS San Francisco CA",
     "ends": "2026-09-10T01:00:00-07:00"
-   },
-   {
-    "event": "Heat Advisory",
-    "severity": "Moderate",
-    "headline": "Heat Advisory issued September 7 at 10:27AM PDT until September 10 at 10:00PM PDT by NWS San Francisco CA",
-    "ends": "2026-09-10T22:00:00-07:00"
    }
   ],
   "office": "MTR",
@@ -750,17 +814,17 @@
    {
     "t": "2026-09-09T02:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-09T03:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-09T04:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-09T05:00",
@@ -855,17 +919,17 @@
    {
     "t": "2026-09-09T23:00",
     "in": 0,
-    "prob": 0
+    "prob": 2
    },
    {
     "t": "2026-09-10T00:00",
     "in": 0,
-    "prob": 0
+    "prob": 2
    },
    {
     "t": "2026-09-10T01:00",
     "in": 0,
-    "prob": 0
+    "prob": 2
    },
    {
     "t": "2026-09-10T02:00",
@@ -890,62 +954,62 @@
    {
     "t": "2026-09-10T06:00",
     "in": 0,
-    "prob": 3
+    "prob": 2
    },
    {
     "t": "2026-09-10T07:00",
     "in": 0,
-    "prob": 3
+    "prob": 2
    },
    {
     "t": "2026-09-10T08:00",
     "in": 0,
-    "prob": 3
+    "prob": 2
    },
    {
     "t": "2026-09-10T09:00",
     "in": 0,
-    "prob": 3
+    "prob": 2
    },
    {
     "t": "2026-09-10T10:00",
     "in": 0,
-    "prob": 3
+    "prob": 2
    },
    {
     "t": "2026-09-10T11:00",
-    "in": 0.008,
-    "prob": 3
+    "in": 0.006,
+    "prob": 2
    },
    {
     "t": "2026-09-10T12:00",
     "in": 0.004,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T13:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T14:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T15:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T16:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T17:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-10T18:00",
@@ -1458,6 +1522,7 @@
     "prob": 0
    }
   ],
+  "qpf_next_6h_in": 0,
   "qpf_24h_in": 0,
   "qpf_72h_in": 0.01,
   "qpf_7d_in": 0.01,
@@ -1467,8 +1532,8 @@
  "bridge_street": {
   "source": "nwps:SBSC1",
   "name": "San Anselmo Creek at Bridge Street",
-  "stage_ft": 1.26,
-  "observed": "2026-09-08T13:45:00Z",
+  "stage_ft": 1.2,
+  "observed": "2026-09-08T19:50:00Z",
   "categories": {
    "major": 17.8,
    "moderate": 16.3,
@@ -1477,14 +1542,6 @@
   },
   "forecast_peak_ft": null,
   "series": [
-   {
-    "t": "2026-08-09T19:32:00Z",
-    "stage": 1.22
-   },
-   {
-    "t": "2026-08-09T19:45:00Z",
-    "stage": 1.22
-   },
    {
     "t": "2026-08-10T07:32:00Z",
     "stage": 1.21
@@ -2016,6 +2073,14 @@
    {
     "t": "2026-09-08T13:45:00Z",
     "stage": 1.26
+   },
+   {
+    "t": "2026-09-08T19:32:00Z",
+    "stage": 1.2
+   },
+   {
+    "t": "2026-09-08T19:50:00Z",
+    "stage": 1.2
    }
   ],
   "forecast": [],
@@ -2054,11 +2119,15 @@
  },
  "derived": {
   "rain_1h_in": null,
+  "rain_6h_in": 0.0,
   "rain_7d_in": 0,
+  "api": 0.0,
   "sump_duty_pct": null
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
-  "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)"
+  "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
+  "cw3e": "RuntimeError: cw3e 404",
+  "cnrfc": "RuntimeError: cnrfc 401"
  }
 }
