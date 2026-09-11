@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-10T23:24:17+00:00",
+ "generated_utc": "2026-09-11T01:20:17+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,29 +83,25 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-10T23:23:00.000Z",
+  "observed_utc": "2026-09-11T01:19:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.884,
-  "temp_f": 100.6,
-  "feels_like_f": 96.51,
-  "dew_point_f": 44.47,
-  "humidity_pct": 15,
-  "wind_mph": 1.79,
-  "wind_gust_mph": 5.37,
-  "wind_dir_deg": 315,
+  "baro_inhg": 29.881,
+  "temp_f": 84.7,
+  "feels_like_f": 82.71,
+  "dew_point_f": 50.69,
+  "humidity_pct": 31,
+  "wind_mph": 2.24,
+  "wind_gust_mph": 2.91,
+  "wind_dir_deg": 273,
   "wind_max_daily_gust_mph": 10.96,
   "device": "DMATStation"
  },
- "usgs": {
-  "flow_cfs": 0.01,
-  "observed": "2026-09-10T15:30:00.000-07:00",
-  "stage_ft": 4.17
- },
+ "usgs": null,
  "nwps": {
   "name": "Corte Madera Creek at Ross",
   "categories": {
@@ -115,38 +111,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-09T22:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-09T23:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-09T23:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-09T23:30:00Z",
-    "stage": 4.18
-   },
-   {
-    "t": "2026-09-09T23:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-10T00:00:00Z",
-    "stage": 4.18
-   },
-   {
-    "t": "2026-09-10T00:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-10T00:30:00Z",
-    "stage": 4.18
-   },
    {
     "t": "2026-09-10T00:45:00Z",
     "stage": 4.18
@@ -498,6 +462,38 @@
    {
     "t": "2026-09-10T22:30:00Z",
     "stage": 4.17
+   },
+   {
+    "t": "2026-09-10T22:45:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-10T23:00:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-10T23:15:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-10T23:30:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-10T23:45:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-11T00:00:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-11T00:15:00Z",
+    "stage": 4.17
+   },
+   {
+    "t": "2026-09-11T00:30:00Z",
+    "stage": 4.17
    }
   ],
   "forecast": [],
@@ -507,8 +503,8 @@
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-09-10T14:00:00+00:00",
-    "dur": "PT4H",
+    "t": "2026-09-10T17:00:00+00:00",
+    "dur": "PT1H",
     "in": 0.0
    },
    {
@@ -666,7 +662,7 @@
    {
     "event": "Heat Advisory",
     "severity": "Moderate",
-    "headline": "Heat Advisory issued September 9 at 3:14AM PDT until September 10 at 10:00PM PDT by NWS San Francisco CA",
+    "headline": "Heat Advisory issued September 10 at 4:47PM PDT until September 10 at 10:00PM PDT by NWS San Francisco CA",
     "ends": "2026-09-10T22:00:00-07:00"
    }
   ],
@@ -2124,6 +2120,7 @@
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
+  "usgs": "HTTPError: 503 Server Error:  for url: https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11460000&parameterCd=00065%2C00060&siteStatus=all",
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
   "cw3e": "RuntimeError: cw3e 404",
   "cnrfc": "RuntimeError: cnrfc 401"
