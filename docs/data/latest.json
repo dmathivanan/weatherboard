@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-17T21:46:20+00:00",
+ "generated_utc": "2026-09-17T23:55:03+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,27 +83,27 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-17T21:45:00.000Z",
+  "observed_utc": "2026-09-17T23:54:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 30.1,
-  "temp_f": 72,
-  "feels_like_f": 71.58,
-  "dew_point_f": 55.92,
-  "humidity_pct": 57,
-  "wind_mph": 0,
-  "wind_gust_mph": 3.8,
-  "wind_dir_deg": 122,
-  "wind_max_daily_gust_mph": 6.04,
+  "baro_inhg": 30.088,
+  "temp_f": 77,
+  "feels_like_f": 76.8,
+  "dew_point_f": 57.47,
+  "humidity_pct": 51,
+  "wind_mph": 5.14,
+  "wind_gust_mph": 5.14,
+  "wind_dir_deg": 146,
+  "wind_max_daily_gust_mph": 10.51,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.05,
-  "observed": "2026-09-17T14:30:00.000-07:00",
+  "observed": "2026-09-17T16:30:00.000-07:00",
   "stage_ft": 4.2
  },
  "nwps": {
@@ -115,38 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-16T19:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T20:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T20:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T20:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T20:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T21:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T21:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-16T21:30:00Z",
-    "stage": 4.19
-   },
    {
     "t": "2026-09-16T21:45:00Z",
     "stage": 4.19
@@ -497,6 +465,38 @@
    },
    {
     "t": "2026-09-17T20:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T20:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T21:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T21:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T21:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T21:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T22:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T22:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-17T22:30:00Z",
     "stage": 4.2
    }
   ],
