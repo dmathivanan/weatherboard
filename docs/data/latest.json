@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-18T19:36:10+00:00",
+ "generated_utc": "2026-09-18T21:52:40+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,28 +83,28 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-18T19:35:00.000Z",
+  "observed_utc": "2026-09-18T21:52:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 30.115,
-  "temp_f": 79.5,
-  "feels_like_f": 79.64,
-  "dew_point_f": 60.85,
-  "humidity_pct": 53,
-  "wind_mph": 0,
-  "wind_gust_mph": 3.13,
-  "wind_dir_deg": 187,
+  "baro_inhg": 30.053,
+  "temp_f": 85.8,
+  "feels_like_f": 86.31,
+  "dew_point_f": 61.97,
+  "humidity_pct": 45,
+  "wind_mph": 1.57,
+  "wind_gust_mph": 2.01,
+  "wind_dir_deg": 175,
   "wind_max_daily_gust_mph": 7.16,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.05,
-  "observed": "2026-09-18T11:30:00.000-07:00",
-  "stage_ft": 4.2
+  "flow_cfs": 0.23,
+  "observed": "2026-09-18T14:30:00.000-07:00",
+  "stage_ft": 4.23
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -115,38 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-17T17:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T18:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T18:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T18:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T18:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T19:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T19:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T19:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-09-17T19:45:00Z",
     "stage": 4.2
@@ -498,17 +466,49 @@
    {
     "t": "2026-09-18T18:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T18:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T19:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T19:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T19:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T19:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T20:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-18T20:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-18T20:30:00Z",
+    "stage": 4.22
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.2,
+  "latest_stage_ft": 4.22,
   "forecast_peak_ft": null
  },
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-09-18T12:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-09-18T14:00:00+00:00",
+    "dur": "PT4H",
     "in": 0.0
    },
    {
@@ -1520,7 +1520,7 @@
   "source": "nwps:SBSC1",
   "name": "San Anselmo Creek at Bridge Street",
   "stage_ft": 1.21,
-  "observed": "2026-09-18T07:50:00Z",
+  "observed": "2026-09-18T19:50:00Z",
   "categories": {
    "major": 17.8,
    "moderate": 16.3,
@@ -1529,10 +1529,6 @@
   },
   "forecast_peak_ft": null,
   "series": [
-   {
-    "t": "2026-08-19T19:45:00Z",
-    "stage": 1.2
-   },
    {
     "t": "2026-08-20T07:32:00Z",
     "stage": 1.2
@@ -2067,6 +2063,14 @@
    },
    {
     "t": "2026-09-18T07:50:00Z",
+    "stage": 1.21
+   },
+   {
+    "t": "2026-09-18T19:32:00Z",
+    "stage": 1.21
+   },
+   {
+    "t": "2026-09-18T19:50:00Z",
     "stage": 1.21
    }
   ],
