@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-18T21:52:40+00:00",
+ "generated_utc": "2026-09-18T23:53:43+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,28 +83,28 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-18T21:52:00.000Z",
+  "observed_utc": "2026-09-18T23:53:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 30.053,
-  "temp_f": 85.8,
-  "feels_like_f": 86.31,
-  "dew_point_f": 61.97,
-  "humidity_pct": 45,
-  "wind_mph": 1.57,
-  "wind_gust_mph": 2.01,
-  "wind_dir_deg": 175,
-  "wind_max_daily_gust_mph": 7.16,
+  "baro_inhg": 30.023,
+  "temp_f": 82,
+  "feels_like_f": 81.94,
+  "dew_point_f": 57.91,
+  "humidity_pct": 44,
+  "wind_mph": 4.25,
+  "wind_gust_mph": 4.92,
+  "wind_dir_deg": 316,
+  "wind_max_daily_gust_mph": 10.07,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.23,
-  "observed": "2026-09-18T14:30:00.000-07:00",
-  "stage_ft": 4.23
+  "flow_cfs": 0.11,
+  "observed": "2026-09-18T16:30:00.000-07:00",
+  "stage_ft": 4.21
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -115,38 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-17T19:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T20:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T20:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T20:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T20:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T21:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T21:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-17T21:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-09-17T21:45:00Z",
     "stage": 4.2
@@ -497,6 +465,38 @@
    },
    {
     "t": "2026-09-18T20:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-18T20:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-18T21:00:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-09-18T21:15:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-09-18T21:30:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-09-18T21:45:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-09-18T22:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-18T22:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-09-18T22:30:00Z",
     "stage": 4.22
    }
   ],
