@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-21T21:04:26+00:00",
+ "generated_utc": "2026-09-22T00:07:09+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,25 +83,29 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-21T21:04:00.000Z",
+  "observed_utc": "2026-09-22T00:06:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.911,
-  "temp_f": 73.6,
-  "feels_like_f": 73.34,
-  "dew_point_f": 57.41,
-  "humidity_pct": 57,
-  "wind_mph": 1.57,
+  "baro_inhg": 29.902,
+  "temp_f": 70.5,
+  "feels_like_f": 69.98,
+  "dew_point_f": 55,
+  "humidity_pct": 58,
+  "wind_mph": 2.46,
   "wind_gust_mph": 4.03,
-  "wind_dir_deg": 177,
-  "wind_max_daily_gust_mph": 9.17,
+  "wind_dir_deg": 148,
+  "wind_max_daily_gust_mph": 10.29,
   "device": "DMATStation"
  },
- "usgs": null,
+ "usgs": {
+  "flow_cfs": 0.06,
+  "observed": "2026-09-21T16:30:00.000-07:00",
+  "stage_ft": 4.2
+ },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
   "categories": {
@@ -111,38 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-20T20:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T21:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T21:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T21:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T21:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T22:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-20T22:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-20T22:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-09-20T22:45:00Z",
     "stage": 4.2
@@ -494,6 +466,38 @@
    {
     "t": "2026-09-21T20:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T20:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T21:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T21:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T21:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T21:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T22:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T22:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-21T22:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -747,27 +751,27 @@
    {
     "t": "2026-09-21T16:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T17:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T18:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T19:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T20:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T21:00",
@@ -777,7 +781,7 @@
    {
     "t": "2026-09-21T22:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-09-21T23:00",
@@ -817,7 +821,7 @@
    {
     "t": "2026-09-22T06:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-22T07:00",
@@ -2137,7 +2141,6 @@
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
-  "usgs": "HTTPError: 503 Server Error:  for url: https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11460000&parameterCd=00065%2C00060&siteStatus=all",
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
   "cw3e": "RuntimeError: cw3e 404",
   "cnrfc": "RuntimeError: cnrfc 401"
