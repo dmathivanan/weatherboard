@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-24T23:28:14+00:00",
+ "generated_utc": "2026-09-25T01:49:40+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -78,32 +78,35 @@
  "cw3e": null,
  "cnrfc": null,
  "model_qpf": {
-  "qpf_ecmwf_24h_in": 0,
+  "qpf_ecmwf_24h_in": null,
+  "errors": {
+   "ecmwf": "ReadTimeout: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=25)"
+  },
   "qpf_gfs_24h_in": 0,
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-24T23:27:00.000Z",
+  "observed_utc": "2026-09-25T01:48:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.849,
-  "temp_f": 83.8,
-  "feels_like_f": 81.84,
-  "dew_point_f": 49.03,
-  "humidity_pct": 30,
-  "wind_mph": 3.13,
-  "wind_gust_mph": 5.59,
-  "wind_dir_deg": 272,
-  "wind_max_daily_gust_mph": 12.53,
+  "baro_inhg": 29.876,
+  "temp_f": 72.3,
+  "feels_like_f": 71.16,
+  "dew_point_f": 47.27,
+  "humidity_pct": 41,
+  "wind_mph": 1.12,
+  "wind_gust_mph": 4.7,
+  "wind_dir_deg": 13,
+  "wind_max_daily_gust_mph": 12.75,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.06,
-  "observed": "2026-09-24T15:30:00.000-07:00",
+  "observed": "2026-09-24T18:30:00.000-07:00",
   "stage_ft": 4.2
  },
  "nwps": {
@@ -115,38 +118,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-23T22:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-09-23T23:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-09-23T23:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-09-23T23:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-09-23T23:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-24T00:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-24T00:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-24T00:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-09-24T00:45:00Z",
     "stage": 4.2
@@ -498,6 +469,38 @@
    {
     "t": "2026-09-24T22:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-09-24T22:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-24T23:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-24T23:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-24T23:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-24T23:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-25T00:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-25T00:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-25T00:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -826,7 +829,7 @@
    {
     "t": "2026-09-25T07:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-25T08:00",
@@ -836,7 +839,7 @@
    {
     "t": "2026-09-25T09:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-09-25T10:00",
@@ -2142,7 +2145,7 @@
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
-  "cw3e": "RuntimeError: cw3e 404",
+  "cw3e": "ConnectTimeout: HTTPSConnectionPool(host='cw3e.ucsd.edu', port=443): Max retries exceeded with url: /wp-content/uploads/AR_Scale/ar_scale_summary.json (Caused by ConnectTimeoutError(<HTTPSConnection(h",
   "cnrfc": "RuntimeError: cnrfc 401"
  }
 }
