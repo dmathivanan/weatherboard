@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-27T23:03:30+00:00",
+ "generated_utc": "2026-09-28T01:39:27+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -80,33 +80,30 @@
  "model_qpf": {
   "qpf_ecmwf_24h_in": 0,
   "qpf_gfs_24h_in": 0,
-  "qpf_hrrr_6h_in": null,
-  "errors": {
-   "hrrr": "ReadTimeout: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=25)"
-  }
+  "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-09-27T23:02:00.000Z",
+  "observed_utc": "2026-09-28T01:39:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0.14,
-  "baro_inhg": 29.867,
-  "temp_f": 68.7,
-  "feels_like_f": 68,
-  "dew_point_f": 53.32,
-  "humidity_pct": 58,
-  "wind_mph": 1.79,
-  "wind_gust_mph": 4.92,
-  "wind_dir_deg": 276,
+  "baro_inhg": 29.878,
+  "temp_f": 59.9,
+  "feels_like_f": 59.9,
+  "dew_point_f": 51.22,
+  "humidity_pct": 73,
+  "wind_mph": 0,
+  "wind_gust_mph": 3.8,
+  "wind_dir_deg": 273,
   "wind_max_daily_gust_mph": 11.86,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.11,
-  "observed": "2026-09-27T15:30:00.000-07:00",
+  "observed": "2026-09-27T17:30:00.000-07:00",
   "stage_ft": 4.21
  },
  "nwps": {
@@ -118,54 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-26T21:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T22:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T22:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T22:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T22:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T23:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T23:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T23:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-26T23:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-27T00:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-27T00:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-27T00:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-09-27T00:45:00Z",
     "stage": 4.2
@@ -501,10 +450,58 @@
    {
     "t": "2026-09-27T21:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-09-27T21:45:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T22:00:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T22:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T22:30:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T22:45:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T23:00:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T23:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-27T23:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-09-27T23:45:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-28T00:00:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-28T00:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-09-28T00:30:00Z",
+    "stage": 4.21
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.2,
+  "latest_stage_ft": 4.21,
   "forecast_peak_ft": null
  },
  "nws": {
