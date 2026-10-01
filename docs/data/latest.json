@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-01T17:22:28+00:00",
+ "generated_utc": "2026-10-01T21:55:14+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -43,7 +43,13 @@
    "ross_ft": 15.0
   }
  },
- "creek_forecast": null,
+ "creek_forecast": {
+  "point_ft": 0.87,
+  "lo_ft": -0.21,
+  "hi_ft": 1.95,
+  "horizon_h": 6,
+  "r2": 0.838
+ },
  "ross_to_bridge": {
   "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
   "slope": 0.767,
@@ -77,27 +83,27 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-01T17:21:00.000Z",
+  "observed_utc": "2026-10-01T21:54:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.89,
-  "temp_f": 72.5,
-  "feels_like_f": 72.18,
-  "dew_point_f": 56.87,
-  "humidity_pct": 58,
-  "wind_mph": 0,
-  "wind_gust_mph": 1.12,
-  "wind_dir_deg": 166,
-  "wind_max_daily_gust_mph": 4.03,
+  "baro_inhg": 29.813,
+  "temp_f": 89.2,
+  "feels_like_f": 88.94,
+  "dew_point_f": 60.23,
+  "humidity_pct": 38,
+  "wind_mph": 1.57,
+  "wind_gust_mph": 4.7,
+  "wind_dir_deg": 183,
+  "wind_max_daily_gust_mph": 5.37,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.06,
-  "observed": "2026-10-01T09:30:00.000-07:00",
+  "observed": "2026-10-01T14:30:00.000-07:00",
   "stage_ft": 4.2
  },
  "nwps": {
@@ -109,70 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-09-30T15:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T16:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T16:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T16:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T16:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T17:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T17:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T17:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T17:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T18:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T18:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T18:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-09-30T18:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-30T19:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-30T19:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-09-30T19:30:00Z",
-    "stage": 4.19
-   },
    {
     "t": "2026-09-30T19:45:00Z",
     "stage": 4.19
@@ -492,6 +434,70 @@
    {
     "t": "2026-10-01T16:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T16:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T17:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T17:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T17:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T17:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T18:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T18:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T18:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T18:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T19:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T19:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T19:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T19:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T20:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T20:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-01T20:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -501,13 +507,8 @@
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-10-01T11:00:00+00:00",
-    "dur": "PT1H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-10-01T12:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-10-01T14:00:00+00:00",
+    "dur": "PT4H",
     "in": 0.0
    },
    {
@@ -665,8 +666,8 @@
    {
     "event": "Coastal Flood Advisory",
     "severity": "Minor",
-    "headline": "Coastal Flood Advisory issued September 30 at 3:46PM PDT until October 1 at 5:00PM PDT by NWS San Francisco CA",
-    "ends": "2026-10-01T17:00:00-07:00"
+    "headline": "Coastal Flood Advisory issued October 1 at 12:20PM PDT until October 2 at 6:00PM PDT by NWS San Francisco CA",
+    "ends": "2026-10-02T18:00:00-07:00"
    }
   ],
   "office": "MTR",
@@ -1097,32 +1098,32 @@
    {
     "t": "2026-10-04T12:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T13:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T14:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T15:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T16:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T17:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-04T18:00",
@@ -1525,8 +1526,8 @@
  "bridge_street": {
   "source": "nwps:SBSC1",
   "name": "San Anselmo Creek at Bridge Street",
-  "stage_ft": 1.21,
-  "observed": "2026-10-01T07:50:00Z",
+  "stage_ft": 1.22,
+  "observed": "2026-10-01T19:50:00Z",
   "categories": {
    "major": 17.8,
    "moderate": 16.3,
@@ -1535,10 +1536,6 @@
   },
   "forecast_peak_ft": null,
   "series": [
-   {
-    "t": "2026-09-01T19:50:00Z",
-    "stage": 1.23
-   },
    {
     "t": "2026-09-02T07:32:00Z",
     "stage": 1.23
@@ -2102,6 +2099,14 @@
    {
     "t": "2026-10-01T07:50:00Z",
     "stage": 1.21
+   },
+   {
+    "t": "2026-10-01T19:32:00Z",
+    "stage": 1.22
+   },
+   {
+    "t": "2026-10-01T19:50:00Z",
+    "stage": 1.22
    }
   ],
   "forecast": [],
@@ -2140,7 +2145,7 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_6h_in": null,
+  "rain_6h_in": 0.0,
   "rain_7d_in": 0,
   "api": 0.0,
   "sump_duty_pct": null
