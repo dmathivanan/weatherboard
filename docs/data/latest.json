@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-02T23:08:47+00:00",
+ "generated_utc": "2026-10-03T01:56:44+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,27 +83,27 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-02T23:07:00.000Z",
+  "observed_utc": "2026-10-03T01:56:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.855,
-  "temp_f": 92.5,
-  "feels_like_f": 91.6,
-  "dew_point_f": 58.3,
-  "humidity_pct": 32,
-  "wind_mph": 1.34,
+  "baro_inhg": 29.846,
+  "temp_f": 76.3,
+  "feels_like_f": 76.36,
+  "dew_point_f": 60.42,
+  "humidity_pct": 58,
+  "wind_mph": 1.12,
   "wind_gust_mph": 2.24,
-  "wind_dir_deg": 160,
+  "wind_dir_deg": 262,
   "wind_max_daily_gust_mph": 5.37,
   "device": "DMATStation"
  },
  "usgs": {
   "flow_cfs": 0.06,
-  "observed": "2026-10-02T15:30:00.000-07:00",
+  "observed": "2026-10-02T18:30:00.000-07:00",
   "stage_ft": 4.2
  },
  "nwps": {
@@ -115,54 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-01T21:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T22:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T22:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T22:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T22:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T23:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T23:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T23:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-01T23:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T00:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T00:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T00:30:00Z",
-    "stage": 4.2
-   },
    {
     "t": "2026-10-02T00:45:00Z",
     "stage": 4.2
@@ -498,6 +450,54 @@
    {
     "t": "2026-10-02T21:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T21:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T22:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T22:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T22:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T22:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T23:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T23:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T23:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-02T23:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T00:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T00:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T00:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -668,12 +668,6 @@
     "severity": "Moderate",
     "headline": "Heat Advisory issued October 2 at 11:16AM PDT until October 5 at 10:00PM PDT by NWS San Francisco CA",
     "ends": "2026-10-05T22:00:00-07:00"
-   },
-   {
-    "event": "Coastal Flood Advisory",
-    "severity": "Minor",
-    "headline": "Coastal Flood Advisory issued October 1 at 7:39PM PDT until October 2 at 6:00PM PDT by NWS San Francisco CA",
-    "ends": "2026-10-02T18:00:00-07:00"
    }
   ],
   "office": "MTR",
@@ -949,7 +943,7 @@
    {
     "t": "2026-10-04T05:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T06:00",
