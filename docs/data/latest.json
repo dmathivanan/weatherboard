@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-03T17:18:11+00:00",
+ "generated_utc": "2026-10-03T20:04:38+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,29 +83,25 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-03T17:17:00.000Z",
+  "observed_utc": "2026-10-03T20:03:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.908,
-  "temp_f": 87.8,
-  "feels_like_f": 86.91,
-  "dew_point_f": 58.25,
-  "humidity_pct": 37,
-  "wind_mph": 0,
-  "wind_gust_mph": 2.01,
-  "wind_dir_deg": 241,
-  "wind_max_daily_gust_mph": 2.24,
+  "baro_inhg": 29.87,
+  "temp_f": 99,
+  "feels_like_f": 98.61,
+  "dew_point_f": 58.05,
+  "humidity_pct": 26,
+  "wind_mph": 2.24,
+  "wind_gust_mph": 2.46,
+  "wind_dir_deg": 297,
+  "wind_max_daily_gust_mph": 5.82,
   "device": "DMATStation"
  },
- "usgs": {
-  "flow_cfs": 0.06,
-  "observed": "2026-10-03T09:30:00.000-07:00",
-  "stage_ft": 4.2
- },
+ "usgs": null,
  "nwps": {
   "name": "Corte Madera Creek at Ross",
   "categories": {
@@ -115,38 +111,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-02T16:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T17:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T17:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T17:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T17:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T18:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T18:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T18:30:00Z",
-    "stage": 4.19
-   },
    {
     "t": "2026-10-02T18:45:00Z",
     "stage": 4.19
@@ -498,6 +462,38 @@
    {
     "t": "2026-10-03T16:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T16:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T17:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T17:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T17:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T17:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T18:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T18:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T18:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -507,13 +503,8 @@
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-10-03T08:00:00+00:00",
-    "dur": "PT4H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-10-03T12:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-10-03T13:00:00+00:00",
+    "dur": "PT5H",
     "in": 0.0
    },
    {
@@ -644,7 +635,7 @@
    {
     "t": "2026-10-10T00:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.0
+    "in": 0.02
    },
    {
     "t": "2026-10-10T06:00:00+00:00",
@@ -671,8 +662,8 @@
    {
     "event": "Heat Advisory",
     "severity": "Moderate",
-    "headline": "Heat Advisory issued October 3 at 7:32AM PDT until October 5 at 10:00PM PDT by NWS San Francisco CA",
-    "ends": "2026-10-05T22:00:00-07:00"
+    "headline": "Heat Advisory issued October 3 at 12:00PM PDT until October 7 at 10:00PM PDT by NWS San Francisco CA",
+    "ends": "2026-10-07T22:00:00-07:00"
    }
   ],
   "office": "MTR",
@@ -913,12 +904,12 @@
    {
     "t": "2026-10-04T22:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T23:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-05T00:00",
@@ -1542,14 +1533,6 @@
   "forecast_peak_ft": null,
   "series": [
    {
-    "t": "2026-09-03T19:32:00Z",
-    "stage": 1.24
-   },
-   {
-    "t": "2026-09-03T19:50:00Z",
-    "stage": 1.24
-   },
-   {
     "t": "2026-09-04T07:32:00Z",
     "stage": 1.3
    },
@@ -2157,6 +2140,7 @@
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
+  "usgs": "HTTPError: 503 Server Error:  for url: https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11460000&parameterCd=00065%2C00060&siteStatus=all",
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
   "cw3e": "RuntimeError: cw3e 404",
   "cnrfc": "RuntimeError: cnrfc 401"
