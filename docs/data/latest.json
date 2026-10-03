@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-03T13:03:43+00:00",
+ "generated_utc": "2026-10-03T17:18:11+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -83,25 +83,29 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-03T13:02:00.000Z",
+  "observed_utc": "2026-10-03T17:17:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.876,
-  "temp_f": 53.4,
-  "feels_like_f": 53.4,
-  "dew_point_f": 49.63,
-  "humidity_pct": 87,
-  "wind_mph": 1.34,
-  "wind_gust_mph": 1.34,
-  "wind_dir_deg": 17,
-  "wind_max_daily_gust_mph": 1.79,
+  "baro_inhg": 29.908,
+  "temp_f": 87.8,
+  "feels_like_f": 86.91,
+  "dew_point_f": 58.25,
+  "humidity_pct": 37,
+  "wind_mph": 0,
+  "wind_gust_mph": 2.01,
+  "wind_dir_deg": 241,
+  "wind_max_daily_gust_mph": 2.24,
   "device": "DMATStation"
  },
- "usgs": null,
+ "usgs": {
+  "flow_cfs": 0.06,
+  "observed": "2026-10-03T09:30:00.000-07:00",
+  "stage_ft": 4.2
+ },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
   "categories": {
@@ -111,70 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-02T12:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T13:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T13:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T13:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T13:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T14:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T14:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T14:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T14:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T15:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T15:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-02T15:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T15:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T16:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T16:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-02T16:30:00Z",
-    "stage": 4.19
-   },
    {
     "t": "2026-10-02T16:45:00Z",
     "stage": 4.19
@@ -494,6 +434,70 @@
    {
     "t": "2026-10-03T12:30:00Z",
     "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T12:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T13:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T13:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T13:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T13:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T14:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T14:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T14:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T14:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T15:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T15:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T15:30:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T15:45:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T16:00:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T16:15:00Z",
+    "stage": 4.2
+   },
+   {
+    "t": "2026-10-03T16:30:00Z",
+    "stage": 4.2
    }
   ],
   "forecast": [],
@@ -503,13 +507,8 @@
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-10-03T03:00:00+00:00",
-    "dur": "PT3H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-10-03T06:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-10-03T08:00:00+00:00",
+    "dur": "PT4H",
     "in": 0.0
    },
    {
@@ -672,7 +671,7 @@
    {
     "event": "Heat Advisory",
     "severity": "Moderate",
-    "headline": "Heat Advisory issued October 3 at 2:02AM PDT until October 5 at 10:00PM PDT by NWS San Francisco CA",
+    "headline": "Heat Advisory issued October 3 at 7:32AM PDT until October 5 at 10:00PM PDT by NWS San Francisco CA",
     "ends": "2026-10-05T22:00:00-07:00"
    }
   ],
@@ -829,7 +828,7 @@
    {
     "t": "2026-10-04T05:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T06:00",
@@ -889,27 +888,27 @@
    {
     "t": "2026-10-04T17:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T18:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T19:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T20:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T21:00",
     "in": 0,
-    "prob": 0
+    "prob": 1
    },
    {
     "t": "2026-10-04T22:00",
@@ -954,32 +953,32 @@
    {
     "t": "2026-10-05T06:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T07:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T08:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T09:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T10:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T11:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-05T12:00",
@@ -1374,32 +1373,32 @@
    {
     "t": "2026-10-08T18:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-08T19:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-08T20:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-08T21:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-08T22:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-08T23:00",
     "in": 0,
-    "prob": 1
+    "prob": 0
    },
    {
     "t": "2026-10-09T00:00",
@@ -1434,32 +1433,32 @@
    {
     "t": "2026-10-09T06:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T07:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T08:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T09:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T10:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T11:00",
     "in": 0,
-    "prob": 1
+    "prob": 8
    },
    {
     "t": "2026-10-09T12:00",
@@ -1494,32 +1493,32 @@
    {
     "t": "2026-10-09T18:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    },
    {
     "t": "2026-10-09T19:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    },
    {
     "t": "2026-10-09T20:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    },
    {
     "t": "2026-10-09T21:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    },
    {
     "t": "2026-10-09T22:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    },
    {
     "t": "2026-10-09T23:00",
     "in": 0,
-    "prob": 1
+    "prob": 9
    }
   ],
   "qpf_next_6h_in": 0,
@@ -2158,7 +2157,6 @@
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
-  "usgs": "HTTPError: 503 Server Error:  for url: https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11460000&parameterCd=00065%2C00060&siteStatus=all",
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
   "cw3e": "RuntimeError: cw3e 404",
   "cnrfc": "RuntimeError: cnrfc 401"
