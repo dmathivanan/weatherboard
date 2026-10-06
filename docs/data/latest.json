@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-05T21:39:01+00:00",
+ "generated_utc": "2026-10-06T01:55:04+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -43,7 +43,13 @@
    "ross_ft": 15.0
   }
  },
- "creek_forecast": null,
+ "creek_forecast": {
+  "point_ft": 0.87,
+  "lo_ft": -0.21,
+  "hi_ft": 1.95,
+  "horizon_h": 6,
+  "r2": 0.838
+ },
  "ross_to_bridge": {
   "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
   "slope": 0.767,
@@ -77,29 +83,25 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-05T21:38:00.000Z",
+  "observed_utc": "2026-10-06T01:54:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.884,
-  "temp_f": 97.5,
-  "feels_like_f": 99.69,
-  "dew_point_f": 63.5,
-  "humidity_pct": 33,
-  "wind_mph": 2.01,
-  "wind_gust_mph": 3.13,
-  "wind_dir_deg": 292,
-  "wind_max_daily_gust_mph": 4.7,
+  "baro_inhg": 29.87,
+  "temp_f": 78.4,
+  "feels_like_f": 78.48,
+  "dew_point_f": 60.36,
+  "humidity_pct": 54,
+  "wind_mph": 0,
+  "wind_gust_mph": 1.34,
+  "wind_dir_deg": 243,
+  "wind_max_daily_gust_mph": 5.82,
   "device": "DMATStation"
  },
- "usgs": {
-  "flow_cfs": 0.03,
-  "observed": "2026-10-05T13:30:00.000-07:00",
-  "stage_ft": 4.19
- },
+ "usgs": null,
  "nwps": {
   "name": "Corte Madera Creek at Ross",
   "categories": {
@@ -109,70 +111,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-04T20:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T21:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T21:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T21:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T21:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T22:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T22:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T22:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T22:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T23:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T23:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T23:30:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-04T23:45:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-05T00:00:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-05T00:15:00Z",
-    "stage": 4.19
-   },
-   {
-    "t": "2026-10-05T00:30:00Z",
-    "stage": 4.19
-   },
    {
     "t": "2026-10-05T00:45:00Z",
     "stage": 4.19
@@ -491,6 +429,70 @@
    },
    {
     "t": "2026-10-05T20:30:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T20:45:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T21:00:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T21:15:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T21:30:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T21:45:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T22:00:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T22:15:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T22:30:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T22:45:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T23:00:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T23:15:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T23:30:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-05T23:45:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-06T00:00:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-06T00:15:00Z",
+    "stage": 4.19
+   },
+   {
+    "t": "2026-10-06T00:30:00Z",
     "stage": 4.19
    }
   ],
@@ -2143,13 +2145,14 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_6h_in": null,
+  "rain_6h_in": 0.0,
   "rain_7d_in": 0,
   "api": 0.0,
   "sump_duty_pct": null
  },
  "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
  "errors": {
+  "usgs": "HTTPError: 503 Server Error:  for url: https://waterservices.usgs.gov/nwis/iv/?format=json&sites=11460000&parameterCd=00065%2C00060&siteStatus=all",
   "sump": "RuntimeError: no sump data (PumpFuse PF03 is cloud-only; no local endpoint reachable)",
   "cw3e": "RuntimeError: cw3e 404",
   "cnrfc": "RuntimeError: cnrfc 401"
