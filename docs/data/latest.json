@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-13T18:06:27+00:00",
+ "generated_utc": "2026-10-13T22:44:40+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -43,7 +43,13 @@
    "ross_ft": 15.0
   }
  },
- "creek_forecast": null,
+ "creek_forecast": {
+  "point_ft": 0.87,
+  "lo_ft": -0.21,
+  "hi_ft": 1.95,
+  "horizon_h": 6,
+  "r2": 0.838
+ },
  "ross_to_bridge": {
   "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
   "slope": 0.767,
@@ -77,28 +83,28 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-13T18:05:00.000Z",
+  "observed_utc": "2026-10-13T22:44:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 30.073,
-  "temp_f": 72.9,
-  "feels_like_f": 71.16,
-  "dew_point_f": 36.95,
-  "humidity_pct": 27,
-  "wind_mph": 1.34,
-  "wind_gust_mph": 4.47,
-  "wind_dir_deg": 196,
-  "wind_max_daily_gust_mph": 10.51,
+  "baro_inhg": 30.038,
+  "temp_f": 81.5,
+  "feels_like_f": 79.74,
+  "dew_point_f": 41.2,
+  "humidity_pct": 24,
+  "wind_mph": 4.25,
+  "wind_gust_mph": 6.71,
+  "wind_dir_deg": 315,
+  "wind_max_daily_gust_mph": 11.86,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.08,
-  "observed": "2026-10-13T10:30:00.000-07:00",
-  "stage_ft": 4.21
+  "flow_cfs": 0.13,
+  "observed": "2026-10-13T15:30:00.000-07:00",
+  "stage_ft": 4.22
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -109,86 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-12T16:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T17:00:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T17:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T17:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T17:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T18:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T18:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T18:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T18:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T19:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T19:15:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T19:30:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T19:45:00Z",
-    "stage": 4.2
-   },
-   {
-    "t": "2026-10-12T20:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T20:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T20:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T20:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T21:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T21:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T21:30:00Z",
-    "stage": 4.21
-   },
    {
     "t": "2026-10-12T21:45:00Z",
     "stage": 4.21
@@ -492,27 +418,97 @@
    {
     "t": "2026-10-13T16:30:00Z",
     "stage": 4.21
+   },
+   {
+    "t": "2026-10-13T16:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T17:00:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-13T17:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-13T17:30:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-13T17:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T18:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T18:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T18:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T18:45:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-13T19:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T19:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T19:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T19:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T20:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T20:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T20:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T20:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T21:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T21:15:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-13T21:30:00Z",
+    "stage": 4.22
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.21,
+  "latest_stage_ft": 4.22,
   "forecast_peak_ft": null
  },
  "nws": {
   "qpf_periods": [
    {
-    "t": "2026-10-13T03:00:00+00:00",
-    "dur": "PT3H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-10-13T06:00:00+00:00",
-    "dur": "PT6H",
-    "in": 0.0
-   },
-   {
-    "t": "2026-10-13T12:00:00+00:00",
-    "dur": "PT6H",
+    "t": "2026-10-13T14:00:00+00:00",
+    "dur": "PT4H",
     "in": 0.0
    },
    {
@@ -638,17 +634,17 @@
    {
     "t": "2026-10-19T18:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.04
+    "in": 0.01
    },
    {
     "t": "2026-10-20T00:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.0
+    "in": 0.03
    },
    {
     "t": "2026-10-20T06:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.0
+    "in": 0.01
    },
    {
     "t": "2026-10-20T12:00:00+00:00",
@@ -658,19 +654,19 @@
    {
     "t": "2026-10-20T18:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.01
+    "in": 0.0
    },
    {
     "t": "2026-10-21T00:00:00+00:00",
     "dur": "PT6H",
-    "in": 0.02
+    "in": 0.0
    }
   ],
   "alerts": [
    {
     "event": "Coastal Flood Advisory",
     "severity": "Minor",
-    "headline": "Coastal Flood Advisory issued October 13 at 4:57AM PDT until October 14 at 4:00PM PDT by NWS San Francisco CA",
+    "headline": "Coastal Flood Advisory issued October 13 at 2:36PM PDT until October 14 at 4:00PM PDT by NWS San Francisco CA",
     "ends": "2026-10-14T16:00:00-07:00"
    }
   ],
@@ -1432,62 +1428,62 @@
    {
     "t": "2026-10-19T06:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T07:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T08:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T09:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T10:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T11:00",
     "in": 0,
-    "prob": 6
+    "prob": 3
    },
    {
     "t": "2026-10-19T12:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T13:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T14:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T15:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T16:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T17:00",
     "in": 0,
-    "prob": 19
+    "prob": 13
    },
    {
     "t": "2026-10-19T18:00",
@@ -1530,8 +1526,8 @@
  "bridge_street": {
   "source": "nwps:SBSC1",
   "name": "San Anselmo Creek at Bridge Street",
-  "stage_ft": 1.21,
-  "observed": "2026-10-12T19:50:00Z",
+  "stage_ft": 1.22,
+  "observed": "2026-10-13T19:50:00Z",
   "categories": {
    "major": 17.8,
    "moderate": 16.3,
@@ -1540,14 +1536,6 @@
   },
   "forecast_peak_ft": null,
   "series": [
-   {
-    "t": "2026-09-13T19:32:00Z",
-    "stage": 1.19
-   },
-   {
-    "t": "2026-09-13T19:50:00Z",
-    "stage": 1.19
-   },
    {
     "t": "2026-09-14T07:32:00Z",
     "stage": 1.19
@@ -2031,6 +2019,14 @@
    {
     "t": "2026-10-12T19:50:00Z",
     "stage": 1.21
+   },
+   {
+    "t": "2026-10-13T19:32:00Z",
+    "stage": 1.22
+   },
+   {
+    "t": "2026-10-13T19:50:00Z",
+    "stage": 1.22
    }
   ],
   "forecast": [],
@@ -2069,7 +2065,7 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_6h_in": null,
+  "rain_6h_in": 0.0,
   "rain_7d_in": 0,
   "api": 0.0,
   "sump_duty_pct": null
