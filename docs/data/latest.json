@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-12T22:59:18+00:00",
+ "generated_utc": "2026-10-13T03:29:20+00:00",
  "site": "52 Woodland",
  "tier": "quiet",
  "reasons": [],
@@ -43,7 +43,13 @@
    "ross_ft": 15.0
   }
  },
- "creek_forecast": null,
+ "creek_forecast": {
+  "point_ft": 0.87,
+  "lo_ft": -0.21,
+  "hi_ft": 1.95,
+  "horizon_h": 6,
+  "r2": 0.838
+ },
  "ross_to_bridge": {
   "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
   "slope": 0.767,
@@ -77,28 +83,28 @@
   "qpf_hrrr_6h_in": 0
  },
  "ambient": {
-  "observed_utc": "2026-10-12T22:58:00.000Z",
+  "observed_utc": "2026-10-13T03:28:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_24h_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
-  "baro_inhg": 29.884,
-  "temp_f": 72.1,
-  "feels_like_f": 70.94,
-  "dew_point_f": 47.09,
-  "humidity_pct": 41,
+  "baro_inhg": 29.949,
+  "temp_f": 53.6,
+  "feels_like_f": 53.6,
+  "dew_point_f": 46.91,
+  "humidity_pct": 78,
   "wind_mph": 0,
-  "wind_gust_mph": 4.7,
-  "wind_dir_deg": 2,
-  "wind_max_daily_gust_mph": 9.62,
+  "wind_gust_mph": 0,
+  "wind_dir_deg": 212,
+  "wind_max_daily_gust_mph": 10.07,
   "device": "DMATStation"
  },
  "usgs": {
-  "flow_cfs": 0.13,
-  "observed": "2026-10-12T15:30:00.000-07:00",
-  "stage_ft": 4.22
+  "flow_cfs": 0.27,
+  "observed": "2026-10-12T19:30:00.000-07:00",
+  "stage_ft": 4.24
  },
  "nwps": {
   "name": "Corte Madera Creek at Ross",
@@ -109,86 +115,6 @@
    "action": 15
   },
   "observed": [
-   {
-    "t": "2026-10-11T20:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T21:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T21:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T21:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T21:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T22:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T22:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T22:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T22:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T23:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T23:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T23:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-11T23:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T00:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T00:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T00:30:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T00:45:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T01:00:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T01:15:00Z",
-    "stage": 4.21
-   },
-   {
-    "t": "2026-10-12T01:30:00Z",
-    "stage": 4.21
-   },
    {
     "t": "2026-10-12T01:45:00Z",
     "stage": 4.21
@@ -492,10 +418,90 @@
    {
     "t": "2026-10-12T21:30:00Z",
     "stage": 4.21
+   },
+   {
+    "t": "2026-10-12T21:45:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-12T22:00:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-12T22:15:00Z",
+    "stage": 4.21
+   },
+   {
+    "t": "2026-10-12T22:30:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-12T22:45:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-12T23:00:00Z",
+    "stage": 4.22
+   },
+   {
+    "t": "2026-10-12T23:15:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-10-12T23:30:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-10-12T23:45:00Z",
+    "stage": 4.23
+   },
+   {
+    "t": "2026-10-13T00:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T00:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T00:30:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T00:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T01:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T01:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T01:30:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T01:45:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T02:00:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T02:15:00Z",
+    "stage": 4.24
+   },
+   {
+    "t": "2026-10-13T02:30:00Z",
+    "stage": 4.24
    }
   ],
   "forecast": [],
-  "latest_stage_ft": 4.21,
+  "latest_stage_ft": 4.24,
   "forecast_peak_ft": null
  },
  "nws": {
@@ -2075,7 +2081,7 @@
  },
  "derived": {
   "rain_1h_in": null,
-  "rain_6h_in": null,
+  "rain_6h_in": 0.0,
   "rain_7d_in": 0,
   "api": 0.0,
   "sump_duty_pct": null
