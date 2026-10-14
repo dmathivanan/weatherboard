@@ -148,11 +148,41 @@ def main():
                        "bridge_peak_ft": e.peak_bridge_stage_ft, "ross_peak_ft": e.peak_ross_stage_ft,
                        "ross_peak_cfs": e.peak_ross_flow_cfs,
                        "sump_peak_inflow_gpm": e.peak_inflow_gpm, "sump_runs": int(e.pump_runs),
+                       "sump_peak_runs_per_15min": int(e.peak_runs_per_15min),
+                       "sump_peak_duty_15min_pct": e.peak_duty_15min_pct,
                        "sump_gallons": e.total_gallons},
             "notes": "",
         })
     (DOCS / "storms_2025_26.json").write_text(json.dumps({"storms": rows}, indent=1), encoding="utf-8")
     print(f"storms_2025_26.json: {len(rows)} storms")
+
+    # ---- point clouds for the charts page (report.html) --------------------
+    pts = {}
+    try:
+        tl = pd.read_parquet(HERE / "timeline.parquet")
+        tl.index = pd.to_datetime(tl.index, utc=True)
+        obs = tl["bridge_stage_obs_max"].dropna()
+        rising = obs.index[obs.diff() > 0]
+        r6 = tl["rain_6h_in"].reindex(rising)
+        api = tl["api_0p9"].reindex(rising)
+        pts["rising_limb"] = {
+            "_note": "Observed Bridge Street readings on a rising limb (stage above the previous reading), "
+                     "with the 6-h rain total and wetness index at that moment. The Layer 3A fit.",
+            "points": [{"t": t.strftime("%Y-%m-%dT%H:%M"), "r6h": round(float(a), 3), "api": round(float(b), 3),
+                        "stage": round(float(c), 2)}
+                       for t, a, b, c in zip(rising, r6, api, obs.loc[rising]) if pd.notna(a) and pd.notna(b)],
+        }
+        dry = tl[(tl.rain_24h_in <= 0.0) & (tl.ross_flow_cfs > 0) & tl.api_0p9.notna()]
+        dry = dry.iloc[::12]   # every 2 h is plenty for a scatter
+        pts["baseflow"] = {
+            "_note": "Rain-free 10-min bins, thinned to 2 h: Ross flow against the wetness index.",
+            "points": [{"flow": round(float(f), 2), "api": round(float(a), 3)}
+                       for f, a in zip(dry.ross_flow_cfs, dry.api_0p9)],
+        }
+    except Exception as e:  # noqa: BLE001
+        pts["error"] = str(e)[:120]
+    (DOCS / "report_points.json").write_text(json.dumps(pts, separators=(",", ":")), encoding="utf-8")
+    print("report_points.json:", {k: len(v.get("points", [])) for k, v in pts.items() if isinstance(v, dict)})
 
 
 if __name__ == "__main__":

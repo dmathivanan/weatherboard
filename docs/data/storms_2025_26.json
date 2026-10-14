@@ -28,6 +28,8 @@
     "ross_peak_cfs": 102.0,
     "sump_peak_inflow_gpm": 16.61,
     "sump_runs": 96,
+    "sump_peak_runs_per_15min": 9,
+    "sump_peak_duty_15min_pct": 19.78,
     "sump_gallons": 2308.6
    },
    "notes": ""
@@ -60,6 +62,8 @@
     "ross_peak_cfs": 328.0,
     "sump_peak_inflow_gpm": 23.99,
     "sump_runs": 149,
+    "sump_peak_runs_per_15min": 12,
+    "sump_peak_duty_15min_pct": 28.56,
     "sump_gallons": 3710.0
    },
    "notes": ""
@@ -92,6 +96,8 @@
     "ross_peak_cfs": 254.0,
     "sump_peak_inflow_gpm": 34.16,
     "sump_runs": 67,
+    "sump_peak_runs_per_15min": 11,
+    "sump_peak_duty_15min_pct": 40.67,
     "sump_gallons": 1745.8
    },
    "notes": ""
@@ -124,6 +130,8 @@
     "ross_peak_cfs": 15.9,
     "sump_peak_inflow_gpm": 4.48,
     "sump_runs": 19,
+    "sump_peak_runs_per_15min": 3,
+    "sump_peak_duty_15min_pct": 5.33,
     "sump_gallons": 408.8
    },
    "notes": ""
@@ -156,6 +164,8 @@
     "ross_peak_cfs": 5.1,
     "sump_peak_inflow_gpm": 1.4,
     "sump_runs": 5,
+    "sump_peak_runs_per_15min": 1,
+    "sump_peak_duty_15min_pct": 1.67,
     "sump_gallons": 105.0
    },
    "notes": ""
@@ -188,6 +198,8 @@
     "ross_peak_cfs": 746.0,
     "sump_peak_inflow_gpm": 13.63,
     "sump_runs": 287,
+    "sump_peak_runs_per_15min": 8,
+    "sump_peak_duty_15min_pct": 16.22,
     "sump_gallons": 6542.2
    },
    "notes": ""
@@ -220,6 +232,8 @@
     "ross_peak_cfs": 288.0,
     "sump_peak_inflow_gpm": 18.95,
     "sump_runs": 128,
+    "sump_peak_runs_per_15min": 10,
+    "sump_peak_duty_15min_pct": 22.56,
     "sump_gallons": 2909.2
    },
    "notes": ""
@@ -252,6 +266,8 @@
     "ross_peak_cfs": 836.0,
     "sump_peak_inflow_gpm": 42.65,
     "sump_runs": 172,
+    "sump_peak_runs_per_15min": 12,
+    "sump_peak_duty_15min_pct": 50.78,
     "sump_gallons": 4361.0
    },
    "notes": ""
@@ -284,6 +300,8 @@
     "ross_peak_cfs": 241.0,
     "sump_peak_inflow_gpm": 11.48,
     "sump_runs": 103,
+    "sump_peak_runs_per_15min": 7,
+    "sump_peak_duty_15min_pct": 13.67,
     "sump_gallons": 2325.4
    },
    "notes": ""
@@ -316,6 +334,8 @@
     "ross_peak_cfs": 278.0,
     "sump_peak_inflow_gpm": 8.21,
     "sump_runs": 33,
+    "sump_peak_runs_per_15min": 5,
+    "sump_peak_duty_15min_pct": 9.78,
     "sump_gallons": 728.0
    },
    "notes": ""
@@ -348,6 +368,8 @@
     "ross_peak_cfs": 552.0,
     "sump_peak_inflow_gpm": 16.05,
     "sump_runs": 435,
+    "sump_peak_runs_per_15min": 9,
+    "sump_peak_duty_15min_pct": 19.11,
     "sump_gallons": 9949.8
    },
    "notes": ""
@@ -380,6 +402,8 @@
     "ross_peak_cfs": 1640.0,
     "sump_peak_inflow_gpm": 26.88,
     "sump_runs": 824,
+    "sump_peak_runs_per_15min": 12,
+    "sump_peak_duty_15min_pct": 32.0,
     "sump_gallons": 19654.6
    },
    "notes": ""
@@ -412,6 +436,8 @@
     "ross_peak_cfs": 9.2,
     "sump_peak_inflow_gpm": 1.49,
     "sump_runs": 9,
+    "sump_peak_runs_per_15min": 1,
+    "sump_peak_duty_15min_pct": 1.78,
     "sump_gallons": 191.8
    },
    "notes": ""
@@ -444,6 +470,8 @@
     "ross_peak_cfs": 66.4,
     "sump_peak_inflow_gpm": 14.28,
     "sump_runs": 77,
+    "sump_peak_runs_per_15min": 8,
+    "sump_peak_duty_15min_pct": 17.0,
     "sump_gallons": 1708.0
    },
    "notes": ""
@@ -476,6 +504,8 @@
     "ross_peak_cfs": 1460.0,
     "sump_peak_inflow_gpm": 27.63,
     "sump_runs": 434,
+    "sump_peak_runs_per_15min": 12,
+    "sump_peak_duty_15min_pct": 32.89,
     "sump_gallons": 10575.6
    },
    "notes": ""
@@ -508,6 +538,8 @@
     "ross_peak_cfs": 374.0,
     "sump_peak_inflow_gpm": 13.53,
     "sump_runs": 149,
+    "sump_peak_runs_per_15min": 8,
+    "sump_peak_duty_15min_pct": 16.11,
     "sump_gallons": 3378.2
    },
    "notes": ""
@@ -540,6 +572,8 @@
     "ross_peak_cfs": 475.0,
     "sump_peak_inflow_gpm": 21.09,
     "sump_runs": 197,
+    "sump_peak_runs_per_15min": 11,
+    "sump_peak_duty_15min_pct": 25.11,
     "sump_gallons": 4558.4
    },
    "notes": ""
@@ -572,6 +606,8 @@
     "ross_peak_cfs": 85.7,
     "sump_peak_inflow_gpm": 4.29,
     "sump_runs": 21,
+    "sump_peak_runs_per_15min": 3,
+    "sump_peak_duty_15min_pct": 5.11,
     "sump_gallons": 449.4
    },
    "notes": ""
@@ -604,6 +640,8 @@
     "ross_peak_cfs": 11.4,
     "sump_peak_inflow_gpm": 2.8,
     "sump_runs": 9,
+    "sump_peak_runs_per_15min": 2,
+    "sump_peak_duty_15min_pct": 3.33,
     "sump_gallons": 189.0
    },
    "notes": ""
@@ -636,6 +674,8 @@
     "ross_peak_cfs": 37.4,
     "sump_peak_inflow_gpm": 5.88,
     "sump_runs": 22,
+    "sump_peak_runs_per_15min": 4,
+    "sump_peak_duty_15min_pct": 7.0,
     "sump_gallons": 471.8
    },
    "notes": ""
@@ -668,6 +708,8 @@
     "ross_peak_cfs": 164.0,
     "sump_peak_inflow_gpm": 14.37,
     "sump_runs": 71,
+    "sump_peak_runs_per_15min": 8,
+    "sump_peak_duty_15min_pct": 17.11,
     "sump_gallons": 1625.4
    },
    "notes": ""
@@ -700,6 +742,8 @@
     "ross_peak_cfs": 65.1,
     "sump_peak_inflow_gpm": 12.23,
     "sump_runs": 27,
+    "sump_peak_runs_per_15min": 7,
+    "sump_peak_duty_15min_pct": 14.56,
     "sump_gallons": 618.8
    },
    "notes": ""
@@ -732,6 +776,8 @@
     "ross_peak_cfs": 93.5,
     "sump_peak_inflow_gpm": 9.24,
     "sump_runs": 122,
+    "sump_peak_runs_per_15min": 6,
+    "sump_peak_duty_15min_pct": 11.0,
     "sump_gallons": 2651.6
    },
    "notes": ""
@@ -764,6 +810,8 @@
     "ross_peak_cfs": 83.5,
     "sump_peak_inflow_gpm": 4.29,
     "sump_runs": 25,
+    "sump_peak_runs_per_15min": 3,
+    "sump_peak_duty_15min_pct": 5.11,
     "sump_gallons": 534.8
    },
    "notes": ""

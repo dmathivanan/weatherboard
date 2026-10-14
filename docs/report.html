@@ -3,585 +3,302 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>52 Weatherboard &mdash; Winter 2025-26 analysis</title>
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>52 Storm Planner — Report</title>
 <link rel="stylesheet" href="assets/app.css?v=11">
 <style>
-/* Report-specific: a reading column, not a dashboard grid. */
-.doc{max-width:960px;margin-inline:auto;padding:0 16px 64px}
-.doc h1{font-size:1.9rem;line-height:1.2;margin:28px 0 6px}
-.doc .lede{color:var(--mute);font-style:italic;margin:0 0 28px}
-.doc h2{font-size:1.25rem;margin:40px 0 12px;padding-top:18px;
-  border-top:2px solid var(--rule);color:var(--navy)}
-.doc h3{font-size:1.02rem;margin:26px 0 8px;color:var(--ink)}
-.doc p,.doc li{line-height:1.62}
-.doc ul,.doc ol{padding-left:22px}
-.doc li{margin:5px 0}
-.doc strong{color:var(--ink);font-weight:650}
-.doc code{background:var(--water-soft);color:var(--ink);padding:1px 5px;
-  border-radius:4px;font-size:.9em}
-.doc pre{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--gold);
-  border-radius:8px;padding:12px 14px;overflow-x:auto;box-shadow:var(--shadow)}
-.doc pre code{background:none;padding:0;font-size:.88rem;line-height:1.5}
-.doc hr{border:0;border-top:1px solid var(--rule);margin:34px 0}
-.doc blockquote{margin:18px 0;padding:10px 16px;border-left:3px solid var(--gold);
-  background:var(--card);color:var(--mute)}
-/* tables scroll on their own rather than pushing the page sideways */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:10px;
-  box-shadow:var(--shadow);background:var(--card)}
-.doc table{border-collapse:collapse;width:100%;font-size:.9rem}
-.doc th{background:var(--navy);color:var(--gold);text-align:left;padding:9px 12px;
-  font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.doc td{padding:8px 12px;border-top:1px solid var(--rule);white-space:nowrap}
-.doc td:first-child{white-space:normal}
-.doc tbody tr:nth-child(even){background:rgba(127,127,127,.05)}
-/* Column alignment comes from the markdown itself (the ---: markers), which the
-   tables extension emits as inline styles. Do not blanket-align here: it would
-   right-align prose columns too. */
-.toc{background:var(--card);border:1px solid var(--rule);border-radius:12px;
-  padding:14px 18px;box-shadow:var(--shadow);margin:0 0 30px}
-.toc h2{border:0;margin:0 0 8px;padding:0;font-size:.75rem;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--gold-dark)}
-.toc ol{margin:0;padding-left:20px;columns:2;column-gap:26px}
-.toc li{margin:3px 0;break-inside:avoid}
-@media (max-width:620px){.toc ol{columns:1}}
-.stamp{color:var(--mute);font-size:.82rem;margin-top:40px;
-  border-top:1px solid var(--rule);padding-top:12px}
+:root{--c1:#2563eb;--c2:#c77f0a;--fit:#1a2332;--ref:#94a3b8;--bandfill:rgba(37,99,235,.10)}
+@media (prefers-color-scheme:dark){:root{--c1:#4f8fe6;--c2:#b3861e;--fit:#e6edf5;--ref:#64748b;--bandfill:rgba(79,143,230,.14)}}
+.lead{font-size:1rem;line-height:1.55;color:var(--mute);margin:4px 0 18px}
+.lead a{white-space:nowrap}
+.fig{display:grid;grid-template-columns:minmax(0,3fr) minmax(220px,2fr);gap:18px;align-items:start}
+@media (max-width:760px){.fig{grid-template-columns:1fr}}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .grid{stroke:var(--rule);stroke-width:1}
+.chart .ax{font-size:10px;fill:var(--mute)}
+.chart .axl{font-size:11px;fill:var(--mute)}
+.chart .pt{fill:var(--c1);stroke:var(--card);stroke-width:1.5}
+.chart .pt.s2{fill:var(--c2)}
+.chart .pt.dim{opacity:.35}
+.chart .fit{fill:none;stroke:var(--fit);stroke-width:2}
+.chart .fit.dash{stroke-dasharray:5 4;stroke-width:1.5}
+.chart .ref{fill:none;stroke:var(--ref);stroke-width:1.2;stroke-dasharray:3 3}
+.chart .band{fill:var(--bandfill)}
+.chart .line-label{font-size:10px;fill:var(--mute)}
+.chart .hline{stroke:var(--amber);stroke-width:1.2;stroke-dasharray:4 3}
+.chart .hline.red{stroke:var(--red)}
+.chart .hit{fill:transparent}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--rule);border-radius:8px;
+  box-shadow:var(--shadow);padding:6px 9px;font-size:.78rem;display:none;white-space:nowrap;z-index:5;line-height:1.35}
+.tip b{font-weight:600}
+.cap{font-size:.9rem;line-height:1.5}
+.cap b{font-weight:600}
+.cap .stat{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;font-size:.84rem;color:var(--mute);margin:10px 0 0}
+.cap .stat b{color:var(--ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--mute);margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend i.line{width:18px;height:2px;border-radius:0;vertical-align:2px}
+.legend i.dash{border-top:2px dashed var(--ref);height:0;background:none}
+.warn{color:var(--amber);font-size:.82rem}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="top-in">
-    <a class="brand" href="index.html">52 Storm Planner</a>
-    <nav class="tabs"><a href="planner.html">Planner</a><a href="wetness.html">Wetness</a><a href="storms.html">Storms</a><a href="creek.html">Creek (live)</a><a href="storm.html">Radar</a><a href="report.html" class="active">Report</a></nav>
-  </div>
-</header>
-<main class="doc">
-<h1>52 Woodland flood board — what last winter actually told us</h1>
-<p class="lede"><em>Analysis of November 2025 – April 2026. Written September 2026.</em></p><nav class="toc"><h2>Contents</h2><ol><li><a href="#1-what-the-data-is">1. What the data is</a></li><li><a href="#2-the-storm-catalog">2. The storm catalog</a></li><li><a href="#3-the-sump-what-the-run-lengths-mean">3. The sump: what the run lengths mean</a></li><li><a href="#4-the-creek">4. The creek</a></li><li><a href="#5-how-good-are-the-rain-forecasts-not-very">5. How good are the rain forecasts? (Not very)</a></li><li><a href="#6-the-rules-before-and-after">6. The rules: before and after</a></li><li><a href="#7-december-2005-and-what-the-sump-is-not-for">7. December 2005, and what the sump is not for</a></li><li><a href="#8-what-everything-rests-on-and-what-to-measure">8. What everything rests on, and what to measure</a></li></ol></nav>
-<p>This is the write-up of five layers of analysis on last winter's data. The short
-version: <strong>the alert rules the board shipped with would have stayed silent
-through the biggest storm of the winter.</strong> They have been rebuilt, and the
-rebuilt rules would have given roughly two and a half days of warning on that
-same storm. Along the way the data confirmed some things about the sump that are
-reassuring, and exposed one assumption that everything else rests on.</p>
-<hr />
-<h2 id="1-what-the-data-is">1. What the data is</h2>
-<p>Four sources, aligned onto a common 10-minute clock covering 1 November 2025 to
-30 April 2026 — 26,064 rows.</p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th>Source</th>
-<th>What it measures</th>
-<th>How often it reports</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Ambient weather station (DMATStation)</td>
-<td>rain at the house</td>
-<td>every 5 minutes</td>
-</tr>
-<tr>
-<td>PumpFuse</td>
-<td>each time the sump pump runs, and for how long</td>
-<td>one record per run</td>
-</tr>
-<tr>
-<td>Bridge Street gauge</td>
-<td>creek level in downtown San Anselmo</td>
-<td>when it changes</td>
-</tr>
-<tr>
-<td>USGS 11460000</td>
-<td>creek level and flow at Ross, downstream</td>
-<td>every 15 minutes</td>
-</tr>
-</tbody>
-</table></div>
-<p>Two of these are genuinely continuous. The other two are not, and it matters:</p>
-<ul>
-<li><strong>Ambient</strong> and <strong>USGS</strong> are near-complete. Ambient had one gap over an hour
-  in six months (1.6 h). USGS had three, all under 1.5 h.</li>
-<li><strong>Bridge Street reports only when the creek moves.</strong> In dry weather it sends a
-  reading every twelve hours; during storms it drops to every few minutes. Over
-  the whole winter only 3.9% of ten-minute slots contain a real reading, but
-  during wet periods that rises to 15.6%, and the median wait for a real reading
-  falls from 173 minutes (dry) to 27 minutes (wet). The gauge densifies exactly
-  when you need it, which is good design, but it means any "Bridge Street level"
-  between storms is an interpolation, not an observation.</li>
-<li><strong>PumpFuse gaps are not missing data.</strong> A gap means the pump did not run.</li>
-</ul>
-<h3>Rainfall had to be reconstructed</h3>
-<p>The weather station does not report "how much rain fell in the last ten
-minutes." It reports running totals that reset — daily at midnight, per-event
-after a dry spell, yearly on 1 January. Rainfall per interval is the difference
-between consecutive readings, with a reset treated as "counter went to zero,
-then climbed to the current value."</p>
-<p>Because that reset handling could easily be wrong, it was checked against an
-independent counter. The daily counter and the yearly counter, differenced the
-same way, disagree by <strong>0.22 inches over six months — 0.61%</strong>. The
-reconstruction is sound.</p>
-<p>Season total: <strong>34.47 inches</strong> across the window.</p>
-<hr />
-<h2 id="2-the-storm-catalog">2. The storm catalog</h2>
-<p>Rain was cut into storms wherever six hours passed with none. That gives <strong>40
-events</strong>; 24 of them exceed a tenth of an inch, the rest are traces.</p>
-<p>The winter's shape, by month:</p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th>Month</th>
-<th style="text-align: right;">Rain (in)</th>
-<th style="text-align: right;">Pump runs</th>
-<th style="text-align: right;">Gallons</th>
-<th style="text-align: right;">Bridge St peak (ft)</th>
-<th style="text-align: right;">Ross peak (ft)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Nov 2025</td>
-<td style="text-align: right;">5.96</td>
-<td style="text-align: right;">335</td>
-<td style="text-align: right;">8,256</td>
-<td style="text-align: right;">3.35</td>
-<td style="text-align: right;">7.15</td>
-</tr>
-<tr>
-<td>Dec 2025</td>
-<td style="text-align: right;">7.09</td>
-<td style="text-align: right;">755</td>
-<td style="text-align: right;">17,541</td>
-<td style="text-align: right;">5.29</td>
-<td style="text-align: right;">9.42</td>
-</tr>
-<tr>
-<td><strong>Jan 2026</strong></td>
-<td style="text-align: right;"><strong>8.80</strong></td>
-<td style="text-align: right;"><strong>1,278</strong></td>
-<td style="text-align: right;"><strong>30,003</strong></td>
-<td style="text-align: right;"><strong>7.38</strong></td>
-<td style="text-align: right;"><strong>12.12</strong></td>
-</tr>
-<tr>
-<td>Feb 2026</td>
-<td style="text-align: right;">7.89</td>
-<td style="text-align: right;">904</td>
-<td style="text-align: right;">21,211</td>
-<td style="text-align: right;">6.90</td>
-<td style="text-align: right;">11.51</td>
-</tr>
-<tr>
-<td>Mar 2026</td>
-<td style="text-align: right;">0.04</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">1.76</td>
-<td style="text-align: right;">4.78</td>
-</tr>
-<tr>
-<td>Apr 2026</td>
-<td style="text-align: right;">4.69</td>
-<td style="text-align: right;">280</td>
-<td style="text-align: right;">6,175</td>
-<td style="text-align: right;">2.72</td>
-<td style="text-align: right;">6.07</td>
-</tr>
-</tbody>
-</table></div>
-<p>March looked at first like a broken export — one pump run in a whole month. It
-isn't: <strong>March 2026 received four hundredths of an inch of rain.</strong> The pump had
-nothing to do.</p>
-<p>The whole winter's peak was <strong>7.38 ft at Bridge Street on 6 January 2026</strong>, which
-is 55% of the 13.3 ft "minor flood" line, and the Town's 6.5 ft "notify the
-public" line was crossed exactly twice. Everything below is therefore calibrated
-on a winter that was wet but never close to flooding.</p>
-<hr />
-<h2 id="3-the-sump-what-the-run-lengths-mean">3. The sump: what the run lengths mean</h2>
-<h3>The physics, which turns out to be simple</h3>
-<p>The pump empties a fixed slug of water from the pit each time it runs. If
-nothing were flowing in, that would take a fixed time — and the shortest run
-ever recorded is <strong>14 seconds</strong>. When water <em>is</em> flowing in, the pump has to
-fight it, so the run takes longer.</p>
-<p>Written out, with <code>V</code> the slug of water, <code>Qp</code> the pump's capacity and <code>Qin</code> the
-inflow:</p>
-<pre><code>run length = V / (Qp − Qin)
-</code></pre>
-<p>The shortest run is the case where nothing is coming in, so <code>14 s = V / Qp</code>.
-Substituting that back gives a genuinely useful result:</p>
-<pre><code>stress  =  1 − 14/run_length  =  Qin / Qp
-</code></pre>
-<p><strong>The "stress" number is simply what fraction of the pump's capacity the inflow
-is using.</strong> Stress 0.6 means water is arriving at 60% of what the pump can move.
-Stress 1.0 is not a number the pump can reach — it is the point where inflow
-equals capacity and the run never ends.</p>
-<p>Three independent checks agree on this:</p>
-<ol>
-<li><strong>Gallons per cycle.</strong> Predicted ~22 from the pit's size; measured <strong>22.4
-   average</strong> across 30 storms.</li>
-<li><strong>Pit geometry.</strong> A 36-inch pit holds 4.41 gallons per inch of depth, so a
-   4.5-inch float travel is 19.8 gallons. The 14-second floor implies 19.6.</li>
-<li><strong>Power draw.</strong> The pump averages <strong>1,394 watts against a 1,380 W rating</strong>
-   across 3,674 runs, with a standard deviation of only 2%. It is doing the same
-   thing, at its rated duty point, every single time.</li>
-</ol>
-<h3>How hard did the pump actually work?</h3>
-<p>Barely. Out of <strong>3,553 runs last winter, six</strong> reached stress 0.6, and those six
-fall in just two episodes (16 November and 25 December). The worst single run —
-134 seconds — implies inflow at <strong>75 GPM, 90% of capacity</strong>, but the worst
-<em>sustained</em> fifteen minutes only reached 42.6 GPM, about half of capacity.</p>
-<p>A real operational finding sits in that gap: when inflow rises, the pump does
-<strong>not</strong> start more often. Starts per fifteen minutes flatten out at twelve
-across every large storm. What changes is how long each run lasts — from the
-usual 15–18 seconds up to 38, 63, 100, 134 seconds. <strong>Run length is the signal;
-run count saturates and will mislead you.</strong></p>
-<h3>What we could not model</h3>
-<p>An attempt was made to predict stress from rainfall. It works in bulk and fails
-where it matters. Rain explains stress reasonably across all runs, but if you
-look only at the runs that were actually stressful, the relationship
-disappears — statistically, essentially nothing. The model under-predicts those
-six critical runs by a factor of two. The worst run of the winter followed only
-0.08 inches of rain in the preceding ten minutes.</p>
-<p>Consequently the "what rainfall rate would overwhelm the pump" question <strong>cannot
-be answered from this data</strong>. The arithmetic says roughly 2.0–2.9 inches per
-hour, but that is 1.3 to 1.9 times more intense than the heaviest ten minutes
-ever recorded here, produced by a model that is known to under-read exactly this
-regime. If anything the true figure is lower. Treat it as "we have never come
-close, and we do not know where the edge is."</p>
-<hr />
-<h2 id="4-the-creek">4. The creek</h2>
-<h3>Rain to creek level</h3>
-<p>Fitting Bridge Street's level against rainfall — using only readings taken while
-the creek was rising, since a falling creek is just draining — gives a clear
-answer about which rainfall window matters:</p>
-<ul>
-<li><strong>Six-hour rainfall is the dominant driver.</strong> Twelve-hour is the best single
-  window on its own, but in combination six-hour carries the most weight.</li>
-<li>The lag is <strong>under an hour</strong>. The creek responds almost immediately.</li>
-<li>Antecedent wetness matters (about a third the weight of the rain term).</li>
-<li><strong>Season-to-date rainfall does not matter at all.</strong> It added essentially
-  nothing in every layer it was tested in, and has been dropped everywhere.</li>
-</ul>
-<p>A simpler model — predicting each storm's <em>peak</em> from its <em>total</em> rain plus how
-wet the ground was at the start — reaches 82% of the variance with two inputs,
-against 87% for the complicated version with five. The simple one is preferred.</p>
-<h3>Ross predicts Bridge Street almost exactly</h3>
-<p>This is the most useful single result in the analysis.</p>
-<pre><code>Bridge Street level  =  0.767 × Ross level  −  1.96
-</code></pre>
-<p>Across 24 storms this fits with <strong>R² = 0.9965</strong> and a typical error of <strong>0.10
-feet</strong>. It is straight — a curved fit adds nothing.</p>
-<p>Why it matters: Bridge Street's gauge is event-based, sparse, occasionally
-offline, and scraped from a county web page. Ross is USGS — real-time, every
-fifteen minutes, reliable, and already on the dashboard. So the downtown creek
-level can be read off a gauge that never goes quiet.</p>
-<p>Converting the Town's action lines onto the Ross gauge:</p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th>Town line</th>
-<th style="text-align: right;">Bridge St</th>
-<th style="text-align: right;">Equivalent Ross</th>
-<th>95% band</th>
-<th>Reliable?</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Stage 2 — notify public</td>
-<td style="text-align: right;">6.5 ft</td>
-<td style="text-align: right;"><strong>11.03 ft</strong></td>
-<td>10.74 – 11.32</td>
-<td><strong>Yes — inside observed range</strong></td>
-</tr>
-<tr>
-<td>Stage 5 — flood horn</td>
-<td style="text-align: right;">13.0 ft</td>
-<td style="text-align: right;">19.50 ft</td>
-<td>19.07 – 19.93</td>
-<td>No — 1.6× beyond the data</td>
-</tr>
-<tr>
-<td>NWS minor flood</td>
-<td style="text-align: right;">13.3 ft</td>
-<td style="text-align: right;">19.89 ft</td>
-<td>19.46 – 20.33</td>
-<td>No — 1.6× beyond the data</td>
-</tr>
-</tbody>
-</table></div>
-<p>Ross ran between 4.54 and 12.12 ft last winter, so <strong>the notify line is a number
-we have actually seen the creek approach</strong>. The flood lines are extrapolation.</p>
-<p>One reassuring cross-check on that extrapolation: applied to the January 1982
-flood of record (Ross 19.81 ft, the highest in 59 years of USGS peaks), the
-formula predicts Bridge Street at <strong>13.24 ft</strong> — almost exactly the 13.0 ft where
-the Town says water reaches the building at 730 San Anselmo Avenue. The
-extrapolation lands where independent local knowledge says it should.</p>
-<h3>Early warning from the creek itself</h3>
-<p>Does the creek's rate of rise in the first three hours tell you where it will
-end up? <strong>On its own, no</strong> — that relationship is weak. Where the creek <em>starts</em>
-matters considerably more than how fast it is climbing. The rise rate does
-predict how much <em>further</em> it will climb, which is useful once you know the
-starting point. Only 9 of 24 storms even had enough early readings to test this,
-because the gauge is quiet until the creek starts moving.</p>
-<hr />
-<h2 id="5-how-good-are-the-rain-forecasts-not-very">5. How good are the rain forecasts? (Not very)</h2>
-<p>Open-Meteo's forecasts were compared against what the station actually caught.</p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th></th>
-<th style="text-align: right;">Captured</th>
-<th style="text-align: right;">Correlation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Day-ahead, all days</td>
-<td style="text-align: right;"><strong>75.5%</strong></td>
-<td style="text-align: right;">0.81</td>
-</tr>
-<tr>
-<td>Three days ahead, all days</td>
-<td style="text-align: right;"><strong>49.6%</strong></td>
-<td style="text-align: right;">0.67</td>
-</tr>
-<tr>
-<td>Day-ahead, wet days only</td>
-<td style="text-align: right;">75.3%</td>
-<td style="text-align: right;">0.53</td>
-</tr>
-<tr>
-<td>Three days ahead, wet days only</td>
-<td style="text-align: right;">49.3%</td>
-<td style="text-align: right;"><strong>0.21</strong></td>
-</tr>
-</tbody>
-</table></div>
-<p><strong>The forecast runs dry, and worse the further out you look.</strong> At three days on
-wet days the correlation of 0.21 is close to no skill at all.</p>
-<p>For the five wettest storms specifically, the day-ahead forecast under-called
-them by <strong>41%</strong> and the three-day by <strong>68%</strong>. The single worst miss was 5 January
-2026 — the day the creek crested — where 2.81 inches fell against a day-ahead
-forecast of 0.62 inches and a three-day forecast of 0.25 inches. <strong>It saw nine
-percent of what arrived.</strong></p>
-<p>This is why every forecast threshold in the rebuilt rules is multiplied by a
-correction factor (1.35 for day-ahead, 2.0 for three-day) before being compared
-to anything.</p>
-<hr />
-<h2 id="6-the-rules-before-and-after">6. The rules: before and after</h2>
-<h3>Before</h3>
-<p>The board's original thresholds were replayed against the winter. Of fifteen
-storms:</p>
-<ul>
-<li><strong>Eight fired no alert of any kind.</strong></li>
-<li>The largest storm of the winter — 5.54 inches, creek to 7.38 feet, past the
-  Town's notify line — <strong>was one of them.</strong> Its heaviest hour reached 0.51
-  inches against a 0.6-inch threshold; its rain rate never touched 0.75 in/hr;
-  and the forecast was far too dry to trip the 2- and 3-inch forecast rules.</li>
-<li>When rules did fire, the typical warning was <strong>0.7 to 2.2 hours</strong> — enough to
-  move a car, not to stage sandbags.</li>
-<li>The sump rules never fired at all (thresholds of 50% and 80% duty, against a
-  season maximum of 50.8%).</li>
-<li>The creek rules never fired (they were set at flood stages the creek came
-  nowhere near).</li>
-</ul>
-<h3>After</h3>
-<p>The rebuilt ladder has five levels and draws on the creek gauge, the pump's run
-lengths, and bias-corrected forecasts.</p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th>Storm (by creek peak)</th>
-<th style="text-align: right;">Rain</th>
-<th style="text-align: right;">Peak ft</th>
-<th>Highest tier</th>
-<th style="text-align: right;">Warning before peak</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>2 Jan 2026</td>
-<td style="text-align: right;">5.54</td>
-<td style="text-align: right;">7.38</td>
-<td><strong>Act</strong></td>
-<td style="text-align: right;"><strong>63 h</strong> (Watch at 98 h)</td>
-</tr>
-<tr>
-<td>14 Feb 2026</td>
-<td style="text-align: right;">3.76</td>
-<td style="text-align: right;">6.90</td>
-<td>Act</td>
-<td style="text-align: right;">1.3 h (Watch at 24 h)</td>
-</tr>
-<tr>
-<td>24 Dec 2025</td>
-<td style="text-align: right;">1.15</td>
-<td style="text-align: right;">5.29</td>
-<td>Act</td>
-<td style="text-align: right;">24 h</td>
-</tr>
-<tr>
-<td>20 Dec 2025</td>
-<td style="text-align: right;">3.30</td>
-<td style="text-align: right;">4.81</td>
-<td>Prepare</td>
-<td style="text-align: right;">24 h</td>
-</tr>
-<tr>
-<td>31 Dec 2025</td>
-<td style="text-align: right;">3.23</td>
-<td style="text-align: right;">4.46</td>
-<td>Prepare</td>
-<td style="text-align: right;">7 h</td>
-</tr>
-<tr>
-<td>18 Feb 2026</td>
-<td style="text-align: right;">1.45</td>
-<td style="text-align: right;">3.95</td>
-<td>Prepare</td>
-<td style="text-align: right;">45 h</td>
-</tr>
-<tr>
-<td>17 Feb 2026</td>
-<td style="text-align: right;">0.95</td>
-<td style="text-align: right;">3.67</td>
-<td>Act</td>
-<td style="text-align: right;">3.7 h</td>
-</tr>
-<tr>
-<td>12 Nov 2025</td>
-<td style="text-align: right;">2.46</td>
-<td style="text-align: right;">3.35</td>
-<td>Act</td>
-<td style="text-align: right;">0.3 h</td>
-</tr>
-<tr>
-<td>4 more storms</td>
-<td style="text-align: right;">≤1.9</td>
-<td style="text-align: right;">≤2.72</td>
-<td>none</td>
-<td style="text-align: right;">—</td>
-</tr>
-</tbody>
-</table></div>
-<p><strong>Eleven of fifteen storms now reach Prepare, eight reach Act.</strong> The four that
-still trigger nothing all peaked below 2.72 feet — well under any level worth
-acting on, so silence is correct there.</p>
-<p>False alarm rates, judged by whether the creek actually did anything that day:
-<strong>Prepare 8%</strong> (one quiet day, and it reached 2.99 ft — a near miss, not a
-blunder). <strong>Act 44%</strong>, which is high and worth watching. One rule as originally
-drafted — "three consecutive lengthening pump runs" — fired on 2.6% of all runs
-and produced a 62% false-alarm rate, because a 16→17→18 second ripple satisfied
-it. Requiring the third run to reach 25 seconds cut it from 94 triggers to 16
-while keeping every real storm.</p>
-<p>Three rules could not be replayed and are flagged rather than quietly skipped:
-the CW3E atmospheric-river outlook and NWS Flood Watch have no local archive, and
-<strong>the backup pump has never been instrumented at all</strong> — every one of the 3,674
-exported runs sits in one power mode matching the primary. Backup-pump start is
-the top of the ladder and nothing can currently raise it.</p>
-<hr />
-<h2 id="7-december-2005-and-what-the-sump-is-not-for">7. December 2005, and what the sump is not for</h2>
-<p><strong>Water entered this basement from the north side in the 2005 flood, to roughly
-two inches. That was before the sump existed. The defense against creek flooding
-on that side is physical barriers, not the pump.</strong> Nothing in this analysis
-changes that. The sump handles groundwater and drain inflow; it is not a flood
-barrier and its capacity is irrelevant to a creek that comes overland.</p>
-<p>We tried to put a number on that event and largely could not:</p>
-<ul>
-<li><strong>USGS 11460000 has no reading for 31 December 2005.</strong> The gauge was not
-  operating: its annual peak record skips 1998–2009 entirely, and continuous
-  data only resumes in November 2009. So the Ross→Bridge Street conversion cannot
-  be applied to 2005 — there is no input to convert.</li>
-<li>For scale, the two nearest reference points on record are the <strong>1982 flood of
-  record (Ross 19.81 ft, 7,200 cfs)</strong>, which converts to about 13.2 ft at Bridge
-  Street, and <strong>2017 (Ross 17.66 ft)</strong> at about 11.6 ft. Published accounts
-  describe 2005 as slightly below 1982.</li>
-<li>Independent accounts of 31 December 2005 put roughly <strong>5,980 cfs</strong> arriving at
-  San Anselmo (about 4,105 cfs in the channel and 1,875 cfs over the streets),
-  with <strong>more than four feet of water on San Anselmo Avenue</strong>, 140 businesses and
-  290 homes damaged, and roughly $30 million in losses.</li>
-<li><strong>No public source gives a water-surface elevation or depth near Woodland
-  Avenue.</strong> The FEMA high-water-mark project summary contains no elevations and
-  does not mention Woodland. The authoritative document is the FEMA Flood
-  Insurance Study flood profile for San Anselmo Creek (Marin County FIS, current
-  FIRM effective 17 March 2014), which has to be pulled from the FEMA Map Service
-  Center; the Town also holds physical high-water-mark plaques from 2005 on
-  buildings around town, and FEMA's estimated-BFE viewer may give a
-  property-level number.</li>
-</ul>
-<p>Getting the FIS profile for the reach near Woodland Ave is the one outstanding
-piece that would turn "roughly two inches from the north" into a design figure
-for the barriers.</p>
-<hr />
-<h2 id="8-what-everything-rests-on-and-what-to-measure">8. What everything rests on, and what to measure</h2>
-<h3>The one assumption that moves everything</h3>
-<p>Every gallon, every inflow rate and every stress number in this report scales
-directly with <strong>how far the float travels before the pump switches off</strong>. That
-distance is recorded as 4.5 inches and is <strong>assumed, not measured.</strong></p>
-<div class="tw"><table>
-<thead>
-<tr>
-<th>If the float travel is…</th>
-<th style="text-align: right;">Pump delivers</th>
-<th>Effect</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3.0 in</td>
-<td style="text-align: right;">56.7 GPM</td>
-<td>every inflow figure drops a third</td>
-</tr>
-<tr>
-<td>4.0 in</td>
-<td style="text-align: right;">75.5 GPM</td>
-<td>drops 10%</td>
-</tr>
-<tr>
-<td><strong>4.5 in (assumed)</strong></td>
-<td style="text-align: right;"><strong>85.0 GPM</strong></td>
-<td>matches the 84 GPM nameplate</td>
-</tr>
-<tr>
-<td>5.0 in</td>
-<td style="text-align: right;">94.4 GPM</td>
-<td>rises 11%</td>
-</tr>
-</tbody>
-</table></div>
-<p>The 4.5-inch assumption produces 84.98 GPM against a nameplate of 84 — agreement
-so close it is either confirmation or coincidence. <strong>Measuring the actual float
-travel is the highest-value thing left to do</strong>, and it takes a tape measure.</p>
-<h3>Everything else worth measuring</h3>
-<ol>
-<li><strong>Instrument the backup pump.</strong> It is the top alert tier and currently cannot
-   fire. Either it never ran last winter or nothing was watching.</li>
-<li><strong>Get the FEMA FIS flood profile</strong> for San Anselmo Creek near Woodland Ave,
-   for a real water-surface elevation at the house.</li>
-<li><strong>Log rival rain forecasts.</strong> The board now records NWS gridded QPF, CNRFC
-   6-hourly QPF, and ECMWF / GFS / HRRR alongside Open-Meteo every run, so next
-   spring can rank them instead of trusting a blend that captured 75% of the rain
-   at one day and 50% at three.</li>
-<li><strong>Re-check the Ross→Bridge Street relation after another winter.</strong> R² of
-   0.997 between two separate gauges is tight enough to be worth confirming
-   before it is relied on.</li>
-<li><strong>Watch the Act-tier false alarm rate</strong> (currently 44%) and tighten if it
-   becomes noise.</li>
-</ol>
-<h3>Two things not to forget</h3>
-<ul>
-<li>Every relationship here was fitted on a winter that <strong>never approached
-  flooding</strong> — peak 55% of minor flood stage. Extrapolating to a real flood is
-  not supported by this data.</li>
-<li>The pump had <strong>at least half its capacity spare in every storm.</strong> The thing
-  that flooded this basement in 2005 was not inflow the sump could have pumped.
-  It was the creek, from the north, and the answer to that is barriers.</li>
-</ul>
-<p class="stamp">Generated from <code>analysis/report.md</code> by
-<code>analysis/render_report.py</code> on 08 September 2026. Edit the markdown and re-run
-that script rather than editing this page &mdash; it is overwritten.</p>
+<header class="top"></header>
+<main>
+  <p class="lead">Every relationship the planner relies on, drawn from last winter's 24 storms and 349 rising-limb creek readings. Points are observations; the solid line is the fit the models use; the shaded band is its 95&nbsp;% range. Hover a point for the storm. <a href="analysis.html">Read the full write-up →</a></p>
+
+  <section class="card"><h2>Bridge Street crest vs storm total <span class="sub" id="s1"></span></h2>
+    <div class="fig"><div class="chart" id="c1"></div><div class="cap" id="t1"></div></div></section>
+
+  <section class="card"><h2>Predicted vs actual crest <span class="sub" id="s2"></span></h2>
+    <div class="fig"><div class="chart" id="c2"></div><div class="cap" id="t2"></div></div></section>
+
+  <section class="card"><h2>Ross gauge vs Bridge Street <span class="sub" id="s3"></span></h2>
+    <div class="fig"><div class="chart" id="c3"></div><div class="cap" id="t3"></div></div></section>
+
+  <section class="card"><h2>Creek stage vs the last 6 hours of rain <span class="sub" id="s4"></span></h2>
+    <div class="fig"><div class="chart" id="c4"></div><div class="cap" id="t4"></div></div></section>
+
+  <section class="card"><h2>Sump inflow vs the heaviest 10 minutes <span class="sub" id="s5"></span></h2>
+    <div class="fig"><div class="chart" id="c5"></div><div class="cap" id="t5"></div></div></section>
+
+  <section class="card"><h2>Pump starts saturate; run length does not <span class="sub" id="s6"></span></h2>
+    <div class="fig"><div class="chart" id="c6"></div><div class="cap" id="t6"></div></div></section>
+
+  <section class="card"><h2>How dry the forecasts ran <span class="sub" id="s7"></span></h2>
+    <div class="fig"><div class="chart" id="c7"></div><div class="cap" id="t7"></div></div></section>
+
+  <section class="card"><h2>Ross baseflow vs ground wetness <span class="sub" id="s8"></span></h2>
+    <div class="fig"><div class="chart" id="c8"></div><div class="cap" id="t8"></div></div></section>
 </main>
+
+<script src="assets/planner.js?v=11"></script>
+<script>
+(async () => {
+  renderNav("report");
+  const [M, cat, P, F] = await Promise.all([
+    loadJSON("data/models.json"),
+    loadJSON("data/storms_2025_26.json"),
+    loadJSON("data/report_points.json").catch(() => ({})),
+    loadJSON("data/forecast.json").catch(e => ({ _missing: String(e) })),
+  ]);
+  setTierChip(tierFromForecast(M, F));
+  const storms = cat.storms.map(s => ({ ...s.actual, f: s.forecast, p: s.predicted, id: +s.id.slice(-2), start: s.start_local }));
+  const label = s => `<b>Storm ${s.id}</b> · ${s.start.slice(0, 10)}`;
+
+  /* ---- scatter helper ----
+     series: [{pts:[{x,y,tip,cls}], cls}], lines: [{fn(x)->y | pts, cls, label, from, to}],
+     hlines: [{y, label, cls}], band: {fn, half}  */
+  function scatter(host, o) {
+    const W = 640, H = 360, L = 48, R = 14, T = 14, B = 44;
+    const xs = o.series.flatMap(s => s.pts.map(p => p.x)), ys = o.series.flatMap(s => s.pts.map(p => p.y));
+    const xmin = o.xmin ?? 0, xmax = o.xmax ?? niceMax(Math.max(...xs));
+    const ymin = o.ymin ?? 0, ymax = o.ymax ?? niceMax(Math.max(...ys, ...(o.hlines || []).map(h => h.y)));
+    const x = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
+    const y = v => T + (H - T - B) * (1 - (v - ymin) / (ymax - ymin));
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}` });
+    for (const v of ticks(ymin, ymax)) {
+      svg.appendChild(svgEl("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "grid" }));
+      svg.appendChild(svgEl("text", { x: L - 6, y: y(v) + 3, "text-anchor": "end", class: "ax" }, fmtTick(v)));
+    }
+    for (const t of (o.xticks || ticks(xmin, xmax).map(v => ({ v, label: fmtTick(v) })))) {
+      svg.appendChild(svgEl("line", { x1: x(t.v), x2: x(t.v), y1: H - B, y2: H - B + 4, class: "grid" }));
+      svg.appendChild(svgEl("text", { x: x(t.v), y: H - B + 15, "text-anchor": "middle", class: "ax" }, t.label));
+    }
+    svg.appendChild(svgEl("text", { x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle", class: "axl" }, o.xlabel));
+    svg.appendChild(svgEl("text", { x: 12, y: (T + H - B) / 2, "text-anchor": "middle", class: "axl", transform: `rotate(-90 12 ${(T + H - B) / 2})` }, o.ylabel));
+    const clampY = v => Math.max(ymin, Math.min(ymax, v));
+    if (o.band) {
+      const a = o.band.from ?? xmin, b = o.band.to ?? xmax, n = 40;
+      let up = "", down = "";
+      for (let i = 0; i <= n; i++) { const xv = a + (b - a) * i / n; up += `${i ? "L" : "M"}${x(xv)} ${y(clampY(o.band.fn(xv) + o.band.half))} `; }
+      for (let i = n; i >= 0; i--) { const xv = a + (b - a) * i / n; down += `L${x(xv)} ${y(clampY(o.band.fn(xv) - o.band.half))} `; }
+      svg.appendChild(svgEl("path", { d: up + down + "Z", class: "band" }));
+    }
+    const labelSlots = [];
+    (o.lines || []).forEach((ln, li) => {
+      const a = ln.from ?? xmin, b = ln.to ?? xmax, n = 60;
+      let d = "", pen = false, lastX = null, lastY = null;
+      for (let i = 0; i <= n; i++) {
+        const xv = a + (b - a) * i / n, yv = ln.fn(xv);
+        if (yv < ymin || yv > ymax) { pen = false; continue; }
+        d += `${pen ? "L" : "M"}${x(xv).toFixed(1)} ${y(yv).toFixed(1)} `; pen = true; lastX = xv; lastY = yv;
+      }
+      svg.appendChild(svgEl("path", { d, class: "fit " + (ln.cls || "") }));
+      if (ln.label && lastX != null) {
+        // label where the line leaves the plot; nudge down if another label is already there
+        let ly = y(lastY) - 5, lx = x(lastX) - 4;
+        while (labelSlots.some(s => Math.abs(s.x - lx) < 120 && Math.abs(s.y - ly) < 13)) ly += 13;
+        labelSlots.push({ x: lx, y: ly });
+        svg.appendChild(svgEl("text", { x: lx, y: ly, "text-anchor": "end", class: "line-label" }, ln.label));
+      }
+    });
+    for (const h of (o.hlines || [])) {
+      svg.appendChild(svgEl("line", { x1: L, x2: W - R, y1: y(h.y), y2: y(h.y), class: "hline " + (h.cls || "") }));
+      svg.appendChild(svgEl("text", { x: L + 4, y: y(h.y) - 4, class: "line-label" }, h.label));
+    }
+    const tip = document.createElement("div"); tip.className = "tip";
+    host.innerHTML = ""; host.appendChild(svg); host.appendChild(tip);
+    for (const s of o.series) for (const p of s.pts) {
+      const r = p.r || 5;
+      const c = svgEl("circle", { cx: x(p.x), cy: y(p.y), r, class: "pt " + (s.cls || "") + " " + (p.cls || "") });
+      svg.appendChild(c);
+      const hit = svgEl("circle", { cx: x(p.x), cy: y(p.y), r: Math.max(r + 5, 9), class: "hit" });
+      hit.addEventListener("mouseenter", () => {
+        tip.innerHTML = p.tip; tip.style.display = "block";
+        const rc = host.getBoundingClientRect();
+        tip.style.left = Math.min(rc.width - 190, x(p.x) / W * rc.width + 10) + "px";
+        tip.style.top = Math.max(0, y(p.y) / H * rc.height - 36) + "px";
+      });
+      hit.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+      svg.appendChild(hit);
+    }
+  }
+  function niceMax(v) { if (!(v > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; const n = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10; return n * p * (v / (n * p) > 0.95 ? 1.2 : 1); }
+  function ticks(a, b) { const span = b - a; const step = [0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 500].find(s => span / s <= 7) || 1000; const out = []; for (let v = Math.ceil(a / step) * step; v <= b + 1e-9; v += step) out.push(+v.toFixed(6)); return out; }
+  const fmtTick = v => Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(0) : v % 1 ? v.toFixed(v * 10 % 1 ? 2 : 1) : v.toFixed(0);
+  const legend = (host, items) => { const d = document.createElement("div"); d.className = "legend"; d.innerHTML = items.map(i => `<span><i class="${i.cls || ""}" style="${i.style || ""}"></i>${i.label}</span>`).join(""); host.appendChild(d); };
+  const stat = rows => `<div class="stat">${rows.map(([k, v]) => `<span>${k}</span><b>${v}</b>`).join("")}</div>`;
+
+  /* ---- 1. crest vs total, coloured by wetness (dry / wet lines) ---- */
+  {
+    const ep = M.event_peak, b = ep.beta;
+    const apis = storms.map(s => s.api_at_start);
+    const med = apis.slice().sort((a, c) => a - c)[Math.floor(apis.length / 2)];
+    const wetCut = 3.0;
+    scatter($("c1"), {
+      xlabel: "Storm total, in", ylabel: "Bridge Street crest, ft",
+      series: [{ pts: storms.map(s => ({ x: s.total_rain_in, y: s.bridge_peak_ft, cls: s.api_at_start >= wetCut ? "" : "dim",
+        tip: `${label(s)}<br>${fmt(s.total_rain_in)}" → ${fmt(s.bridge_peak_ft)} ft<br>wetness ${fmt(s.api_at_start)} in` })) }],
+      lines: [{ fn: x => b[0] + b[1] * x + b[2] * 5.0, label: "wet ground (index 5)" },
+              { fn: x => b[0] + b[1] * x + b[2] * 0.5, cls: "dash", label: "dry ground (index 0.5)" }],
+      hlines: [{ y: 6.5, label: "6.5 ft notify" }],
+    });
+    legend($("c1"), [{ label: "storm, ground wet (index ≥ 3)", style: "background:var(--c1)" }, { label: "storm, ground dry", style: "background:var(--c1);opacity:.35" },
+                     { label: "fit, wet", cls: "line", style: "background:var(--fit)" }, { label: "fit, dry", cls: "line dash" }]);
+    $("s1").textContent = `R² ${ep.r2} · n=${ep.n}`;
+    $("t1").innerHTML = `The crest model: <b>peak = ${b[0]} + ${b[1]} × total + ${b[2]} × wetness</b>. Two inputs explain ${Math.round(ep.r2 * 100)} % of the variance across the winter's storms. The same storm on saturated ground crests about <b>${fmt(b[2] * 4.5, 1)} ft higher</b> than on dry ground, which is why the wetness page exists. The two crests past the notify line both came on ground with an index above 1.`
+      + stat([["Residual sd", `${ep.residual_sd} ft`], ["95 % band", `±${ep.band_95} ft`], ["Median wetness at onset", `${fmt(med)} in`], ["Largest storm", `${M.observed_maxima.total_rain_in}" → ${M.observed_maxima.bridge_peak_ft} ft`]]);
+  }
+
+  /* ---- 2. predicted vs actual ---- */
+  {
+    const ep = M.event_peak;
+    const mx = niceMax(Math.max(...storms.map(s => Math.max(s.bridge_peak_ft, s.p.bridge_peak_ft))));
+    scatter($("c2"), {
+      xlabel: "Actual crest, ft", ylabel: "Model crest, ft", xmax: mx, ymax: mx,
+      series: [{ pts: storms.map(s => ({ x: s.bridge_peak_ft, y: s.p.bridge_peak_ft,
+        tip: `${label(s)}<br>actual ${fmt(s.bridge_peak_ft)} ft · model ${fmt(s.p.bridge_peak_ft, 1)} ft<br>error ${(s.p.bridge_peak_ft - s.bridge_peak_ft >= 0 ? "+" : "")}${(s.p.bridge_peak_ft - s.bridge_peak_ft).toFixed(1)} ft` })) }],
+      lines: [{ fn: x => x, cls: "dash", label: "perfect" }],
+      band: { fn: x => x, half: ep.band_95 },
+    });
+    legend($("c2"), [{ label: "storm", style: "background:var(--c1)" }, { label: "model = actual", cls: "line dash" }, { label: `±${ep.band_95} ft band`, style: "background:var(--bandfill);border:1px solid var(--rule)" }]);
+    const errs = storms.map(s => s.p.bridge_peak_ft - s.bridge_peak_ft);
+    const within = errs.filter(e => Math.abs(e) <= ep.band_95).length;
+    $("s2").textContent = `${within} of ${storms.length} inside the band`;
+    $("t2").innerHTML = `The model applied to the rain that actually fell, against the crest that actually happened. Points on the dashed line are perfect. The two misses are the <b>Feb 14</b> storm (model high by ${fmt(-Math.min(...errs), 1)} ft, a fast 47-hour storm) and <b>Dec 24</b> (model low: 1.15 inches on very wet ground produced 5.3 ft). Everything above 7.4 ft is extrapolation.`
+      + stat([["Mean error", `${(errs.reduce((a, e) => a + e, 0) / errs.length).toFixed(2)} ft`], ["Largest miss", `${fmt(Math.max(...errs.map(Math.abs)), 1)} ft`]]);
+  }
+
+  /* ---- 3. Ross vs Bridge ---- */
+  {
+    const r = M.ross_to_bridge;
+    const fitTo = r.fitted_ross_range_ft[1];
+    scatter($("c3"), {
+      xlabel: "Ross crest (USGS 11460000), ft", ylabel: "Bridge Street crest, ft", xmin: 4, xmax: 20, ymax: 14,
+      series: [{ pts: storms.map(s => ({ x: s.ross_peak_ft, y: s.bridge_peak_ft, tip: `${label(s)}<br>Ross ${fmt(s.ross_peak_ft)} ft → Bridge ${fmt(s.bridge_peak_ft)} ft` })) }],
+      lines: [{ fn: x => r.slope * x + r.intercept, from: 4, to: fitTo },
+              { fn: x => r.slope * x + r.intercept, from: fitTo, to: 20, cls: "dash", label: "extrapolated" }],
+      hlines: [{ y: 6.5, label: `6.5 ft notify = Ross ${r.notify_line_ross_ft}` }, { y: 13, label: `13 ft flood horn = Ross ${r.flood_horn_ross_ft}`, cls: "red" }],
+    });
+    legend($("c3"), [{ label: "storm", style: "background:var(--c1)" }, { label: "fit, inside the data", cls: "line", style: "background:var(--fit)" }, { label: "fit, beyond the data", cls: "line dash" }]);
+    $("s3").textContent = `R² 0.9965 · sd 0.10 ft`;
+    $("t3").innerHTML = `<b>bridge = ${r.slope} × ross ${r.intercept}</b>. The tightest relationship in the data, and the most useful: Ross is a real-time USGS gauge, Bridge Street reports only when it moves. The notify line sits inside the fitted range; the 13 ft line is ${r.flood_horn_extrapolation.split(" ")[0]} beyond it. One cross-check: the 1982 flood of record (Ross 19.81 ft) maps to 13.2 ft, where the Town says water reaches 730 San Anselmo Ave.`
+      + stat([["Fitted Ross range", `${r.fitted_ross_range_ft[0]} – ${r.fitted_ross_range_ft[1]} ft`], ["Notify line band", `${r.notify_line_band_ft[0]} – ${r.notify_line_band_ft[1]} ft`]]);
+  }
+
+  /* ---- 4. rising limb: stage vs 6-h rain ---- */
+  {
+    const cp = M.creek_predictor, pts = (P.rising_limb || {}).points || [];
+    const apis = pts.map(p => p.api).sort((a, b) => a - b), med = apis[Math.floor(apis.length / 2)] || 2;
+    scatter($("c4"), {
+      xlabel: "Rain in the previous 6 h, in", ylabel: "Bridge Street stage, ft",
+      series: [{ pts: pts.map(p => ({ x: p.r6h, y: p.stage, r: 3.5, cls: p.api >= 3 ? "" : "dim", tip: `<b>${p.t.replace("T", " ")}</b><br>${fmt(p.r6h)}" in 6 h → ${fmt(p.stage)} ft<br>wetness ${fmt(p.api)} in` })) }],
+      lines: [{ fn: x => cp.intercept + cp.coef_r6h_in * x + cp.coef_api * 5, label: "wet ground (index 5)" },
+              { fn: x => cp.intercept + cp.coef_r6h_in * x + cp.coef_api * 0.5, cls: "dash", label: "dry ground" }],
+      hlines: [{ y: 6.5, label: "6.5 ft notify" }],
+    });
+    legend($("c4"), [{ label: "reading, ground wet (index ≥ 3)", style: "background:var(--c1)" }, { label: "reading, ground dry", style: "background:var(--c1);opacity:.35" }, { label: "fit, wet", cls: "line", style: "background:var(--fit)" }, { label: "fit, dry", cls: "line dash" }]);
+    $("s4").textContent = `R² ${cp.r2} · n=${pts.length} readings`;
+    $("t4").innerHTML = `Every Bridge Street reading taken while the creek was rising, against the rain of the previous six hours. <b>stage = ${cp.intercept} + ${cp.coef_r6h_in} × rain₆ₕ + ${cp.coef_api} × wetness</b>. Six hours was the window that carried the most weight, and the lag is under an hour: the creek answers the rain almost at once. The planner uses this as the rate-based cross-check.`
+      + stat([["Residual sd", `${cp.residual_sd_ft} ft`], ["95 % band", `±${cp.band_95_ft} ft`], ["Median wetness", `${fmt(med)} in`]]);
+  }
+
+  /* ---- 5. sump inflow vs 10-min peak ---- */
+  {
+    const si = M.sump_inflow, b = si.beta, Qp = M.pump.rated_gpm;
+    scatter($("c5"), {
+      xlabel: "Heaviest 10 minutes, in/hr", ylabel: "Peak 15-min inflow, GPM", ymax: 100,
+      series: [{ pts: storms.map(s => ({ x: s.peak_10min_in * 6, y: s.sump_peak_inflow_gpm, cls: s.api_at_start >= 3 ? "" : "dim", tip: `${label(s)}<br>${fmt(s.peak_10min_in * 6)} in/hr → ${fmt(s.sump_peak_inflow_gpm, 0)} GPM<br>wetness ${fmt(s.api_at_start)} in` })) }],
+      lines: [{ fn: x => b[0] + b[1] * (x / 6) + b[2] * 5, label: "wet ground (index 5)" }, { fn: x => b[0] + b[1] * (x / 6) + b[2] * 0.5, cls: "dash", label: "dry ground" }],
+      hlines: [{ y: Qp, label: `${Qp} GPM pump capacity`, cls: "red" }],
+    });
+    legend($("c5"), [{ label: "storm, ground wet", style: "background:var(--c1)" }, { label: "storm, ground dry", style: "background:var(--c1);opacity:.35" }, { label: "fit, wet", cls: "line", style: "background:var(--fit)" }, { label: "fit, dry", cls: "line dash" }]);
+    $("s5").textContent = `R² ${si.r2} · n=${si.n}`;
+    $("t5").textContent = "";
+    $("t5").innerHTML = `Inflow is what the pump had to move in its busiest quarter-hour: run seconds × ${Qp} GPM. <b>inflow = ${b[0]} + ${b[1]} × rain₁₀ₘ + ${b[2]} × wetness</b>, with rain in inches per 10 minutes. The pump never passed half of capacity in any sustained window last winter, and the heaviest ten minutes ever recorded here (1.56 in/hr) is far short of the 2 to 3 in/hr the line reaches capacity at. That extrapolation is the one number in this report not to trust: the run-level model under-reads the worst single runs by about 2×.`
+      + stat([["Max sustained inflow", `${M.observed_maxima.inflow_gpm_15min} GPM`], ["Worst single run", "134 s ≈ 75 GPM"], ["Residual sd", `${si.residual_sd} GPM`]]);
+  }
+
+  /* ---- 6. starts per 15 min vs inflow ---- */
+  {
+    scatter($("c6"), {
+      xlabel: "Peak 15-min inflow, GPM", ylabel: "Pump starts in that 15 min", ymax: 16,
+      series: [{ pts: storms.map(s => ({ x: s.sump_peak_inflow_gpm, y: s.sump_peak_runs_per_15min, tip: `${label(s)}<br>${fmt(s.sump_peak_inflow_gpm, 0)} GPM · ${s.sump_peak_runs_per_15min} starts / 15 min` })) }],
+      lines: [{ fn: x => { const q = Math.min(x, 82); const run = 14 / (1 - q / 84); const refill = q > 0.5 ? 19.6 / q * 60 : 1e9; return 900 / (run + refill); }, label: "pit identity: run + refill" }],
+      hlines: [{ y: 12, label: "12 starts: where the data flattens" }],
+    });
+    legend($("c6"), [{ label: "storm", style: "background:var(--c1)" }, { label: "cycle time from the pit geometry", cls: "line", style: "background:var(--fit)" }]);
+    $("s6").textContent = "run length is the signal";
+    $("t6").innerHTML = `As inflow rises the pump does <b>not</b> start more often: starts flatten at about twelve per quarter-hour. What grows is how long each run lasts, from the usual 15–18 s to 38, 63, 100 and 134 s. The curve is the cycle time implied by the pit, a run of 14 / (1 − Qin/Qp) seconds then a refill of 19.6 gal ÷ Qin, and the data sit <b>below</b> it from about 25 GPM on: real starts are even scarcer than geometry allows. Counting starts will mislead you; the planner reports run length.`
+      + stat([["Shortest run ever", `${M.pump.min_run_s} s (dry pit)`], ["Drawdown per cycle", `${M.pump.drawdown_gal} gal`]]);
+  }
+
+  /* ---- 7. forecast skill ---- */
+  {
+    const withF = storms.filter(s => s.f && s.f.day_ahead_total_in != null);
+    const mx = niceMax(Math.max(...withF.map(s => s.total_rain_in)));
+    scatter($("c7"), {
+      xlabel: "Rain that fell, in", ylabel: "Forecast total (raw), in", xmax: mx, ymax: mx,
+      series: [{ cls: "", pts: withF.map(s => ({ x: s.total_rain_in, y: s.f.day_ahead_total_in, tip: `${label(s)}<br>fell ${fmt(s.total_rain_in)}" · day-ahead said ${fmt(s.f.day_ahead_total_in)}"` })) },
+               { cls: "s2", pts: withF.map(s => ({ x: s.total_rain_in, y: s.f.three_day_total_in, r: 4, tip: `${label(s)}<br>fell ${fmt(s.total_rain_in)}" · 3-day said ${fmt(s.f.three_day_total_in)}"` })) }],
+      lines: [{ fn: x => x, cls: "dash", label: "forecast = observed" },
+              { fn: x => x / M.qpf_bias.lead_24h, label: `÷${M.qpf_bias.lead_24h}` },
+              { fn: x => x / M.qpf_bias.lead_72h, cls: "dash", label: `÷${M.qpf_bias.lead_72h}` }],
+    });
+    legend($("c7"), [{ label: "day-ahead forecast", style: "background:var(--c1)" }, { label: "three-day forecast", style: "background:var(--c2)" }, { label: "perfect forecast", cls: "line dash" }, { label: "the bias lines the planner corrects with", cls: "line", style: "background:var(--fit)" }]);
+    const sum = k => withF.reduce((a, s) => a + s.f[k], 0), obs = withF.reduce((a, s) => a + s.total_rain_in, 0);
+    $("s7").textContent = `Open-Meteo archive · ${withF.length} storms`;
+    $("t7").innerHTML = `Almost every point sits below the dashed line: the forecast ran dry, and worse with lead. Over these storms the day-ahead total captured <b>${Math.round(100 * sum("day_ahead_total_in") / obs)} %</b> of the rain and the three-day <b>${Math.round(100 * sum("three_day_total_in") / obs)} %</b>. The worst miss was Jan 2–6: 5.5 inches against a day-ahead 2.1 and a three-day 1.6. The planner multiplies the first 24 h of forecast by ${M.qpf_bias.lead_24h} and the 72-hour mark by ${M.qpf_bias.lead_72h} before using it.`
+      + stat([["Day-ahead, all days", "75.5 % captured, r 0.81"], ["3-day, wet days", "49 % captured, r 0.21"]]);
+  }
+
+  /* ---- 8. baseflow vs wetness ---- */
+  {
+    const bf = M.baseflow_to_api || {}, pts = (P.baseflow || {}).points || [];
+    scatter($("c8"), {
+      xlabel: "Ross flow on a rain-free day, cfs (log scale)", ylabel: "Wetness index, in", xmin: -2.5, xmax: 5, ymax: 9,
+      xticks: [0.1, 0.3, 1, 3, 10, 30, 100].map(v => ({ v: Math.log(v), label: String(v) })),
+      series: [{ pts: pts.map(p => ({ x: Math.log(p.flow), y: p.api, r: 2.5, tip: `${fmt(p.flow, p.flow < 10 ? 2 : 0)} cfs · index ${fmt(p.api)} in` })) }],
+      lines: bf.intercept != null ? [{ fn: x => bf.intercept + bf.coef_ln_flow * x, label: "fit" }] : [],
+    });
+    legend($("c8"), [{ label: "rain-free 2-hour sample", style: "background:var(--c1)" }, { label: "fit on log flow", cls: "line", style: "background:var(--fit)" }]);
+    $("s8").textContent = `R² ${bf.r2} · n=${bf.n}`;
+    $("t8").innerHTML = `Between storms the creek's baseflow tracks how wet the catchment is, loosely: <b>index = ${bf.intercept} + ${bf.coef_ln_flow} × ln(flow)</b> explains about half the variance. The station's rain ledger is the primary wetness source; this is the cross-check the wetness page shows, and the fallback if the station history is unavailable. The cloud is wide because flow also depends on how recently it rained, not just how much.`
+      + stat([["Residual sd", `${bf.residual_sd} in`]]);
+  }
+})();
+</script>
 </body>
 </html>

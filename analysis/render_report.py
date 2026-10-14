@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Render analysis/report.md into docs/report.html, styled like the rest of the board.
+Render analysis/report.md into docs/analysis.html (the written report; report.html is the charts page), styled like the rest of the board.
 
 Kept as a generator rather than a hand-written page so the published report can
 never drift from the markdown it came from: edit report.md, re-run this.
@@ -16,7 +16,7 @@ import markdown
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 SRC = HERE / "report.md"
-OUT = ROOT / "docs" / "report.html"
+OUT = ROOT / "docs" / "analysis.html"
 ASSET_V = 9
 
 PAGES = [("planner.html", "Planner"), ("wetness.html", "Wetness"), ("storms.html", "Storms"),
