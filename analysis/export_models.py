@@ -143,6 +143,7 @@ def main():
             "predicted": {"bridge_peak_ft": round(float(pred), 2), "kind": "hindcast",
                           "_note": "event_peak model applied to the ACTUAL total and API"},
             "actual": {"total_rain_in": e.total_rain_in, "peak_1h_in": e.peak_rain_1h_in,
+                       "peak_10min_in": e.peak_rain_10min_in, "peak_30min_in": e.peak_rain_30min_in,
                        "peak_6h_in": e.peak_rain_6h_in, "api_at_start": e.api_at_start,
                        "bridge_peak_ft": e.peak_bridge_stage_ft, "ross_peak_ft": e.peak_ross_stage_ft,
                        "ross_peak_cfs": e.peak_ross_flow_cfs,
