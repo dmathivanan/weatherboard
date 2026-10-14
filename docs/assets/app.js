@@ -1,4 +1,6 @@
-/* 52 Woodland flood board — shared helpers, nav, data loading, rollups */
+/* 52 Woodland — legacy live pages (creek.html, storm.html): nav, data loading, rollups.
+   The planner pages use assets/planner.js instead. data/latest.json is no longer
+   refreshed by a poller; these pages overlay live feeds on that last snapshot. */
 const TZ = "America/Los_Angeles";
 const SITE = { lat: 37.9745, lon: -122.5625, zip: "94960", name: "San Anselmo" };
 
@@ -10,11 +12,12 @@ const SITE = { lat: 37.9745, lon: -122.5625, zip: "94960", name: "San Anselmo" }
 const AMBIENT_PROXY_URL = "";
 
 const PAGES = [
-  { id: "dashboard", href: "index.html",   label: "Dashboard" },
-  { id: "rainfall",  href: "rainfall.html", label: "Rainfall" },
-  { id: "creek",     href: "creek.html",    label: "Creek" },
-  { id: "storm",     href: "storm.html",    label: "Storm" },
-  { id: "report",    href: "report.html",   label: "Report" },
+  { id: "planner",  href: "planner.html", label: "Planner" },
+  { id: "wetness",  href: "wetness.html", label: "Wetness" },
+  { id: "storms",   href: "storms.html",  label: "Storms" },
+  { id: "creek",    href: "creek.html",   label: "Creek (live)" },
+  { id: "storm",    href: "storm.html",   label: "Radar" },
+  { id: "report",   href: "report.html",  label: "Report" },
 ];
 const TIER_LABEL = { quiet: "Quiet", watch: "Watch", prepare: "Prepare", act: "Act now",
                      emergency: "EMERGENCY" };
@@ -33,7 +36,7 @@ function renderHeader(active) {
   if (!el) return;
   el.innerHTML =
     `<div class="top-in">
-       <span class="brand">52 Weatherboard</span>
+       <a class="brand" href="index.html">52 Storm Planner</a>
        <nav class="tabs">${PAGES.map(p =>
          `<a href="${p.href}"${p.id === active ? ' class="active"' : ''}>${p.label}</a>`).join("")}</nav>
        <button class="refresh" id="refreshbtn"

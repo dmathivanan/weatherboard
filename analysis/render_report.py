@@ -19,8 +19,8 @@ SRC = HERE / "report.md"
 OUT = ROOT / "docs" / "report.html"
 ASSET_V = 9
 
-PAGES = [("index.html", "Dashboard"), ("rainfall.html", "Rainfall"),
-         ("creek.html", "Creek"), ("storm.html", "Storm"), ("report.html", "Report")]
+PAGES = [("planner.html", "Planner"), ("wetness.html", "Wetness"), ("storms.html", "Storms"),
+         ("creek.html", "Creek (live)"), ("storm.html", "Radar"), ("report.html", "Report")]
 
 HEAD = """<!doctype html>
 <html lang="en">
@@ -75,7 +75,7 @@ HEAD = """<!doctype html>
 <body>
 <header class="top">
   <div class="top-in">
-    <span class="brand">52 Weatherboard</span>
+    <a class="brand" href="index.html">52 Storm Planner</a>
     <nav class="tabs">{nav}</nav>
   </div>
 </header>

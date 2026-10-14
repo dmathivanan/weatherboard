@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>52 Storm Planner — Planner</title>
+<link rel="stylesheet" href="assets/app.css?v=10">
+<style>
+.inputs label{display:block;font-size:.82rem;color:var(--mute);margin:10px 0 2px}
+.inputs label b{color:var(--ink);font-size:1.05rem;font-weight:600;margin-left:6px}
+.inputs input[type=range]{width:100%;accent-color:var(--water)}
+.inputs input[type=number],.inputs input[type=datetime-local],.inputs select{
+  font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:6px 8px;width:100%}
+.inputs .pair{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font:inherit;font-size:.74rem;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  border-radius:999px;padding:3px 9px;cursor:pointer}
+.chip:hover{border-color:var(--water)}
+.chip b{font-weight:600}
+.stamp{font-size:.8rem;color:var(--mute);margin:0 0 12px}
+.stamp.stale{color:var(--amber);font-weight:500}
+.hero{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hero .pt{font-size:2.4rem;font-weight:700;line-height:1}
+.hero .band{color:var(--mute);font-size:.9rem}
+.lines{margin-top:10px}
+.lines .row .v{font-size:1rem}
+.warn{color:var(--amber);font-size:.82rem;margin-top:8px}
+.bad{color:var(--red)}
+ul.check{list-style:none;padding:0;margin:0}
+ul.check li{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule);font-size:.92rem}
+ul.check li:last-child{border-bottom:0}
+ul.check .due{font-weight:600;white-space:nowrap}
+ul.check .due small{display:block;font-weight:400;color:var(--mute)}
+ul.check li.off{opacity:.45}
+ul.check li.past .due{color:var(--red)}
+ul.check .need{font-size:.74rem;color:var(--mute)}
+.btn{font:inherit;font-size:.85rem;font-weight:600;color:var(--navy);background:var(--gold);border:0;border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin:8px 0 2px}
+.meter i{display:block;height:100%;background:var(--water)}
+.tier-reasons{font-size:.9rem;opacity:.95}
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <p class="stamp" id="stamp">Loading forecast…</p>
+
+  <div class="tier quiet" id="tier"><b>Quiet</b><span class="tier-reasons" id="reasons"></span></div>
+
+  <div class="cards2">
+    <section class="card inputs">
+      <h2>Storm inputs <span class="sub">pre-filled from the 6-hour forecast · edit freely</span></h2>
+
+      <label>48-hour rain total <b id="totalv">–</b> <span class="u">in</span></label>
+      <div class="pair">
+        <input type="range" id="total" min="0" max="10" step="0.05" value="0">
+        <input type="number" id="totaln" min="0" max="20" step="0.05" value="0">
+      </div>
+      <div class="chips" id="totalchips"></div>
+
+      <label>Peak hourly rate <b id="peakv">–</b> <span class="u">in/hr</span></label>
+      <div class="pair">
+        <input type="range" id="peak" min="0" max="1.5" step="0.01" value="0">
+        <input type="number" id="peakn" min="0" max="3" step="0.01" value="0">
+      </div>
+      <div class="chips" id="peakchips"></div>
+
+      <label>Ground wetness at onset <b id="apiv">–</b> <span class="u">API, in</span></label>
+      <div class="pair">
+        <input type="range" id="api" min="0" max="8" step="0.05" value="0">
+        <input type="number" id="apin" min="0" max="12" step="0.05" value="0">
+      </div>
+      <div class="meter"><i id="apimeter" style="width:0"></i></div>
+      <div class="note" id="apinote" style="margin-top:2px"></div>
+
+      <label>Rain starts</label>
+      <input type="datetime-local" id="onset">
+      <label>Heaviest rain at</label>
+      <input type="datetime-local" id="peakat">
+      <label>Rain ends</label>
+      <input type="datetime-local" id="end">
+
+      <div class="tiles c2" style="margin-top:12px">
+        <div>
+          <label>CW3E AR scale</label>
+          <select id="ar"><option value="">none</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div>
+          <label>NWS Flood Watch</label>
+          <select id="fw"><option value="0">no</option><option value="1">yes</option></select>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn ghost" id="reset">Back to forecast</button>
+        <button class="btn" id="save">Save this plan</button>
+      </div>
+      <p class="note" id="savednote"></p>
+    </section>
+
+    <div>
+      <section class="card">
+        <h2>Bridge Street crest <span class="sub" id="bridgefit"></span></h2>
+        <div class="hero"><span class="pt" id="bpt">–<small>ft</small></span><span class="band" id="bband"></span></div>
+        <div class="lines">
+          <div class="row"><span>Ross equivalent (USGS 11460000)</span><span class="v" id="rosseq">–</span></div>
+          <div class="row"><span>To the 6.5 ft notify line</span><span class="v" id="d65">–</span></div>
+          <div class="row"><span>To 13 ft (water at 730 SA Ave)</span><span class="v" id="d13">–</span></div>
+          <div class="row"><span>Rate-based cross-check (6-h model)</span><span class="v" id="cross">–</span></div>
+          <div class="row"><span>Creek crest expected</span><span class="v" id="crest">–</span></div>
+        </div>
+        <div class="warn" id="bwarn"></div>
+      </section>
+
+      <section class="card">
+        <h2>Sump at the peak rate <span class="sub" id="sumpfit"></span></h2>
+        <div class="tiles c3">
+          <div class="tile"><div class="v" id="stress">–<small>%</small></div><div class="k">of pump capacity</div></div>
+          <div class="tile"><div class="v" id="run">–<small>s</small></div><div class="k">run duration</div></div>
+          <div class="tile"><div class="v" id="rph">–</div><div class="k">runs per hour</div></div>
+        </div>
+        <div class="secondary" id="sumptail"></div>
+        <div class="warn" id="swarn"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Preparedness checklist <span class="sub" id="checksub"></span></h2>
+    <ul class="check" id="check"></ul>
+    <p class="note">Deadlines follow the storm timing above. Items dimmed are below this plan's tier; they still show so the order is visible.</p>
+  </section>
+
+  <section class="card">
+    <h2>Where the inputs came from</h2>
+    <div id="sources" class="note" style="margin:0"></div>
+  </section>
+</main>
+
+<script src="assets/planner.js?v=10"></script>
+<script>
+(async () => {
+  renderNav("planner");
+  const { models: M, forecast: F } = await loadModelsAndForecast();
+  const pre = F.prefill || {};
+  const alts = pre.alternatives || {};
+
+  // ---- stamp ----
+  const st = $("stamp");
+  if (F._missing) {
+    st.textContent = "No forecast.json yet — run forecast.py (or the forecast workflow). Sliders still work.";
+    st.classList.add("stale");
+  } else {
+    const age = (Date.now() - Date.parse(F.generated_utc)) / 3600e3;
+    st.textContent = `Forecast inputs from ${whenStr(Date.parse(F.generated_utc))} (${age.toFixed(1)} h ago)`
+      + (Object.keys(F.errors || {}).length ? " · feeds down: " + Object.keys(F.errors).join(", ") : "");
+    st.classList.toggle("stale", age > 9);
+  }
+
+  // ---- inputs ----
+  const ids = ["total", "peak", "api"];
+  const link = (id) => {
+    const r = $(id), n = $(id + "n");
+    r.addEventListener("input", () => { n.value = r.value; run(); });
+    n.addEventListener("input", () => { r.value = clamp(+n.value, +r.min, +r.max); run(); });
+  };
+  ids.forEach(link);
+  ["onset", "peakat", "end", "ar", "fw"].forEach(id => $(id).addEventListener("input", run));
+
+  const setVal = (id, v) => { $(id).value = v == null ? 0 : v; $(id + "n").value = v == null ? 0 : v; };
+  function fromForecast() {
+    setVal("total", pre.total_48h_in ?? 0);
+    setVal("peak", pre.peak_1h_inhr ?? 0);
+    setVal("api", pre.api_in ?? 0);
+    const now = Math.ceil(Date.now() / 3600e3) * 3600e3;   // next top of the hour
+    const onset = pre.onset ? parseLocal(pre.onset) : now + 24 * 3600e3;
+    $("onset").value = toLocalInput(onset);
+    $("peakat").value = toLocalInput(pre.peak_at ? parseLocal(pre.peak_at) : onset + 18 * 3600e3);
+    $("end").value = toLocalInput(pre.end ? parseLocal(pre.end) : onset + 48 * 3600e3);
+    $("ar").value = pre.ar_category ? String(pre.ar_category) : "";
+    $("fw").value = pre.flood_watch ? "1" : "0";
+    run();
+  }
+  $("reset").addEventListener("click", fromForecast);
+
+  // alternative-source chips for the two sliders
+  const chip = (label, v, id) => v == null ? "" :
+    `<button class="chip" data-id="${id}" data-v="${v}">${label} <b>${fmt(v, 2)}</b></button>`;
+  $("totalchips").innerHTML =
+    chip("Open-Meteo ×bias", alts.open_meteo_corrected_48h, "total") +
+    chip("Open-Meteo raw", alts.open_meteo_raw_48h, "total") +
+    chip("NWS grid", alts.nws_grid_48h, "total") +
+    chip("CNRFC Napa", alts.cnrfc_apc_48h, "total") +
+    chip("CNRFC Venado", alts.cnrfc_venc1_48h, "total");
+  const q = F.qpf || {};
+  $("peakchips").innerHTML =
+    chip("Open-Meteo ×bias", q.peak_1h_omc_inhr, "peak") +
+    chip("Open-Meteo raw", q.peak_1h_om_inhr, "peak") +
+    chip("NWS grid (6-h avg)", q.peak_1h_nws_inhr, "peak") +
+    chip("Last winter's max", M.observed_maxima.peak_1h_in, "peak");
+  document.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+    setVal(c.dataset.id, +c.dataset.v); run();
+  }));
+
+  // ---- compute + paint ----
+  function inputs() {
+    return {
+      total: +$("totaln").value || 0, peak1h: +$("peakn").value || 0, api: +$("apin").value || 0,
+      onset: parseLocal($("onset").value), peakAt: parseLocal($("peakat").value), end: parseLocal($("end").value),
+      ar_category: $("ar").value ? +$("ar").value : null, flood_watch: $("fw").value === "1",
+    };
+  }
+  let last = null;
+  function run() {
+    const inp = inputs();
+    const out = evaluatePlan(M, inp);
+    last = { inp, out };
+    $("totalv").textContent = fmt(inp.total); $("peakv").textContent = fmt(inp.peak1h); $("apiv").textContent = fmt(inp.api);
+    const W = M.wetness;
+    const pct = clamp(100 * inp.api / W.saturated_api_in, 0, 100);
+    $("apimeter").style.width = pct + "%";
+    const cat = (W.categories.find(c => inp.api <= c.max_api_in) || {}).label || "";
+    $("apinote").textContent = `${cat} · ${pct.toFixed(0)}% of the wettest start last winter`
+      + (F.wetness && F.wetness.api_in != null ? ` · today ${fmt(F.wetness.api_in)} in (${F.wetness.source})` : "");
+
+    // tier
+    const t = out.tier;
+    $("tier").className = "tier " + t.tier;
+    $("tier").querySelector("b").textContent = TIER_LABEL[t.tier];
+    $("reasons").textContent = t.reasons.length ? t.reasons.join(" · ") : "Nothing in this plan crosses a rule.";
+    setTierChip(t.tier);
+
+    // creek
+    const b = out.bridge;
+    $("bpt").innerHTML = fmt(b.pt, 1) + "<small>ft</small>";
+    $("bband").textContent = `95% band ${fmt(b.lo, 1)} – ${fmt(b.hi, 1)} ft`;
+    $("bridgefit").textContent = `R² ${M.event_peak.r2} · n=${M.event_peak.n} storms`;
+    $("rosseq").innerHTML = `${fmt(out.ross.ross, 1)}<span class="u">ft</span>` + (out.ross.inRange ? "" : ' <span class="u bad">beyond fitted range</span>');
+    const dist = (line, need) => {
+      const d = line - b.pt;
+      if (d <= 0) return `<span class="bad">reached</span> (+${fmt(-d, 1)} ft)`;
+      return `${fmt(d, 1)}<span class="u">ft below</span> · <span class="u">${fmt(need - inp.total, 1)}" more rain</span>`;
+    };
+    $("d65").innerHTML = dist(6.5, b.rain_to_notify);
+    $("d13").innerHTML = dist(13, b.rain_to_flood);
+    $("cross").innerHTML = `${fmt(out.cross.pt, 1)}<span class="u">ft, from ~${fmt(out.cross.r6h, 1)}" in the heaviest 6 h</span>`;
+    $("crest").textContent = out.crestMs ? whenStr(out.crestMs) + " (heaviest rain + " + out.lagH + " h)" : "–";
+    const warns = [];
+    if (b.extrapolated) warns.push(`Beyond last winter's data (max crest ${M.observed_maxima.bridge_peak_ft} ft from ${M.observed_maxima.total_rain_in}"): the fit is linear and untested up there.`);
+    if (b.pt >= 6.5) warns.push("Past the notify line the Ross mapping is still inside its fitted range; the 13 ft line is a 1.6× extrapolation.");
+    $("bwarn").innerHTML = warns.join("<br>");
+
+    // sump
+    const s = out.sump;
+    $("stress").innerHTML = fmt(100 * s.mean.stress, 0) + "<small>%</small>";
+    $("run").innerHTML = fmt(s.mean.run_s, 0) + "<small>s</small>";
+    $("rph").textContent = s.mean.runs_per_hr > 0 ? fmt(s.mean.runs_per_hr, 0) : "0";
+    $("sumpfit").textContent = `${fmt(s.mean.gpm, 0)} GPM of ${M.pump.rated_gpm} · R² ${M.sump_inflow.r2}`;
+    $("sumptail").innerHTML = `Tail case (model under-reads the worst runs ~2×): <b>${fmt(100 * s.tail.stress, 0)}%</b> capacity, runs of <b>${fmt(s.tail.run_s, 0)} s</b>`
+      + (s.tail.capacity ? ' — <b class="bad">at capacity; backup pump would start</b>' : "")
+      + `. Last winter's worst: 15-min avg ${M.observed_maxima.inflow_gpm_15min} GPM, single run 134 s.`;
+    $("swarn").textContent = s.extrapolated ? `Peak rate above anything recorded here (${M.observed_maxima.peak_1h_in} in/hr); the sump model has no data in this regime.` : "";
+
+    // checklist
+    const now = Date.now();
+    $("checksub").textContent = inp.onset ? `rain ${whenStr(inp.onset)} → crest ${out.crestMs ? whenStr(out.crestMs) : "?"}` : "";
+    $("check").innerHTML = out.checklist.map(c => {
+      const rel = c.due == null ? "" : (c.due < now ? "passed" : relTime(c.due - now));
+      return `<li class="${c.active ? "" : "off"}${c.due != null && c.due < now && c.active ? " past" : ""}">
+        <span class="due">${c.due == null ? "–" : whenStr(c.due)}<small>${rel}</small></span>
+        <span>${c.task}<br><span class="need">${c.when === "crest" ? "before crest" : "before rain"} ${Math.abs(c.offset_h)} h · ${c.needLabel}+</span></span></li>`;
+    }).join("");
+  }
+  function relTime(ms) {
+    const h = ms / 3600e3;
+    return h < 1 ? `in ${Math.round(h * 60)} min` : h < 48 ? `in ${h.toFixed(0)} h` : `in ${(h / 24).toFixed(1)} d`;
+  }
+
+  // ---- save plan ----
+  $("save").addEventListener("click", () => {
+    if (!last) return;
+    const { inp, out } = last;
+    const plans = loadPlans();
+    const id = "plan-" + new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
+    plans.push({
+      id, saved_local: toLocalInput(Date.now()), forecast_generated_utc: F.generated_utc || null,
+      start_local: toLocalInput(inp.onset), end_local: toLocalInput(inp.end),
+      forecast: { total_48h_in: inp.total, peak_1h_inhr: inp.peak1h, api_in: inp.api,
+                  ar_category: inp.ar_category, flood_watch: inp.flood_watch,
+                  source: "planner inputs as saved" },
+      predicted: { bridge_peak_ft: +out.bridge.pt.toFixed(2), lo_ft: +out.bridge.lo.toFixed(2), hi_ft: +out.bridge.hi.toFixed(2),
+                   ross_equivalent_ft: +out.ross.ross.toFixed(2), sump_run_s: +out.sump.mean.run_s.toFixed(0),
+                   crest_local: out.crestMs ? toLocalInput(out.crestMs) : null, tier: out.tier.tier },
+      actual: { total_rain_in: null, peak_1h_in: null, bridge_peak_ft: null, ross_peak_ft: null, sump_peak_run_s: null, tier_reached: null },
+      notes: "",
+    });
+    savePlans(plans);
+    $("savednote").innerHTML = `Saved in this browser (${plans.length} plan${plans.length > 1 ? "s" : ""}). <a href="storms.html">Storms →</a> shows it with a JSON row to paste into data/storms.json.`;
+  });
+
+  // ---- sources ----
+  const src = [];
+  if (!F._missing) {
+    src.push(`<b>Open-Meteo</b> hourly, bias-corrected ×${M.qpf_bias.lead_24h} (≤24 h) to ×${M.qpf_bias.lead_72h} (72 h+): ${fmt(q.omc_48h_in)}" / 48 h (raw ${fmt(q.om_48h_in)}").`);
+    src.push(`<b>NWS grid QPF</b> ${fmt(q.nws_48h_in)}" / 48 h${q.nws_grid_updated ? ", issued " + whenStr(Date.parse(q.nws_grid_updated)) : ""}.`);
+    const cn = q.cnrfc_points || {};
+    src.push(`<b>CNRFC point QPF</b> (no Marin point; Napa and Venado bracket us): Napa ${fmt((cn.APC || {}).qpf_48h_in)}", Venado ${fmt((cn.VENC1 || {}).qpf_48h_in)}" / 48 h.`);
+    const mq = q.models_24h || {};
+    src.push(`<b>Per-model 24 h</b>: ECMWF ${fmt(mq.qpf_ecmwf_24h_in)}", GFS ${fmt(mq.qpf_gfs_24h_in)}", HRRR 6 h ${fmt(mq.qpf_hrrr_6h_in)}".`);
+    src.push(`<b>CW3E AR scale</b> at the coast off Marin: ${F.ar ? F.ar.ar_category : "–"}${F.ar && F.ar.file_modified ? " (file " + F.ar.file_modified + ")" : ""}.`);
+    const w = F.wetness || {};
+    src.push(`<b>Wetness</b> API ${fmt(w.api_in)}" (${w.category}, from ${w.source}); Ross baseflow ${fmt(w.baseflow_cfs)} cfs; season ${fmt(w.season_rain_in)}" since ${w.season_start}.`);
+    const c = F.creek_now || {};
+    src.push(`<b>Creek now</b>: Bridge St ${fmt(c.bridge_stage_ft)} ft, Ross ${fmt(c.ross_stage_ft)} ft / ${fmt(c.ross_flow_cfs, 1)} cfs.`);
+    if ((F.alerts || []).length) src.push(`<b>NWS alerts</b>: ${F.alerts.map(a => a.event).join(", ")}.`);
+  }
+  $("sources").innerHTML = src.join("<br>") || "–";
+
+  fromForecast();
+})();
+</script>
+</body>
+</html>

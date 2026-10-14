@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>52 Storm Planner — Storms</title>
+<link rel="stylesheet" href="assets/app.css?v=10">
+<style>
+.tw{overflow-x:auto;margin:0 -16px;padding:0 16px}
+table.t{width:100%;border-collapse:collapse;font-size:.85rem;min-width:860px}
+table.t th,table.t td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+table.t th{color:var(--mute);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+table.t th.g{border-bottom:2px solid var(--rule);text-align:center;color:var(--ink)}
+table.t td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.t td.miss{color:var(--mute)}
+table.t tr.big td{font-weight:600}
+.tierdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.tierdot.quiet{background:var(--quiet)}.tierdot.watch{background:var(--water)}.tierdot.prepare{background:var(--amber)}.tierdot.act{background:var(--red)}.tierdot.emergency{background:#7f1d1d}
+.err{display:inline-block;padding:1px 6px;border-radius:6px;background:var(--water-soft);font-size:.78rem}
+.err.bad{background:#fee2e2;color:#991b1b}
+pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;overflow-x:auto;margin:6px 0 0}
+.btn{font:inherit;font-size:.8rem;font-weight:600;color:var(--navy);background:var(--gold);border:0;border-radius:8px;padding:5px 10px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.plan{padding:10px 0;border-bottom:1px solid var(--rule)}
+.plan:last-child{border-bottom:0}
+.stamp{font-size:.8rem;color:var(--mute);margin:0 0 12px}
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <p class="stamp">Forecast vs predicted vs actual, one row per storm. After each storm fill the actual columns in <code>data/storms.json</code>.</p>
+
+  <section class="card">
+    <h2>This season <span class="sub" id="seasonsub"></span></h2>
+    <div class="tw"><table class="t" id="cur"></table></div>
+    <p class="note" id="curnote"></p>
+  </section>
+
+  <section class="card">
+    <h2>Plans saved in this browser <span class="sub">from the planner · not yet in storms.json</span></h2>
+    <div id="plans"></div>
+  </section>
+
+  <section class="card">
+    <h2>Winter 2025-26 <span class="sub">calibration winter · predicted = model hindcast on the actual rain</span></h2>
+    <div class="tw"><table class="t" id="hist"></table></div>
+    <p class="note">Forecast columns are Open-Meteo's own archive of what it said the day before (raw, before bias correction), summed over the storm's days. Predicted applies the crest model to the rain that actually fell, so the error column measures the model, not the forecast. Peak crest 7.38 ft on 6 Jan 2026 is the most the model has seen.</p>
+  </section>
+</main>
+
+<script src="assets/planner.js?v=10"></script>
+<script>
+(async () => {
+  renderNav("storms");
+  const [M, cur, hist, F] = await Promise.all([
+    loadJSON("data/models.json"),
+    loadJSON("data/storms.json").catch(() => ({ storms: [] })),
+    loadJSON("data/storms_2025_26.json").catch(() => ({ storms: [] })),
+    loadJSON("data/forecast.json").catch(e => ({ _missing: String(e) })),
+  ]);
+  setTierChip(tierFromForecast(M, F));
+  const n = (v, d = 2) => v == null ? '<td class="n miss">–</td>' : `<td class="n">${fmt(v, d)}</td>`;
+  const errCell = (p, a) => {
+    if (p == null || a == null) return '<td class="n miss">–</td>';
+    const e = p - a; const bad = Math.abs(e) > (M.event_peak.band_95 || 1.5);
+    return `<td class="n"><span class="err${bad ? " bad" : ""}">${e >= 0 ? "+" : ""}${e.toFixed(1)}</span></td>`;
+  };
+  const tierCell = t => t ? `<td><span class="tierdot ${t}"></span>${TIER_LABEL[t] || t}</td>` : '<td class="miss">–</td>';
+
+  // ---- current season ----
+  const head = `<tr><th></th><th></th><th class="g" colspan="4">Forecast</th><th class="g" colspan="3">Predicted</th><th class="g" colspan="5">Actual</th><th></th></tr>
+    <tr><th>Storm</th><th>Dates</th><th>48 h</th><th>Peak /hr</th><th>Index</th><th>AR</th><th>Bridge ft</th><th>Ross eq</th><th>Tier</th><th>Rain</th><th>Bridge ft</th><th>Ross ft</th><th>Run s</th><th>Tier</th><th>Err ft</th></tr>`;
+  const rows = (cur.storms || []).map(s => {
+    const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
+    return `<tr><td>${s.name || s.id}</td><td>${(s.start_local || "").slice(0, 10)} → ${(s.end_local || "").slice(5, 10)}</td>`
+      + n(f.total_48h_in) + n(f.peak_1h_inhr) + n(f.api_in) + (f.ar_category != null ? `<td class="n">${f.ar_category}</td>` : '<td class="n miss">–</td>')
+      + n(p.bridge_peak_ft, 1) + n(p.ross_equivalent_ft, 1) + tierCell(p.tier)
+      + n(a.total_rain_in) + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_run_s, 0) + tierCell(a.tier_reached)
+      + errCell(p.bridge_peak_ft, a.bridge_peak_ft) + "</tr>";
+  });
+  $("cur").innerHTML = head + (rows.join("") || `<tr><td colspan="15" class="miss">No storms logged yet. Save a plan on the planner, paste its row into data/storms.json, then fill the actuals afterwards.</td></tr>`);
+  $("seasonsub").textContent = (cur.storms || []).length + " storms";
+
+  // ---- saved plans ----
+  const plans = loadPlans();
+  const host = $("plans");
+  if (!plans.length) host.innerHTML = '<p class="note" style="margin:0">None yet.</p>';
+  else host.innerHTML = plans.slice().reverse().map((p, i) => `
+    <div class="plan">
+      <div><b>${p.start_local ? p.start_local.replace("T", " ") : "?"}</b> · ${fmt(p.forecast.total_48h_in)}" / 48 h, peak ${fmt(p.forecast.peak_1h_inhr)} in/hr, index ${fmt(p.forecast.api_in)} →
+        Bridge St <b>${fmt(p.predicted.bridge_peak_ft, 1)} ft</b> (${fmt(p.predicted.lo_ft, 1)}–${fmt(p.predicted.hi_ft, 1)}), <span class="tierdot ${p.predicted.tier}"></span>${TIER_LABEL[p.predicted.tier] || ""}
+        <span class="u">saved ${p.saved_local.replace("T", " ")}</span></div>
+      <div style="margin-top:6px;display:flex;gap:6px">
+        <button class="btn" data-copy="${i}">Copy JSON row</button>
+        <button class="btn ghost" data-show="${i}">Show</button>
+        <button class="btn ghost" data-del="${i}">Delete</button>
+      </div>
+      <pre class="json" id="json${i}" style="display:none"></pre>
+    </div>`).join("");
+  const rev = plans.slice().reverse();
+  const rowOf = p => JSON.stringify({ id: p.id, season: seasonOf(p.start_local), name: "", start_local: p.start_local, end_local: p.end_local,
+    forecast: { issued_local: p.saved_local, ...p.forecast }, predicted: p.predicted, actual: p.actual, notes: p.notes }, null, 1);
+  host.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+    const txt = rowOf(rev[+b.dataset.copy]);
+    try { await navigator.clipboard.writeText(txt); b.textContent = "Copied"; } catch { $("json" + b.dataset.copy).style.display = "block"; }
+  }));
+  host.querySelectorAll("[data-show]").forEach(b => b.addEventListener("click", () => {
+    const pre = $("json" + b.dataset.show); pre.textContent = rowOf(rev[+b.dataset.show]); pre.style.display = pre.style.display === "none" ? "block" : "none";
+  }));
+  host.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => {
+    const idx = plans.indexOf(rev[+b.dataset.del]); plans.splice(idx, 1); savePlans(plans); location.reload();
+  }));
+  function seasonOf(s) { if (!s) return ""; const y = +s.slice(0, 4), m = +s.slice(5, 7); return m >= 10 ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`; }
+
+  // ---- last winter ----
+  const h2 = `<tr><th></th><th></th><th class="g" colspan="2">Forecast (raw)</th><th class="g" colspan="1">Predicted</th><th class="g" colspan="7">Actual</th><th></th></tr>
+    <tr><th>Storm</th><th>Start</th><th>Day-ahead</th><th>3-day</th><th>Bridge ft</th><th>Rain</th><th>Peak 1 h</th><th>Index</th><th>Bridge ft</th><th>Ross ft</th><th>Inflow GPM</th><th>Runs</th><th>Err ft</th></tr>`;
+  const hs = (hist.storms || []).slice().sort((a, b) => (b.actual.bridge_peak_ft || 0) - (a.actual.bridge_peak_ft || 0));
+  $("hist").innerHTML = h2 + hs.map(s => {
+    const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
+    return `<tr class="${a.bridge_peak_ft >= 6.5 ? "big" : ""}"><td>${s.id.slice(-2)}</td><td>${s.start_local.replace("T", " ")}</td>`
+      + n(f.day_ahead_total_in) + n(f.three_day_total_in) + n(p.bridge_peak_ft, 1)
+      + n(a.total_rain_in) + n(a.peak_1h_in) + n(a.api_at_start) + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_inflow_gpm, 0) + n(a.sump_runs, 0)
+      + errCell(p.bridge_peak_ft, a.bridge_peak_ft) + "</tr>";
+  }).join("");
+})();
+</script>
+</body>
+</html>

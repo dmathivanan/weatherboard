@@ -3,11 +3,9 @@
   "lat": 37.9745,
   "lon": -122.5625,
   "timezone": "America/Los_Angeles",
-
   "usgs_site": "11460000",
   "nwps_gauge": "CMDC1",
   "bridge_street_gauge_url": "https://www.sananselmo.gov/538/Creek-Camera-and-Flood-Gauge",
-
   "bridge_street": {
     "_note": "San Anselmo Creek at Bridge Street = Marin OneRain 'FS 19' (site 38036) = NWS/NWPS 'SBSC1'. Same gauge/datum; flood cats action 11.3 / minor 13.3 / moderate 16.3 / major 17.8 ft.",
     "nwps_lid": "SBSC1",
@@ -19,35 +17,72 @@
       "_note": "Town of San Anselmo 'Emergency Procedures in Event of Winter Storms and Flooding', 2013 staff report (sananselmo.gov ArchiveCenter Item/3152). Five operational stages on the downtown Station 19 / Bridge St gauge. Stage 1 is a pre-storm forecast condition with no creek level. 13 ft = water reaches the building at 730 San Anselmo Ave.",
       "stage1_note": "Large storms forecast + ground saturated: alert merchants, stage sand & bags, first staff alert",
       "lines": [
-        {"stage": 2, "ft": 6.5,   "action": "Notify public", "color": "#64748b"},
-        {"stage": 3, "ft": 8.14,  "action": "Prep flood gates", "color": "#d97706"},
-        {"stage": 4, "ft": 11.14, "action": "Consider evacuation", "color": "#f97316"},
-        {"stage": 5, "ft": 13,    "action": "Flood horn", "note": "water at 730 SA Ave", "color": "#dc2626"}
+        {
+          "stage": 2,
+          "ft": 6.5,
+          "action": "Notify public",
+          "color": "#64748b"
+        },
+        {
+          "stage": 3,
+          "ft": 8.14,
+          "action": "Prep flood gates",
+          "color": "#d97706"
+        },
+        {
+          "stage": 4,
+          "ft": 11.14,
+          "action": "Consider evacuation",
+          "color": "#f97316"
+        },
+        {
+          "stage": 5,
+          "ft": 13,
+          "action": "Flood horn",
+          "note": "water at 730 SA Ave",
+          "color": "#dc2626"
+        }
       ]
     }
   },
-
   "sump": {
     "_note": "Two PumpFuse PF03 units (ESP32/Espressif), identified on the LAN by MAC (kept out of this public repo). The PF03 exposes NO local API: the reachable unit had zero open TCP ports (full 1-1024 + IoT scan), no mDNS/Bonjour advert, no Tuya broadcast; the manufacturer confirms cloud-only operation. So there is nothing to poll locally today. Set each pump's 'url' to a JSON endpoint once one exists - a future PF03 local REST endpoint, or a bridge (Home Assistant, an MQTT->HTTP shim, or a cloud export). Env overrides: SUMP_PRIMARY_URL, SUMP_BACKUP_URL. Empty url = disabled. PumpFuse is energy-based (no pit-level sensor); it reports on/off, watts, runtime, cycles, gallons.",
     "pit_diameter_in": 36,
     "float_model": "Zoeller 10-2041",
     "float_differential_in": 4.5,
     "float_differential_status": "assumed, not measured",
-    "inflow_sources": ["perimeter drains", "basement sub-slab drains", "most downspouts"],
+    "inflow_sources": [
+      "perimeter drains",
+      "basement sub-slab drains",
+      "most downspouts"
+    ],
     "_geometry_note": "A 36-inch pit holds 4.4064 gal per inch of depth, so delivered GPM = float_differential_in * 18.885 (~x19). At the assumed 4.5 in that is 84.98 GPM, within 1.2% of the 84 GPM nameplate - an independent check on the pump rating from geometry alone. But the differential is ASSUMED: at 4.0 in delivered drops to 75.5 GPM and at 3.0 in to 56.7 GPM. Every inflow, gallons and stress figure in analysis/ scales linearly with this number. Measure it before trusting any of them.",
-
     "_note2": "gpm here is mirrored from primary_pump/backup_pump.rated_gpm, which are the single source of truth. Do not edit these two numbers directly - change the spec block below and mirror. The old 40/30 placeholders were wrong and have been removed.",
     "pumps": [
-      {"name": "primary", "label": "Primary - Zoeller N140", "spec": "primary_pump", "gpm": 84, "url": ""},
-      {"name": "backup", "label": "Backup - Zoeller N145", "spec": "backup_pump", "gpm": 55, "url": ""}
+      {
+        "name": "primary",
+        "label": "Primary - Zoeller N140",
+        "spec": "primary_pump",
+        "gpm": 84,
+        "url": ""
+      },
+      {
+        "name": "backup",
+        "label": "Backup - Zoeller N145",
+        "spec": "backup_pump",
+        "gpm": 55,
+        "url": ""
+      }
     ]
   },
-
   "_pump_spec_note": "Nameplate specs for the two pumps - the single source of truth for GPM. sump.pumps[].gpm mirrors rated_gpm and sump.pumps[].spec names the block it mirrors. Measured draw over 3,674 runs (Sep 2025-Jun 2026) averaged 1394 W against the 1380 W rating, so the primary runs at its rated duty point and 84 GPM is the right constant for inflow. 'hp' was dropped: the old 1.0/0.75 values did not match these models and no verified figure replaced them.",
   "primary_pump": {
     "model": "Zoeller N140",
     "rated_gpm": 84,
-    "range": [80, 86],
+    "range": [
+      80,
+      86
+    ],
     "rated_watts": 1380,
     "discharge_in": 2
   },
@@ -57,10 +92,9 @@
     "rated_watts": 1500,
     "discharge_in": 2
   },
-
   "thresholds": {
     "_note": "SUPERSEDED by the 'tiers' block below, kept only so old history.csv rows stay interpretable. Replayed against winter 2025-26 these rules fired nothing at all on 8 of 15 storms, including the largest (5.54 in, Bridge St 7.38 ft). See analysis/report.md.",
-    "_status": "retired 2026-09-08",
+    "_status": "retired 2026-09-08; poller.py removed 2026-10-14 so history.csv no longer grows",
     "watch_qpf_72h_in": 3.0,
     "prepare_qpf_24h_in": 2.0,
     "act_rain_rate_inhr": 0.75,
@@ -68,13 +102,136 @@
     "sump_prepare_duty_pct": 50,
     "sump_act_duty_pct": 80
   },
-
   "qpf_bias": {
     "_note": "Open-Meteo runs dry here. Measured against station totals over Nov 2025-Apr 2026: day-ahead QPF captured 75.5% of observed rain, 3-day lead 49.6%, and the five wettest events were under-forecast 41% and 68%. Every QPF used in a rule is multiplied by these before comparison.",
     "lead_24h": 1.35,
-    "lead_72h": 2.0
+    "lead_72h": 2.0,
+    "_how_applied": "forecast.py multiplies each forecast hour by a factor of its lead time: lead_24h for the first 24 h, a straight line from lead_24h at 24 h to lead_72h at 72 h, and lead_72h beyond."
   },
-
+  "cnrfc": {
+    "_note": "CNRFC has no Marin forecast point. The 6-hourly point QPF products HD8RSA (days 1-3) and HD4RSA (days 4-6) are parsed for the nearest points: APC (Napa, 14 ft, drier than San Anselmo) and VENC1 (Venado, Sonoma hills, 1260 ft, wetter). Treat them as regional bracketing, not a house forecast. The old restricted/graphicalRVF_csv.php endpoint returns 401 and was dropped 2026-10-14.",
+    "points": [
+      "APC",
+      "VENC1"
+    ],
+    "products": {
+      "days_1_3": "https://www.cnrfc.noaa.gov/awipsProducts/RNOHD8RSA.php",
+      "days_4_6": "https://www.cnrfc.noaa.gov/awipsProducts/RNOHD4RSA.php"
+    }
+  },
+  "cw3e": {
+    "_note": "CW3E publishes the maximum forecast AR Scale per coastal point as JSON (the file behind the AR Scale plume map). Nearest coastal points to the house are 38.0N 123.0W and 37.5N 122.5W; the category is the max over both. The old ar_scale_summary.json URL returns 404 and was dropped 2026-10-14.",
+    "url": "https://cw3e.ucsd.edu/images/json/ARScale_Locations_WestCoast.json",
+    "points": [
+      [
+        38.0,
+        -123.0
+      ],
+      [
+        37.5,
+        -122.5
+      ]
+    ],
+    "keys": [
+      "coast_Control_GEFS",
+      "coast_Mean_GEFS",
+      "coast_Control_ECMWF",
+      "coast_Mean_ECMWF"
+    ]
+  },
+  "wetness": {
+    "_note": "Ground wetness index. The antecedent precipitation index (API, 0.9/day decay) is the term both creek models were fitted on, so it IS the index; wetness_pct rescales it against saturated_api_in (the API when the Jan 2026 storm began, the wettest start last winter) for a 0-100 reading. USGS Ross baseflow is the cross-check and the fallback when the station history is unavailable.",
+    "decay_per_day": 0.9,
+    "saturated_api_in": 5.2,
+    "categories": [
+      {
+        "max_api_in": 0.5,
+        "label": "dry"
+      },
+      {
+        "max_api_in": 1.5,
+        "label": "damp"
+      },
+      {
+        "max_api_in": 3.0,
+        "label": "moist"
+      },
+      {
+        "max_api_in": 5.0,
+        "label": "wet"
+      },
+      {
+        "max_api_in": 99,
+        "label": "saturated"
+      }
+    ],
+    "ledger_days": 35,
+    "water_year_start_month": 10
+  },
+  "planner": {
+    "_note": "Storm-timing assumptions used by planner.html. lag_peak_rain_to_crest_h is the median lag from the heaviest hour of rain to the Bridge Street crest across last winter's storms (events.csv).",
+    "lag_peak_rain_to_crest_h": 1.5,
+    "storm_window_h": 48,
+    "rain_threshold_in": 0.02,
+    "checklist": [
+      {
+        "task": "Clear gutters, downspouts and the north-side yard drain",
+        "when": "onset",
+        "offset_h": -24,
+        "min_tier": "watch"
+      },
+      {
+        "task": "Test primary pump; confirm backup pump float lifts and runs",
+        "when": "onset",
+        "offset_h": -24,
+        "min_tier": "watch"
+      },
+      {
+        "task": "Charge phones and lights; check the Tesla backup circuit",
+        "when": "onset",
+        "offset_h": -12,
+        "min_tier": "watch"
+      },
+      {
+        "task": "Move cars off the low side of Woodland",
+        "when": "onset",
+        "offset_h": -3,
+        "min_tier": "prepare"
+      },
+      {
+        "task": "Lift basement storage off the floor; roll up rugs",
+        "when": "onset",
+        "offset_h": -6,
+        "min_tier": "prepare"
+      },
+      {
+        "task": "Stage sandbags and barrier boards on the north side",
+        "when": "onset",
+        "offset_h": -6,
+        "min_tier": "prepare"
+      },
+      {
+        "task": "Deploy north-side barriers (2005 water came from the north, not the sump)",
+        "when": "crest",
+        "offset_h": -4,
+        "min_tier": "act"
+      },
+      {
+        "task": "Walk the creek at Bridge St; compare the gauge to the Town stage lines",
+        "when": "crest",
+        "offset_h": -2,
+        "min_tier": "act"
+      },
+      {
+        "task": "Shut off power to basement outlets below 12 in; move to the upper floor",
+        "when": "crest",
+        "offset_h": -1,
+        "min_tier": "emergency"
+      }
+    ],
+    "peak_24h_fraction_of_48h": 0.8,
+    "_peak_24h_note": "For a 48-h storm the heaviest 24 h held 75-99% of the total last winter (events.csv); 0.8 converts the 48-h slider to the 24-h quantity the Prepare rule was written for."
+  },
   "creek_predictor": {
     "_note": "Layer 3A, Bridge Street stage on the rising limb only (n=349 observed readings). Used by the Act tier: feed r6h_in = observed last-6h rain + bias-corrected next-6h QPF, and api = current antecedent index. Season-to-date was dropped - it added +0.005 R2 across every layer tested.",
     "intercept": 0.8725,
@@ -84,18 +241,22 @@
     "residual_sd_ft": 0.5498,
     "band_95_ft": 1.078
   },
-
   "ross_to_bridge": {
     "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
     "slope": 0.767,
     "intercept": -1.9568,
-    "fitted_ross_range_ft": [4.54, 12.12],
+    "fitted_ross_range_ft": [
+      4.54,
+      12.12
+    ],
     "notify_line_ross_ft": 11.03,
-    "notify_line_band_ft": [10.74, 11.32],
+    "notify_line_band_ft": [
+      10.74,
+      11.32
+    ],
     "flood_horn_ross_ft": 19.5,
     "flood_horn_extrapolation": "1.61x beyond fitted range - not trustworthy"
   },
-
   "tiers": {
     "_note": "Rebuilt 2026-09-08 from the winter 2025-26 replay. Ordered quiet < watch < prepare < act < emergency; the highest satisfied rule wins. 'ross_ft' is USGS 11460000 stage, 'bridge_ft' is San Anselmo at Bridge St, 'run_s' is a single primary-pump run length. QPF terms are already bias-corrected by qpf_bias.",
     "watch": {
@@ -105,7 +266,10 @@
     },
     "prepare": {
       "qpf_24h_corrected_in": 2.0,
-      "bridge_ft_with_rain": {"bridge_ft": 3.0, "qpf_24h_corrected_in": 1.0},
+      "bridge_ft_with_rain": {
+        "bridge_ft": 3.0,
+        "qpf_24h_corrected_in": 1.0
+      },
       "ross_ft": 9.0,
       "sump_run_s": 35
     },

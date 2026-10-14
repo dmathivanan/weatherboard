@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<title>52 Storm Planner — Wetness</title>
+<link rel="stylesheet" href="assets/app.css?v=10">
+<style>
+.hero{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hero .pt{font-size:2.6rem;font-weight:700;line-height:1}
+.hero .cat{font-size:1.1rem;font-weight:600;text-transform:capitalize}
+.meter{height:12px;border-radius:6px;background:var(--rule);overflow:hidden;margin:12px 0 4px;position:relative}
+.meter i{display:block;height:100%;background:var(--water)}
+.meter b{position:absolute;top:-3px;width:2px;height:18px;background:var(--amber)}
+.scale{display:flex;justify-content:space-between;font-size:.74rem;color:var(--mute)}
+.stamp{font-size:.8rem;color:var(--mute);margin:0 0 12px}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .bar{fill:var(--water)}
+.chart .bar.model{fill:var(--water);opacity:.45}
+.chart .line{fill:none;stroke:var(--water);stroke-width:2;stroke-linejoin:round}
+.chart .grid{stroke:var(--rule);stroke-width:1}
+.chart .ax{font-size:10px;fill:var(--mute)}
+.chart .hit{fill:transparent}
+.chart .hover{stroke:var(--mute);stroke-width:1;stroke-dasharray:3 3;display:none}
+.tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--rule);border-radius:8px;
+  box-shadow:var(--shadow);padding:6px 9px;font-size:.78rem;display:none;white-space:nowrap;z-index:5}
+.tip b{font-weight:600}
+.src{font-size:.78rem;color:var(--mute);margin-top:6px}
+table.t{width:100%;border-collapse:collapse;font-size:.88rem}
+table.t th,table.t td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--rule)}
+table.t th{color:var(--mute);font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+table.t td.n{text-align:right;font-variant-numeric:tabular-nums}
+details summary{cursor:pointer;color:var(--gold-dark);font-weight:500;font-size:.88rem;margin-top:10px}
+</style>
+</head>
+<body>
+<header class="top"></header>
+<main>
+  <p class="stamp" id="stamp">Loading…</p>
+
+  <section class="card">
+    <h2>Ground wetness index <span class="sub" id="wsrc"></span></h2>
+    <div class="hero"><span class="pt" id="api">–<small>in</small></span><span class="cat" id="cat">–</span></div>
+    <div class="meter"><i id="meter" style="width:0"></i><b id="satmark" style="left:100%"></b></div>
+    <div class="scale"><span>dry</span><span>damp</span><span>moist</span><span>wet</span><span>saturated</span></div>
+    <p class="note" id="explain"></p>
+    <div class="tiles c3" style="margin-top:12px">
+      <div class="tile"><div class="v" id="r7">–<small>in</small></div><div class="k">rain, last 7 days</div></div>
+      <div class="tile"><div class="v" id="season">–<small>in</small></div><div class="k" id="seasonk">season to date</div></div>
+      <div class="tile"><div class="v" id="base">–<small>cfs</small></div><div class="k">Ross baseflow (7-day low)</div></div>
+    </div>
+    <div class="secondary" id="basenote"></div>
+  </section>
+
+  <section class="card">
+    <h2>Daily rain, last 35 days <span class="sub">station gauge · lighter bars are model-filled days</span></h2>
+    <div class="chart" id="rainchart"></div>
+  </section>
+
+  <section class="card">
+    <h2>Wetness index, last 35 days <span class="sub">API with 0.9/day decay</span></h2>
+    <div class="chart" id="apichart"></div>
+  </section>
+
+  <section class="card">
+    <h2>What wetness does to the plan</h2>
+    <div id="effects" class="note" style="margin:0"></div>
+    <details><summary>Daily table</summary><table class="t" id="daytable"></table></details>
+  </section>
+</main>
+
+<script src="assets/planner.js?v=10"></script>
+<script>
+(async () => {
+  renderNav("wetness");
+  const { models: M, forecast: F } = await loadModelsAndForecast();
+  const ledger = await loadJSON("data/rain_daily.json").catch(() => ({ days: {}, source: {} }));
+  const w = F.wetness || {};
+  const W = M.wetness;
+  setTierChip(tierFromForecast(M, F));
+
+  $("stamp").textContent = F._missing ? "No forecast.json yet — run forecast.py." :
+    `Computed ${whenStr(Date.parse(F.generated_utc))} by the 6-hour job · ${ledger.updated_utc ? "ledger " + whenStr(Date.parse(ledger.updated_utc)) : ""}`;
+
+  const api = w.api_in ?? 0;
+  const pct = clamp(100 * api / W.saturated_api_in, 0, 100);
+  $("api").innerHTML = fmt(api) + "<small>in</small>";
+  $("cat").textContent = w.category || "–";
+  $("meter").style.width = pct + "%";
+  $("wsrc").textContent = w.source ? "from " + w.source + (w.gauge_days_in_window != null ? ` · ${w.gauge_days_in_window} gauge days` : "") : "";
+  $("explain").innerHTML = `The index is the antecedent precipitation index both creek models were fitted on: every day's rain, decayed by ${W.decay_per_day}× per day. `
+    + `${W.saturated_api_in} in is the reading when the January 2026 storm began — the wettest start last winter — and sets the right end of the bar. `
+    + `Now at <b>${pct.toFixed(0)}%</b> of that.`;
+  $("r7").innerHTML = fmt(w.rain_7d_in) + "<small>in</small>";
+  $("season").innerHTML = fmt(w.season_rain_in, 1) + "<small>in</small>";
+  $("seasonk").textContent = "since " + (w.season_start || "Oct 1") + (w.season_complete ? "" : " (ledger incomplete)");
+  $("base").innerHTML = fmt(w.baseflow_cfs, w.baseflow_cfs < 10 ? 2 : 0) + "<small>cfs</small>";
+  const bf = M.baseflow_to_api || {};
+  $("basenote").innerHTML = w.baseflow_implied_api_in != null
+    ? `Baseflow-implied index <b>${fmt(w.baseflow_implied_api_in)} in</b> (R² ${bf.r2}, a loose cross-check on dry days; the station history is the primary source). Ross stage ${fmt(w.baseflow_stage_ft)} ft.`
+    : `Baseflow is too low to imply a wetness value (the fit uses log flow); the creek is at its summer floor. Ross stage ${fmt(w.baseflow_stage_ft)} ft.`;
+
+  // ---- series ----
+  const days = Object.keys(ledger.days || {}).sort().slice(-35);
+  const rain = days.map(d => ({ d, v: ledger.days[d] || 0, model: (ledger.source || {})[d] !== "ambient" }));
+  // API rebuilt day by day from the ledger (same arithmetic as forecast.py)
+  const all = Object.keys(ledger.days || {}).sort();
+  const apiSeries = []; let acc = 0; let prev = null;
+  for (const d of all) {
+    if (prev) acc *= Math.pow(W.decay_per_day, (Date.parse(d) - Date.parse(prev)) / 86400e3);
+    acc += ledger.days[d] || 0; prev = d;
+    apiSeries.push({ d, v: acc });
+  }
+  const apiLast = apiSeries.slice(-35);
+
+  // ---- charts (plain SVG) ----
+  function chart(host, series, kind, unit) {
+    const Wd = 720, H = 200, L = 36, R = 8, T = 10, B = 26;
+    const n = series.length; if (!n) { host.textContent = "No data yet."; return; }
+    const max = Math.max(0.1, ...series.map(p => p.v)) * 1.1;
+    const x = i => L + (i + 0.5) * (Wd - L - R) / n;
+    const y = v => T + (H - T - B) * (1 - v / max);
+    const svg = svgEl("svg", { viewBox: `0 0 ${Wd} ${H}` });
+    const ticks = 4;
+    for (let k = 0; k <= ticks; k++) {
+      const v = max * k / ticks;
+      svg.appendChild(svgEl("line", { x1: L, x2: Wd - R, y1: y(v), y2: y(v), class: "grid" }));
+      svg.appendChild(svgEl("text", { x: L - 4, y: y(v) + 3, "text-anchor": "end", class: "ax" }, v.toFixed(v < 1 ? 2 : 1)));
+    }
+    const bw = (Wd - L - R) / n - 2;
+    if (kind === "bar") {
+      series.forEach((p, i) => {
+        if (p.v <= 0) return;
+        const h = y(0) - y(p.v);
+        svg.appendChild(svgEl("rect", { x: x(i) - bw / 2, y: y(p.v), width: bw, height: h, rx: Math.min(4, bw / 2),
+          class: "bar" + (p.model ? " model" : "") }));
+      });
+    } else {
+      const d = series.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.v).toFixed(1)).join(" ");
+      svg.appendChild(svgEl("path", { d, class: "line" }));
+      const lastP = series[n - 1];
+      svg.appendChild(svgEl("circle", { cx: x(n - 1), cy: y(lastP.v), r: 4, class: "bar" }));
+    }
+    series.forEach((p, i) => {
+      if (i % 7 === 0 || i === n - 1)
+        svg.appendChild(svgEl("text", { x: x(i), y: H - 8, "text-anchor": "middle", class: "ax" }, dayStr(Date.parse(p.d + "T12:00:00"))));
+    });
+    const hover = svgEl("line", { y1: T, y2: H - B, class: "hover" });
+    svg.appendChild(hover);
+    const tip = document.createElement("div"); tip.className = "tip";
+    host.innerHTML = ""; host.appendChild(svg); host.appendChild(tip);
+    series.forEach((p, i) => {
+      const hit = svgEl("rect", { x: x(i) - (Wd - L - R) / n / 2, y: T, width: (Wd - L - R) / n, height: H - T - B, class: "hit" });
+      hit.addEventListener("mouseenter", e => {
+        hover.setAttribute("x1", x(i)); hover.setAttribute("x2", x(i)); hover.style.display = "block";
+        tip.innerHTML = `<b>${dayStr(Date.parse(p.d + "T12:00:00"))}</b> · ${p.v.toFixed(2)} ${unit}${p.model ? " (model)" : ""}`;
+        tip.style.display = "block";
+        const r = host.getBoundingClientRect();
+        tip.style.left = Math.min(r.width - 150, (x(i) / Wd) * r.width + 8) + "px";
+        tip.style.top = "8px";
+      });
+      hit.addEventListener("mouseleave", () => { hover.style.display = "none"; tip.style.display = "none"; });
+      svg.appendChild(hit);
+    });
+  }
+  chart($("rainchart"), rain, "bar", "in");
+  chart($("apichart"), apiLast, "line", "in API");
+
+  // ---- effects ----
+  const ep = M.event_peak, si = M.sump_inflow;
+  const b = predictBridge(M, 3.0, api), b0 = predictBridge(M, 3.0, 0);
+  $("effects").innerHTML =
+    `Each inch of index adds <b>${fmt(ep.beta[2])} ft</b> to the Bridge Street crest for the same storm, and <b>${fmt(si.beta[2], 1)} GPM</b> to peak sump inflow. `
+    + `A 3-inch storm on today's ground crests near <b>${fmt(b.pt, 1)} ft</b>; on dry ground it would be ${fmt(b0.pt, 1)} ft. `
+    + `Rain needed from here to reach the 6.5 ft notify line in one storm: <b>${fmt(b.rain_to_notify, 1)}"</b>. <a href="planner.html">Open the planner →</a>`;
+
+  $("daytable").innerHTML = "<tr><th>Day</th><th class='n'>Rain (in)</th><th class='n'>Index (in)</th><th>Source</th></tr>"
+    + apiLast.slice().reverse().map(p => `<tr><td>${p.d}</td><td class="n">${fmt(ledger.days[p.d])}</td><td class="n">${fmt(p.v)}</td><td>${(ledger.source || {})[p.d] || ""}</td></tr>`).join("");
+})();
+</script>
+</body>
+</html>

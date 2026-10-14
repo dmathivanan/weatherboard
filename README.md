@@ -1,177 +1,137 @@
-# 52 Woodland flood board
+# 52 Woodland storm planner
 
-A cloud-only flood monitor served by GitHub Pages. No hardware at home.
+A planner for the next storm at 52 Woodland Ave, San Anselmo. Served by GitHub
+Pages from `docs/`. No hardware at home, no live loop.
 
-Data arrives in two layers:
+The product changed on 2026-10-14. It used to be a live monitor polled every 15
+minutes (which GitHub's cron turned into every ~3 hours). It is now a **planner**:
+a job runs every six hours and writes the forecast inputs, and the pages turn
+those inputs into a Bridge Street crest, a sump load, a tier and a checklist with
+clock-time deadlines, all computed in the browser so the sliders are live.
 
-- **Live** — the browser fetches the creek gauges, NWS alerts and the forecast
-  straight from the source on every load and every Refresh (`assets/live.js`),
-  and recomputes the tier from those values. Nothing on screen waits for a poll.
-- **Archive** — GitHub Actions runs `poller.py` and commits `docs/data/`. It
-  supplies what only history can produce (rain/sump rollups) and backstops any
-  live feed that fails.
+## How it fits together
 
-The split exists because `schedule:` in Actions is best-effort. The workflow asks
-for every 15 minutes; measured over 40 consecutive commits the median gap was
-**170 minutes** and not one gap was under 20. Every run succeeded — GitHub simply
-does not fire the cron most of the time. That cadence is fine for an archive and
-useless for a board you check during a storm, hence the live layer.
+```
+config.json            thresholds, pump specs, town stage lines, bias factors, checklist
+analysis/              last winter's data and the fitted models (see analysis/report.md)
+  export_models.py     -> docs/data/models.json         coefficients the pages run
+                       -> docs/data/storms_2025_26.json the calibration catalog
+fetchers.py            one function per feed; raises on failure, isolated by safe()
+forecast.py            the 6-hour job
+                       -> docs/data/forecast.json       forecast inputs + wetness + prefill
+                       -> docs/data/rain_daily.json     station rain per local day (ledger)
+docs/
+  index.html           landing page
+  planner.html         the planner
+  wetness.html         the ground wetness index
+  storms.html          the storm catalog (forecast vs predicted vs actual)
+  data/storms.json     hand-maintained catalog for the current season
+  assets/planner.js    the models, tier ladder and checklist, client-side
+  creek.html, storm.html   legacy live pages (browser-fetched gauges, alerts, radar)
+  report.html          the winter 2025-26 analysis write-up
+.github/workflows/forecast.yml   runs forecast.py every 6 h and commits docs/data/
+```
 
-Two caveats worth knowing:
+### The six-hour job (`forecast.py`)
 
-- **Ambient (DMATStation) is not live.** It needs an account key, which cannot
-  ship in a public page, so the weather card comes from the last commit. Set
-  `AMBIENT_PROXY_URL` in `assets/app.js` to a proxy returning `fetch_ambient()`'s
-  shape to make it live too.
-- **The creek gauges cap their own freshness.** They report on change, so in dry
-  weather the newest NWPS reading can be a couple of hours old. Polling harder
-  does not help; the header states the reading's real age.
+Pulls, each isolated so one dead feed never blanks the file:
 
-## Dashboard pages
-
-`docs/` is a small multi-page site (shared `assets/app.css`, `assets/live.js` and
-`assets/app.js`). Each page reads `data/latest.json` and `data/history.csv` as
-its baseline, then `live.js` overlays the feeds it can fetch directly:
-
-- **index.html** — Dashboard: current weather, rainfall rollups, sump activity,
-  creek summary.
-- **rainfall.html** — rain rate history + Open-Meteo/NWS forecast.
-- **creek.html** — San Anselmo (SBSC1) vs Ross (CMDC1) stage over the past 12 h,
-  with the Town's flood-stage lines.
-- **storm.html** — RainViewer animated radar (past + 2-h nowcast) centered on
-  94960, NWS alerts, QPF outlook.
-
-External libraries are loaded from CDNs (allowed on GitHub Pages): Chart.js
-(charts), Leaflet + RainViewer (radar), Google Fonts. Client-side rollups
-(6 h / max-today / N-hours-ago / sump run-rates) are computed in `app.js` from
-`history.csv`; the poller only needs to keep appending rows.
-
-## Feeds
-
-| Source | What it gives | Access |
+| Source | What | Notes |
 |---|---|---|
-| Ambient Weather | rain rate (in/hr), event / 24h / weekly totals | API keys from ambientweather.net |
-| USGS 11460000 | Corte Madera Creek at Ross, stage + flow | public JSON |
-| NWS NWPS gauge CMDC1 | same gauge with flood categories and NWS forecast stage | public JSON |
-| NWS api.weather.gov | gridded QPF + active alerts for the house | public JSON |
-| Open-Meteo | hourly rain forecast, 7 days, used for the 24h/72h totals | public JSON |
-| Sump monitor | pit level, runtime, cycles | placeholder adapter (see below) |
-| Bridge Street gauge | San Anselmo Creek downtown, the gauge that floods first | NWPS `SBSC1` JSON (primary) + Marin OneRain FS 19 graph (fallback) |
+| NWS grid | QPF periods + active alerts for the house | `api.weather.gov` |
+| Open-Meteo | hourly rain, 7 days, plus ECMWF / GFS / HRRR 24 h | **bias-corrected per `qpf_bias`**: ×1.35 for the first 24 h, sliding to ×2.0 at 72 h |
+| CNRFC | 6-hourly point QPF, days 1–6 | no Marin point exists; Napa (`APC`) and Venado (`VENC1`) bracket the house |
+| CW3E | maximum forecast AR Scale at the coast off Marin | the JSON behind the AR Scale plume map, points 38.0N/123.0W and 37.5N/122.5W |
+| USGS 11460000 | Ross stage and flow, last 7 days | baseflow = 10th percentile of the week |
+| Ambient | station rain per local day | needs `AMBIENT_APP_KEY` / `AMBIENT_API_KEY` |
 
-## Setup (about 20 minutes)
+Then it computes the **ground wetness index**: the antecedent precipitation index
+(API, 0.9/day decay) that both creek models were fitted on, rebuilt from the
+station's daily totals. `rain_daily.json` is a ledger that grows through the
+season; the job re-reads the last three days each run and fills any gap from
+Open-Meteo's analysis, marking those days as model. Ross baseflow gives a loose
+cross-check (`baseflow_to_api`, R² 0.50) and is the fallback when the station is
+unreachable. `saturated_api_in` (5.2 in, the index when the January 2026 storm
+began) sets 100 % on the wetness bar.
 
-1. Create a GitHub repository (private is fine) and upload these files, keeping
-   the folder structure (`.github/workflows/poll.yml`, `docs/index.html`, ...).
-2. Ambient Weather: sign in at ambientweather.net, Account -> API Keys, create
-   one Application Key and one API Key.
-3. Repo -> Settings -> Secrets and variables -> Actions -> New repository secret:
-   `AMBIENT_APP_KEY`, `AMBIENT_API_KEY`. Optional: `PUSHOVER_TOKEN`,
-   `PUSHOVER_USER` (pushover.net, ~$5 one-time, gives phone push alerts).
-4. Repo -> Settings -> Pages -> Source: "Deploy from a branch", branch `main`,
-   folder `/docs`. Your dashboard URL appears there.
-5. Repo -> Actions -> "poll" -> Run workflow. Check the run log; the last line
-   prints the tier and any feed errors. After that it runs on its own.
-6. Open `config.json` and adjust `lat`/`lon` if needed. Thresholds are starter
-   values; recalibrate after each storm (below).
+Finally it picks the wettest 48 h in the horizon and writes `prefill`: the
+48-hour total, peak hourly rate, onset / heaviest hour / end, the index, the AR
+category and whether a Flood Watch is up. The planner starts from those and the
+chips under each slider offer the other sources' numbers.
 
-Notes: GitHub's cron is best-effort and often runs 5–15 minutes late under
-load. GitHub disables scheduled workflows on repos with no activity for 60
-days; the bot's own commits count, so this only matters if polling stops.
+### The planner (`planner.html`, `assets/planner.js`)
 
-## v2 design: local server, two cadences (build this first)
+All from `models.json`:
 
-Rain rates here change in minutes, so `poller.py` should be refactored from a
-one-shot cron script into a long-running process with two loops:
+- **Bridge Street crest** `peak_ft = 1.19 + 0.93 × total_in + 0.33 × API`
+  (R² 0.82, n = 24, 95 % band ±1.5 ft). Fitted on a winter whose highest crest
+  was 7.38 ft; above that the page says so.
+- **Rate-based cross-check**: the Layer 3A rising-limb model fed an estimated
+  heaviest-6-hour rain (`r6h_from_storm`, R² 0.83).
+- **Ross equivalent** from `bridge = 0.767 × ross − 1.96` (R² 0.997), with the
+  fitted range flagged.
+- **Distance to 6.5 and 13 ft**, and the rain still needed to reach each.
+- **Sump at the peak rate**: peak 15-minute inflow from the heaviest 10 minutes
+  (`0.31 × peak_1h`) and the index (R² 0.89), then the pit identity
+  `run_s = 14 / (1 − Qin/Qp)` and runs per hour from run + refill. A 2× tail
+  case is shown because the run-level model under-reads the worst runs by about
+  that much (report §3).
+- **Tier** on the `config.json` ladder, each rule fed the planner's equivalent
+  (the 48-h total × 0.8 stands in for the heaviest 24 h).
+- **Checklist** from `config.json → planner.checklist`: each item is anchored to
+  rain onset or the creek crest (heaviest hour + the median 0.8 h lag) with an
+  offset in hours and a minimum tier.
 
-- **Fast loop, every 60–120 s:** Ambient Weather (or, better, the station's
-  "custom server" upload pushed to a local HTTP listener every 16–60 s) and
-  both PumpFuse units (primary 1 HP Zoeller, backup 3/4 HP). Discover the
-  PumpFuse local endpoint on the LAN first; fall back to its app export.
-- **Slow loop:** USGS + NWPS every 15 min, NWS alerts every 5 min, Open-Meteo
-  and NWS grid forecasts every 60 min.
-- **Storage:** SQLite (`floodboard.db`), one table per source, plus a
-  `windows` table with rolling 10/30/60-min rain totals and 15/60-min sump
-  duty for each pump, recomputed on every fast tick.
-- **Rules:** evaluate tiers on the rolling windows, never on a single reading.
-  Backup pump activation is an Act-tier signal on its own.
-- **Dashboard:** serve `docs/` locally (any static server); it reads a small
-  `latest.json` the process rewrites each tick, plus a 48-h window endpoint.
-- **Deployment:** develop on the laptop; run the same process on a Raspberry
-  Pi (on the Tesla-backed circuit) for winter. GitHub Actions is not suitable
-  at this cadence.
+**Save this plan** stores the inputs and outputs in the browser; `storms.html`
+shows saved plans with a JSON row to paste into `data/storms.json`. After the
+storm, fill the `actual` block there from the station, NWPS `SBSC1`, USGS and
+the PumpFuse app. The PumpFuse live feed stays out on purpose; the app's own
+alerts cover the pump.
 
-## Calibrating from last winter
+## Setup
 
-Import the Ambient and PumpFuse exports (`./imports/`) into the same SQLite
-schema, resample to 10-min windows, then fit: primary duty cycle (and inflow =
-duty × pump GPM) against rain rate with a lag search (0–90 min) and a 7-day
-antecedent term. Do the same for creek stage at Ross (USGS historical) against
-6-h and 24-h rain totals. Write the resulting thresholds into `config.json`.
+1. Repo → Settings → Secrets → Actions: `AMBIENT_APP_KEY`, `AMBIENT_API_KEY`,
+   optionally `FLOODBOARD_CONTACT` (an email for the User-Agent).
+2. Repo → Settings → Pages → Deploy from branch `main`, folder `/docs`.
+3. Actions → **forecast** → Run workflow once; the log's last line prints the
+   48-h total, peak rate, index and any feed errors. After that it runs on its
+   own every six hours (late, usually; GitHub's cron is best-effort).
+4. Locally: `pip install requests python-dotenv`, put the Ambient keys in `.env`,
+   `python forecast.py`, then serve `docs/` with any static server.
 
-`./imports/bridge_street.csv` holds last winter's downtown gauge (Nov 2025–Apr
-2026, San Anselmo Creek at Bridge Street, `datetime_utc,stage_ft`), pulled by
-`imports/download_bridge_street.py`. It is event-based (sub-15-min during
-storms, sparse when flat); the peak was 7.38 ft on 2026-01-06, well below the
-13.3-ft minor-flood stage. Note it only covers the Nov–Apr window, while the
-Ambient export runs through the following summer, so join on the overlap.
+Re-run `python analysis/export_models.py` after any refit (it needs pandas and
+pyarrow and reads `analysis/timeline.parquet` + `events.csv`).
+
+## What was retired
+
+- `poller.py` and the 15-minute `poll.yml`. `docs/data/latest.json` and
+  `history.csv` stay as the last snapshot (the legacy live pages overlay fresh
+  gauge reads on them) but no longer grow.
+- The sump adapter (`fetch_sump`): the PumpFuse PF03 has no local API, and the
+  planner does not need one.
+- `rainfall.html`, which only read the archive.
+- The dead CNRFC (`restricted/graphicalRVF_csv.php`, 401) and CW3E
+  (`ar_scale_summary.json`, 404) endpoints, replaced as in the table above.
+- Pushover tier-change pushes, which lived in the poller.
 
 ## Pump capacity is a derived number, not a measured one
 
-The 84 GPM used throughout `analysis/` is the **nameplate** figure for the Zoeller
-N140, and it is pending measurement. Two independent lines of evidence support
-it, and one assumption could invalidate both.
+The 84 GPM used throughout is the **nameplate** figure for the Zoeller N140.
+Geometry (a 36-inch pit, 4.41 gal per inch, an *assumed* 4.5-inch float travel)
+gives 85.0 GPM, and the 14-second shortest run gives the same drawdown volume,
+so the three agree. But the float travel is assumed: at 4.0 in delivered drops
+to 75.5 GPM and at 3.0 in to 56.7 GPM, and every inflow and stress figure
+scales with it. Measuring the actual float travel is the single highest-value
+calibration left.
 
-**Geometry.** A 36-inch pit holds 4.4064 gal per inch of depth, so for this pit
+## December 2005
 
-```
-delivered GPM = float_differential_in x 18.885   (~ x19)
-```
-
-At the assumed 4.5 in float differential that is **84.98 GPM**, within 1.2% of
-nameplate.
-
-**Run duration.** For a pit of drawdown volume V, `duration = V/(Qp - Qin)`, so
-the shortest run is the dry-pit case `dur_min = V/Qp`. The shortest run in 3,674
-records is 14 s, which puts V at 19.6 gal against the 19.83 gal the geometry
-gives. The same identity makes `stress = 1 - 14/duration` equal to `Qin/Qp` -
-fractional pump capacity - which is what `analysis/stress_model.py` is built on.
-
-**The catch:** `float_differential_in` is recorded in `config.json` as *assumed,
-not measured*. Delivered GPM scales linearly with it, so a differential of 4.0 in
-means 75.5 GPM and 3.0 in means 56.7 GPM. Every inflow, gallons-pumped and stress
-figure in `analysis/` moves with it, and so do the alert thresholds derived from
-them. Measuring the actual float travel is the single highest-value calibration
-left; until then treat 84 GPM as provisional.
-
-## Sump adapter
-
-`fetch_sump()` in `poller.py` is a placeholder that reads a JSON endpoint
-(`SUMP_URL` secret). Replace it with the real API once the monitor brand is
-known. Duty cycle is computed from cumulative runtime between polls, so any
-device that exposes runtime or an on/off history will work.
-
-## Calibrating the model
-
-`docs/data/history.csv` is the dataset. After each storm, pull the rows for
-that event and record, in one spreadsheet line per storm:
-
-- peak 15-minute rain rate, 1-hour and 24-hour totals
-- 7-day antecedent rain before the storm started
-- peak sump duty cycle (and whether the pit ever came close to overflowing)
-- peak creek stage at Ross, and the Bridge Street reading if you noted it
-- how much of the 24h/72h forecast total actually fell
-
-Two or three storms are enough to set `thresholds` in `config.json` from your
-own house rather than guesses.
+Water entered this basement from the north side in the 2005 flood, before the
+sump existed. The defense against creek flooding on that side is physical
+barriers, not the pump; the checklist's Act-tier items are about the barriers.
+See `analysis/report.md` §7 for what is and is not known about that event.
 
 ## Tiers
 
-- **Quiet** – nothing in observations or the 3-day forecast.
-- **Watch** – 3-day forecast total over the watch threshold, or NWS forecasting
-  the Ross gauge to reach action stage.
-- **Prepare** – NWS Flood Watch, 24-hour forecast over threshold, sump duty
-  above the prepare level, or Ross gauge above action stage.
-- **Act** – NWS Flood Warning, observed rain rate or 1-hour total over the act
-  thresholds, sump duty above the act level, or Ross gauge above minor flood.
-
-The phone gets one push when the tier changes, high priority for Act.
+Quiet < Watch < Prepare < Act < Emergency; the highest satisfied rule wins
+(`config.json → tiers`, rebuilt from the winter 2025-26 replay, report §6).

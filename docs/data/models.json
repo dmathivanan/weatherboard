@@ -1,0 +1,297 @@
+{
+ "event_peak": {
+  "beta": [
+   1.1925,
+   0.9296,
+   0.3338
+  ],
+  "cols": [
+   "total_rain_in",
+   "api_at_start"
+  ],
+  "r2": 0.8222,
+  "residual_sd": 0.7083,
+  "n": 24,
+  "dof": 21,
+  "band_95": 1.504,
+  "_note": "Bridge Street crest from the storm total and the wetness index at onset. Fitted on a winter whose highest crest was 7.38 ft; above that it is extrapolation."
+ },
+ "r6h_from_storm": {
+  "beta": [
+   -0.056,
+   0.1533,
+   2.023
+  ],
+  "cols": [
+   "total_rain_in",
+   "peak_rain_1h_in"
+  ],
+  "r2": 0.8279,
+  "residual_sd": 0.2391,
+  "n": 24,
+  "dof": 21,
+  "band_95": 0.507
+ },
+ "r10_from_r1h": {
+  "beta": [
+   0.3091
+  ],
+  "cols": [
+   "peak_rain_1h_in"
+  ],
+  "r2": 0.671,
+  "residual_sd": 0.036,
+  "n": 24,
+  "dof": 23,
+  "band_95": 0.076
+ },
+ "sump_inflow": {
+  "beta": [
+   -2.0923,
+   152.8165,
+   1.0737
+  ],
+  "cols": [
+   "peak_rain_10min_in",
+   "api_at_start"
+  ],
+  "r2": 0.8896,
+  "residual_sd": 3.7037,
+  "n": 24,
+  "dof": 21,
+  "band_95": 7.863,
+  "_note": "Peak 15-minute inflow (GPM) from the heaviest 10 minutes of rain and wetness. Last winter's max was 42.65 GPM; the run-level model under-reads the worst single runs by about 2x (report sec. 3), so the planner shows a 2x tail band."
+ },
+ "sump_stress_run": {
+  "beta": [
+   0.066389,
+   1.889134,
+   0.009237,
+   0.000236
+  ],
+  "cols": [
+   "rain_10min_in",
+   "api",
+   "season_rain_in"
+  ],
+  "_note": "stress = 1 - 14/run_s = Qin/Qp, per run (stress_model.py, wR2 ~0.3)"
+ },
+ "baseflow_to_api": {
+  "intercept": -0.1864,
+  "coef_ln_flow": 0.904,
+  "r2": 0.4973,
+  "residual_sd": 0.95,
+  "n": 18621,
+  "_note": "API implied by Ross baseflow on rain-free bins; a cross-check and the fallback when the station history is unavailable."
+ },
+ "timing": {
+  "lag_peak_rain_to_crest_h": 0.83,
+  "lag_rain_to_inflow_h": -0.02,
+  "_note": "median across storms >= 0.5 in, heaviest hour of rain to Bridge Street crest / peak inflow"
+ },
+ "pump": {
+  "rated_gpm": 84,
+  "min_run_s": 14.0,
+  "drawdown_gal": 19.6,
+  "backup_gpm": 55,
+  "_note": "run_s = V/(Qp-Qin); V = 14 s x Qp. Float travel is assumed, not measured (README)."
+ },
+ "observed_maxima": {
+  "bridge_peak_ft": 7.38,
+  "ross_peak_ft": 12.12,
+  "total_rain_in": 5.54,
+  "peak_1h_in": 0.65,
+  "api_at_start": 5.203,
+  "inflow_gpm_15min": 42.65,
+  "_note": "largest values the models have seen; beyond them the planner flags extrapolation"
+ },
+ "ross_to_bridge": {
+  "_note": "Peak-to-peak fit across 24 storms, R2 0.9965, residual sd 0.0967 ft. Ross (USGS 11460000) is real-time and reliable; Bridge Street's own gauge is event-based and sparse. The notify line sits INSIDE the fitted range, the flood lines do not.",
+  "slope": 0.767,
+  "intercept": -1.9568,
+  "fitted_ross_range_ft": [
+   4.54,
+   12.12
+  ],
+  "notify_line_ross_ft": 11.03,
+  "notify_line_band_ft": [
+   10.74,
+   11.32
+  ],
+  "flood_horn_ross_ft": 19.5,
+  "flood_horn_extrapolation": "1.61x beyond fitted range - not trustworthy"
+ },
+ "creek_predictor": {
+  "_note": "Layer 3A, Bridge Street stage on the rising limb only (n=349 observed readings). Used by the Act tier: feed r6h_in = observed last-6h rain + bias-corrected next-6h QPF, and api = current antecedent index. Season-to-date was dropped - it added +0.005 R2 across every layer tested.",
+  "intercept": 0.8725,
+  "coef_r6h_in": 2.0903,
+  "coef_api": 0.2895,
+  "r2": 0.838,
+  "residual_sd_ft": 0.5498,
+  "band_95_ft": 1.078
+ },
+ "tiers": {
+  "_note": "Rebuilt 2026-09-08 from the winter 2025-26 replay. Ordered quiet < watch < prepare < act < emergency; the highest satisfied rule wins. 'ross_ft' is USGS 11460000 stage, 'bridge_ft' is San Anselmo at Bridge St, 'run_s' is a single primary-pump run length. QPF terms are already bias-corrected by qpf_bias.",
+  "watch": {
+   "cw3e_ar_category_min": 1,
+   "nws_flood_watch": true,
+   "qpf_72h_corrected_in": 3.0
+  },
+  "prepare": {
+   "qpf_24h_corrected_in": 2.0,
+   "bridge_ft_with_rain": {
+    "bridge_ft": 3.0,
+    "qpf_24h_corrected_in": 1.0
+   },
+   "ross_ft": 9.0,
+   "sump_run_s": 35
+  },
+  "act": {
+   "ross_ft": 11.0,
+   "predicted_bridge_ft": 6.5,
+   "sump_run_s": 93,
+   "sump_increasing_runs": 3,
+   "sump_increasing_min_final_s": 25,
+   "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm."
+  },
+  "emergency": {
+   "backup_pump_start": true,
+   "primary_run_no_stop_s": 180,
+   "ross_ft": 15.0
+  }
+ },
+ "qpf_bias": {
+  "_note": "Open-Meteo runs dry here. Measured against station totals over Nov 2025-Apr 2026: day-ahead QPF captured 75.5% of observed rain, 3-day lead 49.6%, and the five wettest events were under-forecast 41% and 68%. Every QPF used in a rule is multiplied by these before comparison.",
+  "lead_24h": 1.35,
+  "lead_72h": 2.0,
+  "_how_applied": "forecast.py multiplies each forecast hour by a factor of its lead time: lead_24h for the first 24 h, a straight line from lead_24h at 24 h to lead_72h at 72 h, and lead_72h beyond."
+ },
+ "wetness": {
+  "_note": "Ground wetness index. The antecedent precipitation index (API, 0.9/day decay) is the term both creek models were fitted on, so it IS the index; wetness_pct rescales it against saturated_api_in (the API when the Jan 2026 storm began, the wettest start last winter) for a 0-100 reading. USGS Ross baseflow is the cross-check and the fallback when the station history is unavailable.",
+  "decay_per_day": 0.9,
+  "saturated_api_in": 5.2,
+  "categories": [
+   {
+    "max_api_in": 0.5,
+    "label": "dry"
+   },
+   {
+    "max_api_in": 1.5,
+    "label": "damp"
+   },
+   {
+    "max_api_in": 3.0,
+    "label": "moist"
+   },
+   {
+    "max_api_in": 5.0,
+    "label": "wet"
+   },
+   {
+    "max_api_in": 99,
+    "label": "saturated"
+   }
+  ],
+  "ledger_days": 35,
+  "water_year_start_month": 10
+ },
+ "planner": {
+  "_note": "Storm-timing assumptions used by planner.html. lag_peak_rain_to_crest_h is the median lag from the heaviest hour of rain to the Bridge Street crest across last winter's storms (events.csv).",
+  "lag_peak_rain_to_crest_h": 1.5,
+  "storm_window_h": 48,
+  "rain_threshold_in": 0.02,
+  "checklist": [
+   {
+    "task": "Clear gutters, downspouts and the north-side yard drain",
+    "when": "onset",
+    "offset_h": -24,
+    "min_tier": "watch"
+   },
+   {
+    "task": "Test primary pump; confirm backup pump float lifts and runs",
+    "when": "onset",
+    "offset_h": -24,
+    "min_tier": "watch"
+   },
+   {
+    "task": "Charge phones and lights; check the Tesla backup circuit",
+    "when": "onset",
+    "offset_h": -12,
+    "min_tier": "watch"
+   },
+   {
+    "task": "Move cars off the low side of Woodland",
+    "when": "onset",
+    "offset_h": -3,
+    "min_tier": "prepare"
+   },
+   {
+    "task": "Lift basement storage off the floor; roll up rugs",
+    "when": "onset",
+    "offset_h": -6,
+    "min_tier": "prepare"
+   },
+   {
+    "task": "Stage sandbags and barrier boards on the north side",
+    "when": "onset",
+    "offset_h": -6,
+    "min_tier": "prepare"
+   },
+   {
+    "task": "Deploy north-side barriers (2005 water came from the north, not the sump)",
+    "when": "crest",
+    "offset_h": -4,
+    "min_tier": "act"
+   },
+   {
+    "task": "Walk the creek at Bridge St; compare the gauge to the Town stage lines",
+    "when": "crest",
+    "offset_h": -2,
+    "min_tier": "act"
+   },
+   {
+    "task": "Shut off power to basement outlets below 12 in; move to the upper floor",
+    "when": "crest",
+    "offset_h": -1,
+    "min_tier": "emergency"
+   }
+  ],
+  "peak_24h_fraction_of_48h": 0.8,
+  "_peak_24h_note": "For a 48-h storm the heaviest 24 h held 75-99% of the total last winter (events.csv); 0.8 converts the 48-h slider to the 24-h quantity the Prepare rule was written for."
+ },
+ "town_stages": [
+  {
+   "stage": 2,
+   "ft": 6.5,
+   "action": "Notify public",
+   "color": "#64748b"
+  },
+  {
+   "stage": 3,
+   "ft": 8.14,
+   "action": "Prep flood gates",
+   "color": "#d97706"
+  },
+  {
+   "stage": 4,
+   "ft": 11.14,
+   "action": "Consider evacuation",
+   "color": "#f97316"
+  },
+  {
+   "stage": 5,
+   "ft": 13,
+   "action": "Flood horn",
+   "note": "water at 730 SA Ave",
+   "color": "#dc2626"
+  }
+ ],
+ "bridge_flood_categories": {
+  "action": 11.3,
+  "minor": 13.3,
+  "moderate": 16.3,
+  "major": 17.8
+ },
+ "generated": "2026-10-14T14:56:30Z",
+ "_source": "analysis/export_models.py"
+}

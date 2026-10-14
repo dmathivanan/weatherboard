@@ -26,7 +26,7 @@ a{color:var(--gold-dark);font-weight:500}
 /* header / nav — navy top bar, gold accents (matches the training site) */
 header.top{position:sticky;top:0;z-index:20;background:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .top-in{max-width:860px;margin-inline:auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.brand{font-weight:700;font-size:1.05rem;margin-right:auto;white-space:nowrap;color:#fff}
+.brand{font-weight:700;font-size:1.05rem;margin-right:auto;white-space:nowrap;color:#fff;text-decoration:none}
 .brand small{color:rgba(255,255,255,.7);font-weight:400}
 nav.tabs{display:flex;gap:2px;flex-wrap:wrap}
 nav.tabs a{color:rgba(255,255,255,.85);text-decoration:none;font-size:.92rem;padding:6px 12px;border-radius:8px;font-weight:600}

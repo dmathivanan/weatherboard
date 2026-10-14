@@ -1,19 +1,23 @@
-name: poll
+name: forecast
 
+# Six-hourly storm-planner inputs. Replaces the retired 15-minute poll: the
+# product is a planner, not a live monitor, and GitHub's cron is best-effort
+# (expect runs to land late, not on the minute). Writes docs/data/forecast.json
+# and docs/data/rain_daily.json; the pages compute everything else client-side.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: poll
+  group: forecast
   cancel-in-progress: false
 
 jobs:
-  poll:
+  forecast:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,21 +28,18 @@ jobs:
 
       - run: pip install requests python-dotenv
 
-      - name: Run poller
+      - name: Build forecast.json
         env:
           AMBIENT_APP_KEY: ${{ secrets.AMBIENT_APP_KEY }}
           AMBIENT_API_KEY: ${{ secrets.AMBIENT_API_KEY }}
           FLOODBOARD_CONTACT: ${{ secrets.FLOODBOARD_CONTACT }}
-          SUMP_URL: ${{ secrets.SUMP_URL }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
-        run: python poller.py
+        run: python forecast.py
 
       - name: Commit data
         run: |
           git config user.name "floodboard-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add docs/data
-          git commit -m "data $(date -u +%Y-%m-%dT%H:%M)" || echo "nothing to commit"
+          git add docs/data/forecast.json docs/data/rain_daily.json
+          git commit -m "forecast $(date -u +%Y-%m-%dT%H:%M)" || echo "nothing to commit"
           git pull --rebase
           git push
