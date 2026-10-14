@@ -25,7 +25,7 @@ a{color:var(--gold-dark);font-weight:500}
 
 /* header / nav — navy top bar, gold accents (matches the training site) */
 header.top{position:sticky;top:0;z-index:20;background:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.top-in{max-width:860px;margin-inline:auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top-in{max-width:1180px;margin-inline:auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{font-weight:700;font-size:1.05rem;margin-right:auto;white-space:nowrap;color:#fff;text-decoration:none}
 .brand small{color:rgba(255,255,255,.7);font-weight:400}
 nav.tabs{display:flex;gap:2px;flex-wrap:wrap}
@@ -37,7 +37,7 @@ nav.tabs a.active{background:var(--gold);color:var(--navy)}
 .tierchip.prepare{background:var(--amber)} .tierchip.act{background:var(--red)}
 .tierchip.emergency{background:#7f1d1d;box-shadow:0 0 0 2px #fca5a5}
 
-main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
+main{max-width:1180px;margin-inline:auto;padding:18px 16px 64px}
 .updated{color:var(--mute);font-size:.85rem;margin:0 0 14px}
 .updated.stale{color:var(--amber);font-weight:500}
 
@@ -71,7 +71,7 @@ main{max-width:860px;margin-inline:auto;padding:18px 16px 64px}
   display:flex;align-items:center;justify-content:space-between;gap:8px}
 .card > h2 .sub{font-weight:400;text-transform:none;letter-spacing:0;font-size:.8rem;color:rgba(255,255,255,.8)}
 .card > h2 .sub a{color:var(--gold)}
-.cards2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media (max-width:640px){.cards2{grid-template-columns:1fr}}
 
 /* stat tiles */

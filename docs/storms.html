@@ -5,37 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>52 Storm Planner — Storms</title>
-<link rel="stylesheet" href="assets/app.css?v=10">
+<link rel="stylesheet" href="assets/app.css?v=11">
 <style>
 .tw{overflow-x:auto;margin:0 -16px;padding:0 16px}
-table.t{width:100%;border-collapse:collapse;font-size:.85rem;min-width:860px}
-table.t th,table.t td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
-table.t th{color:var(--mute);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-table.t th.g{border-bottom:2px solid var(--rule);text-align:center;color:var(--ink)}
-table.t td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-table.t td.miss{color:var(--mute)}
-table.t tr.big td{font-weight:600}
-.tierdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-.tierdot.quiet{background:var(--quiet)}.tierdot.watch{background:var(--water)}.tierdot.prepare{background:var(--amber)}.tierdot.act{background:var(--red)}.tierdot.emergency{background:#7f1d1d}
-.err{display:inline-block;padding:1px 6px;border-radius:6px;background:var(--water-soft);font-size:.78rem}
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:.84rem;min-width:900px}
+table.t th,table.t td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:middle;white-space:nowrap}
+table.t thead th{color:var(--mute);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;
+  background:var(--card);position:sticky;top:0;z-index:1}
+table.t thead tr.groups th{font-size:.72rem;letter-spacing:.06em;text-align:center;color:var(--ink);
+  border-bottom:0;padding:6px 10px 2px;background:var(--paper)}
+table.t thead tr.groups th.g{border-left:3px solid var(--card)}
+table.t thead tr.groups th.f{color:var(--water)} table.t thead tr.groups th.p{color:var(--gold-dark)} table.t thead tr.groups th.a{color:var(--green)}
+table.t thead tr.cols th{border-bottom:2px solid var(--rule)}
+table.t thead tr.cols th small{display:block;font-weight:400;text-transform:none;letter-spacing:0;color:var(--mute)}
+table.t th.n,table.t td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.t td.gs,table.t th.gs{border-left:3px solid var(--paper)}
+table.t td.first,table.t th.first{position:sticky;left:0;background:var(--card);z-index:2;font-weight:600}
+table.t tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--paper) 55%,var(--card))}
+table.t tbody tr:hover td{background:var(--water-soft)}
+table.t td.miss{color:var(--mute);text-align:center}
+table.t tr.big td.first{color:var(--red)}
+table.t td.date{color:var(--mute);font-size:.82rem}
+table.t td.date b{color:var(--ink);font-weight:600}
+.chip{display:inline-block;font-size:.72rem;font-weight:600;color:#fff;padding:2px 8px;border-radius:999px}
+.chip.quiet{background:var(--quiet)}.chip.watch{background:var(--water)}.chip.prepare{background:var(--amber)}.chip.act{background:var(--red)}.chip.emergency{background:#7f1d1d}
+.err{display:inline-block;min-width:44px;text-align:right;padding:1px 7px;border-radius:6px;background:var(--water-soft);font-weight:600}
 .err.bad{background:#fee2e2;color:#991b1b}
+@media (prefers-color-scheme:dark){.err.bad{background:#5a1d1d;color:#fca5a5}}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--water);vertical-align:middle;margin-right:6px;opacity:.7}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--mute);margin-top:10px}
+.legend .err{font-size:.74rem;min-width:0}
 pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;overflow-x:auto;margin:6px 0 0}
 .btn{font:inherit;font-size:.8rem;font-weight:600;color:var(--navy);background:var(--gold);border:0;border-radius:8px;padding:5px 10px;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
 .plan{padding:10px 0;border-bottom:1px solid var(--rule)}
 .plan:last-child{border-bottom:0}
-.stamp{font-size:.8rem;color:var(--mute);margin:0 0 12px}
+.stamp{font-size:.85rem;color:var(--mute);margin:0 0 14px}
+.sumline{display:flex;gap:22px;flex-wrap:wrap;font-size:.85rem;color:var(--mute);margin:0 0 10px}
+.sumline b{color:var(--ink)}
 </style>
 </head>
 <body>
 <header class="top"></header>
 <main>
-  <p class="stamp">Forecast vs predicted vs actual, one row per storm. After each storm fill the actual columns in <code>data/storms.json</code>.</p>
+  <p class="stamp">One row per storm: what was forecast, what the models predicted from it, and what actually happened. Fill the actual columns in <code>data/storms.json</code> after each storm.</p>
 
   <section class="card">
     <h2>This season <span class="sub" id="seasonsub"></span></h2>
     <div class="tw"><table class="t" id="cur"></table></div>
-    <p class="note" id="curnote"></p>
+    <div class="legend">
+      <span><span class="chip prepare">Prepare</span> tier from the planner / reached</span>
+      <span><span class="err">+0.4</span> crest error, predicted − actual, ft</span>
+      <span><span class="err bad">+2.1</span> outside the model's ±<span id="bandv"></span> ft band</span>
+    </div>
   </section>
 
   <section class="card">
@@ -44,13 +66,14 @@ pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);b
   </section>
 
   <section class="card">
-    <h2>Winter 2025-26 <span class="sub">calibration winter · predicted = model hindcast on the actual rain</span></h2>
+    <h2>Winter 2025-26 <span class="sub">calibration winter · 24 storms over 0.10 in</span></h2>
+    <div class="sumline" id="histsum"></div>
     <div class="tw"><table class="t" id="hist"></table></div>
-    <p class="note">Forecast columns are Open-Meteo's own archive of what it said the day before (raw, before bias correction), summed over the storm's days. Predicted applies the crest model to the rain that actually fell, so the error column measures the model, not the forecast. Peak crest 7.38 ft on 6 Jan 2026 is the most the model has seen.</p>
+    <p class="note">Forecast columns are Open-Meteo's own archive of what it said one and three days ahead (raw, before bias correction), summed over the storm's days. Predicted applies the crest model to the rain that <em>actually</em> fell, so its error measures the model, not the forecast. Rows in red crossed the 6.5 ft notify line. Sorted by crest.</p>
   </section>
 </main>
 
-<script src="assets/planner.js?v=10"></script>
+<script src="assets/planner.js?v=11"></script>
 <script>
 (async () => {
   renderNav("storms");
@@ -61,26 +84,51 @@ pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);b
     loadJSON("data/forecast.json").catch(e => ({ _missing: String(e) })),
   ]);
   setTierChip(tierFromForecast(M, F));
-  const n = (v, d = 2) => v == null ? '<td class="n miss">–</td>' : `<td class="n">${fmt(v, d)}</td>`;
+  const band = M.event_peak.band_95 || 1.5;
+  $("bandv").textContent = band.toFixed(1);
+
+  const n = (v, d = 2, cls = "") => v == null ? `<td class="miss ${cls}">–</td>` : `<td class="n ${cls}">${fmt(v, d)}</td>`;
   const errCell = (p, a) => {
-    if (p == null || a == null) return '<td class="n miss">–</td>';
-    const e = p - a; const bad = Math.abs(e) > (M.event_peak.band_95 || 1.5);
-    return `<td class="n"><span class="err${bad ? " bad" : ""}">${e >= 0 ? "+" : ""}${e.toFixed(1)}</span></td>`;
+    if (p == null || a == null) return '<td class="miss gs">–</td>';
+    const e = p - a; const bad = Math.abs(e) > band;
+    return `<td class="n gs"><span class="err${bad ? " bad" : ""}">${e >= 0 ? "+" : ""}${e.toFixed(1)}</span></td>`;
   };
-  const tierCell = t => t ? `<td><span class="tierdot ${t}"></span>${TIER_LABEL[t] || t}</td>` : '<td class="miss">–</td>';
+  const tierCell = t => t ? `<td><span class="chip ${t}">${TIER_LABEL[t] || t}</span></td>` : '<td class="miss">–</td>';
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const dateCell = (s, e) => {
+    if (!s) return '<td class="miss">–</td>';
+    const d = x => { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(x || ""); return m ? { y: +m[1], mo: +m[2], d: +m[3], h: +m[4], mi: m[5] } : null; };
+    const a = d(s), b = d(e);
+    if (!a) return '<td class="miss">–</td>';
+    const hm = o => `${((o.h + 11) % 12) + 1}:${o.mi} ${o.h < 12 ? "am" : "pm"}`;
+    let txt = `<b>${months[a.mo - 1]} ${a.d}, ${a.y}</b> ${hm(a)}`;
+    if (b) {
+      const same = a.y === b.y && a.mo === b.mo && a.d === b.d;
+      const hrs = (Date.parse(e) - Date.parse(s)) / 3600e3;
+      txt += ` → ${same ? "" : `${months[b.mo - 1]} ${b.d} `}${hm(b)}` + (isFinite(hrs) && hrs > 0 ? ` · ${hrs.toFixed(0)} h` : "");
+    }
+    return `<td class="date">${txt}</td>`;
+  };
+  const rainBar = (v, max, cls = "") => v == null ? `<td class="miss ${cls}">–</td>`
+    : `<td class="n ${cls}"><span class="bar" style="width:${Math.max(3, 40 * v / max).toFixed(0)}px"></span>${fmt(v)}</td>`;
 
   // ---- current season ----
-  const head = `<tr><th></th><th></th><th class="g" colspan="4">Forecast</th><th class="g" colspan="3">Predicted</th><th class="g" colspan="5">Actual</th><th></th></tr>
-    <tr><th>Storm</th><th>Dates</th><th>48 h</th><th>Peak /hr</th><th>Index</th><th>AR</th><th>Bridge ft</th><th>Ross eq</th><th>Tier</th><th>Rain</th><th>Bridge ft</th><th>Ross ft</th><th>Run s</th><th>Tier</th><th>Err ft</th></tr>`;
+  const head = `<thead>
+    <tr class="groups"><th></th><th></th><th class="g f" colspan="4">Forecast</th><th class="g p" colspan="3">Predicted</th><th class="g a" colspan="5">Actual</th><th class="g"></th></tr>
+    <tr class="cols"><th class="first">Storm</th><th>Dates <small>local</small></th>
+      <th class="n gs">48 h <small>in</small></th><th class="n">Peak <small>in/hr</small></th><th class="n">Wetness <small>API in</small></th><th class="n">AR <small>scale</small></th>
+      <th class="n gs">Bridge St <small>ft</small></th><th class="n">Ross eq <small>ft</small></th><th>Tier</th>
+      <th class="n gs">Rain <small>in</small></th><th class="n">Bridge St <small>ft</small></th><th class="n">Ross <small>ft</small></th><th class="n">Run <small>s</small></th><th>Tier</th>
+      <th class="n gs">Error <small>ft</small></th></tr></thead>`;
   const rows = (cur.storms || []).map(s => {
     const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
-    return `<tr><td>${s.name || s.id}</td><td>${(s.start_local || "").slice(0, 10)} → ${(s.end_local || "").slice(5, 10)}</td>`
-      + n(f.total_48h_in) + n(f.peak_1h_inhr) + n(f.api_in) + (f.ar_category != null ? `<td class="n">${f.ar_category}</td>` : '<td class="n miss">–</td>')
-      + n(p.bridge_peak_ft, 1) + n(p.ross_equivalent_ft, 1) + tierCell(p.tier)
-      + n(a.total_rain_in) + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_run_s, 0) + tierCell(a.tier_reached)
+    return `<tr><td class="first">${s.name || s.id}</td>${dateCell(s.start_local, s.end_local)}`
+      + n(f.total_48h_in, 2, "gs") + n(f.peak_1h_inhr) + n(f.api_in) + (f.ar_category != null ? `<td class="n">${f.ar_category}</td>` : '<td class="miss">–</td>')
+      + n(p.bridge_peak_ft, 1, "gs") + n(p.ross_equivalent_ft, 1) + tierCell(p.tier)
+      + n(a.total_rain_in, 2, "gs") + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_run_s, 0) + tierCell(a.tier_reached)
       + errCell(p.bridge_peak_ft, a.bridge_peak_ft) + "</tr>";
   });
-  $("cur").innerHTML = head + (rows.join("") || `<tr><td colspan="15" class="miss">No storms logged yet. Save a plan on the planner, paste its row into data/storms.json, then fill the actuals afterwards.</td></tr>`);
+  $("cur").innerHTML = head + "<tbody>" + (rows.join("") || `<tr><td colspan="15" class="miss" style="text-align:left;white-space:normal;padding:14px 10px">No storms logged yet. Save a plan on the planner, paste its row into data/storms.json, then fill the actuals afterwards.</td></tr>`) + "</tbody>";
   $("seasonsub").textContent = (cur.storms || []).length + " storms";
 
   // ---- saved plans ----
@@ -89,8 +137,8 @@ pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);b
   if (!plans.length) host.innerHTML = '<p class="note" style="margin:0">None yet.</p>';
   else host.innerHTML = plans.slice().reverse().map((p, i) => `
     <div class="plan">
-      <div><b>${p.start_local ? p.start_local.replace("T", " ") : "?"}</b> · ${fmt(p.forecast.total_48h_in)}" / 48 h, peak ${fmt(p.forecast.peak_1h_inhr)} in/hr, index ${fmt(p.forecast.api_in)} →
-        Bridge St <b>${fmt(p.predicted.bridge_peak_ft, 1)} ft</b> (${fmt(p.predicted.lo_ft, 1)}–${fmt(p.predicted.hi_ft, 1)}), <span class="tierdot ${p.predicted.tier}"></span>${TIER_LABEL[p.predicted.tier] || ""}
+      <div><b>${p.start_local ? p.start_local.replace("T", " ") : "?"}</b> · ${fmt(p.forecast.total_48h_in)}" / 48 h, peak ${fmt(p.forecast.peak_1h_inhr)} in/hr, wetness ${fmt(p.forecast.api_in)} →
+        Bridge St <b>${fmt(p.predicted.bridge_peak_ft, 1)} ft</b> (${fmt(p.predicted.lo_ft, 1)}–${fmt(p.predicted.hi_ft, 1)}) <span class="chip ${p.predicted.tier}">${TIER_LABEL[p.predicted.tier] || ""}</span>
         <span class="u">saved ${p.saved_local.replace("T", " ")}</span></div>
       <div style="margin-top:6px;display:flex;gap:6px">
         <button class="btn" data-copy="${i}">Copy JSON row</button>
@@ -115,16 +163,28 @@ pre.json{font-size:.74rem;background:var(--paper);border:1px solid var(--rule);b
   function seasonOf(s) { if (!s) return ""; const y = +s.slice(0, 4), m = +s.slice(5, 7); return m >= 10 ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`; }
 
   // ---- last winter ----
-  const h2 = `<tr><th></th><th></th><th class="g" colspan="2">Forecast (raw)</th><th class="g" colspan="1">Predicted</th><th class="g" colspan="7">Actual</th><th></th></tr>
-    <tr><th>Storm</th><th>Start</th><th>Day-ahead</th><th>3-day</th><th>Bridge ft</th><th>Rain</th><th>Peak 1 h</th><th>Index</th><th>Bridge ft</th><th>Ross ft</th><th>Inflow GPM</th><th>Runs</th><th>Err ft</th></tr>`;
   const hs = (hist.storms || []).slice().sort((a, b) => (b.actual.bridge_peak_ft || 0) - (a.actual.bridge_peak_ft || 0));
-  $("hist").innerHTML = h2 + hs.map(s => {
+  const maxRain = Math.max(0.1, ...hs.map(s => s.actual.total_rain_in || 0));
+  const errs = hs.filter(s => s.predicted.bridge_peak_ft != null && s.actual.bridge_peak_ft != null).map(s => s.predicted.bridge_peak_ft - s.actual.bridge_peak_ft);
+  const within = errs.filter(e => Math.abs(e) <= band).length;
+  const totRain = hs.reduce((a, s) => a + (s.actual.total_rain_in || 0), 0);
+  $("histsum").innerHTML = `<span>Rain <b>${totRain.toFixed(1)} in</b></span><span>Crests over 6.5 ft <b>${hs.filter(s => s.actual.bridge_peak_ft >= 6.5).length}</b></span>`
+    + `<span>Model within ±${band.toFixed(1)} ft <b>${within} of ${errs.length}</b></span><span>Mean error <b>${(errs.reduce((a, e) => a + e, 0) / (errs.length || 1)).toFixed(2)} ft</b></span>`;
+  const h2 = `<thead>
+    <tr class="groups"><th></th><th></th><th class="g f" colspan="2">Forecast (raw)</th><th class="g p" colspan="1">Predicted</th><th class="g a" colspan="7">Actual</th><th class="g"></th></tr>
+    <tr class="cols"><th class="first">#</th><th>Dates <small>local</small></th>
+      <th class="n gs">Day ahead <small>in</small></th><th class="n">3 days <small>in</small></th>
+      <th class="n gs">Bridge St <small>ft</small></th>
+      <th class="n gs">Rain <small>in</small></th><th class="n">Peak 1 h <small>in</small></th><th class="n">Wetness <small>API in</small></th><th class="n">Bridge St <small>ft</small></th><th class="n">Ross <small>ft</small></th><th class="n">Inflow <small>GPM</small></th><th class="n">Runs</th>
+      <th class="n gs">Error <small>ft</small></th></tr></thead>`;
+  $("hist").innerHTML = h2 + "<tbody>" + hs.map(s => {
     const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
-    return `<tr class="${a.bridge_peak_ft >= 6.5 ? "big" : ""}"><td>${s.id.slice(-2)}</td><td>${s.start_local.replace("T", " ")}</td>`
-      + n(f.day_ahead_total_in) + n(f.three_day_total_in) + n(p.bridge_peak_ft, 1)
-      + n(a.total_rain_in) + n(a.peak_1h_in) + n(a.api_at_start) + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_inflow_gpm, 0) + n(a.sump_runs, 0)
+    return `<tr class="${a.bridge_peak_ft >= 6.5 ? "big" : ""}"><td class="first">${+s.id.slice(-2)}</td>${dateCell(s.start_local, s.end_local)}`
+      + n(f.day_ahead_total_in, 2, "gs") + n(f.three_day_total_in)
+      + n(p.bridge_peak_ft, 1, "gs")
+      + rainBar(a.total_rain_in, maxRain, "gs") + n(a.peak_1h_in) + n(a.api_at_start) + n(a.bridge_peak_ft) + n(a.ross_peak_ft) + n(a.sump_peak_inflow_gpm, 0) + n(a.sump_runs, 0)
       + errCell(p.bridge_peak_ft, a.bridge_peak_ft) + "</tr>";
-  }).join("");
+  }).join("") + "</tbody>";
 })();
 </script>
 </body>
