@@ -63,18 +63,50 @@
   "_note": "Peak 15-minute inflow (GPM) from the heaviest 10 minutes of rain and wetness. Last winter's max was 42.65 GPM; the run-level model under-reads the worst single runs by about 2x (report sec. 3), so the planner shows a 2x tail band."
  },
  "sump_stress_run": {
+  "tail": {
+   "beta": [
+    0.204493,
+    1.183862,
+    0.006789
+   ],
+   "cols": [
+    "rain_10min_aligned_in",
+    "api"
+   ],
+   "r2": 0.3682,
+   "residual_sd": 0.0726,
+   "n": 235,
+   "_note": "fit on runs with stress >= 0.3 only; the worst-run estimate in the planner"
+  },
   "beta": [
-   0.066389,
-   1.889134,
-   0.009237,
-   0.000236
+   0.041721,
+   2.107531,
+   0.011457,
+   0.000437
   ],
   "cols": [
-   "rain_10min_in",
+   "rain_10min_aligned_in",
    "api",
    "season_rain_in"
   ],
-  "_note": "stress = 1 - 14/run_s = Qin/Qp, per run (stress_model.py, wR2 ~0.3)"
+  "window": "10 min ending 5 min after the run start",
+  "r2_weighted": 0.7214,
+  "r2": 0.6723,
+  "r2_stressed_runs": -0.0228,
+  "n": 3553,
+  "n_stressed": 235,
+  "residual_sd": 0.0476,
+  "residual_sd_stressed": 0.0835,
+  "old_misaligned": {
+   "beta": [
+    0.066389,
+    1.889134,
+    0.009237,
+    0.000236
+   ],
+   "r2_weighted": 0.5201
+  },
+  "_note": "stress = 1 - 14/run_s = Qin/Qp per run, from the 10 min of rain ending 5 min AFTER the run starts (the pit answers within minutes; a window ending at the start misses the burst). 'tail' is the same fit on stressed runs only, used for the worst-run estimate."
  },
  "baseflow_to_api": {
   "intercept": -0.1864,
@@ -292,6 +324,6 @@
   "moderate": 16.3,
   "major": 17.8
  },
- "generated": "2026-10-14T14:56:30Z",
+ "generated": "2026-10-15T00:04:36Z",
  "_source": "analysis/export_models.py"
 }

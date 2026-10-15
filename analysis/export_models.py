@@ -71,12 +71,13 @@ def main():
 
     # Run-level stress model (stress_model.py), for the per-run story.
     try:
-        b = np.load(HERE / "beta_r10_api_season.npy")
-        m["sump_stress_run"] = {"beta": [round(float(x), 6) for x in b],
-                                "cols": ["rain_10min_in", "api", "season_rain_in"],
-                                "_note": "stress = 1 - 14/run_s = Qin/Qp, per run (stress_model.py, wR2 ~0.3)"}
-    except Exception:  # noqa: BLE001
-        pass
+        fit = json.loads((HERE / "stress_run_fit.json").read_text(encoding="utf-8"))
+        fit["_note"] = ("stress = 1 - 14/run_s = Qin/Qp per run, from the 10 min of rain ending 5 min AFTER the "
+                        "run starts (the pit answers within minutes; a window ending at the start misses the burst). "
+                        "'tail' is the same fit on stressed runs only, used for the worst-run estimate.")
+        m["sump_stress_run"] = fit
+    except Exception as e:  # noqa: BLE001
+        m["sump_stress_run_error"] = str(e)[:120]
 
     # Baseflow -> wetness cross-check, from the 10-min timeline on dry bins.
     try:
@@ -181,6 +182,10 @@ def main():
         }
     except Exception as e:  # noqa: BLE001
         pts["error"] = str(e)[:120]
+    try:
+        pts["runs"] = json.loads((HERE / "runs_points.json").read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        pts["runs_error"] = str(e)[:120]
     (DOCS / "report_points.json").write_text(json.dumps(pts, separators=(",", ":")), encoding="utf-8")
     print("report_points.json:", {k: len(v.get("points", [])) for k, v in pts.items() if isinstance(v, dict)})
 

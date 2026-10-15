@@ -131,21 +131,53 @@ across every large storm. What changes is how long each run lasts — from the
 usual 15–18 seconds up to 38, 63, 100, 134 seconds. **Run length is the signal;
 run count saturates and will mislead you.**
 
-### What we could not model
+### Rain does explain the stressful runs, once the clock is right
 
-An attempt was made to predict stress from rainfall. It works in bulk and fails
-where it matters. Rain explains stress reasonably across all runs, but if you
-look only at the runs that were actually stressful, the relationship
-disappears — statistically, essentially nothing. The model under-predicts those
-six critical runs by a factor of two. The worst run of the winter followed only
-0.08 inches of rain in the preceding ten minutes.
+*Corrected 14 October 2026.* The first pass at this concluded that rain could
+not explain the runs that mattered: fitted across all runs it worked, but on the
+stressful runs alone the relationship vanished, and the winter's worst run (134
+seconds, 16 November at 23:33) appeared to follow only 0.08 inches in the
+preceding ten minutes.
 
-Consequently the "what rainfall rate would overwhelm the pump" question **cannot
-be answered from this data**. The arithmetic says roughly 2.0–2.9 inches per
-hour, but that is 1.3 to 1.9 times more intense than the heaviest ten minutes
-ever recorded here, produced by a model that is known to under-read exactly this
-regime. If anything the true figure is lower. Treat it as "we have never come
-close, and we do not know where the edge is."
+That was a timing artifact. The pit answers rain within about five minutes, and
+the station stamps each five-minute bin at its *end*, so the rain falling as a
+run starts lands in the bin after the run's timestamp. A window ending at the
+run's start misses the burst. The 134-second run sat inside the heaviest five
+minutes of the whole winter (0.20 inches, a 2.4 in/hr burst) and "saw" none of
+it.
+
+Ending the ten-minute window five minutes *after* the run starts fixes it:
+
+| Rain window | R², all runs | R², stressed runs only |
+|---|--:|--:|
+| 10 min ending at the run start (original) | 0.52 | 0.05 |
+| **10 min ending 5 min after the start** | **0.72** | **0.37** |
+| 15 min, same alignment | 0.65 | 0.23 |
+| 30 min or longer | ≤ 0.61 | ≈ 0 |
+
+Longer windows make it worse, not better: they dilute the burst. The eight
+longest runs of the winter all fall at 1.3 to 1.6 in/hr in the aligned window,
+which is coherent. The model is
+
+```
+stress = 0.04 + 2.11 × rain₁₀ₘ + 0.011 × API      (rain in inches per 10 min)
+```
+
+It describes the *typical* run at a given rate well. The extreme runs are still
+above it: at the 134-second run's rate it predicts a run near 40 seconds, so
+the worst single run was two to three times the typical-run estimate. The
+residual spread on stressed runs (sd 0.08 in stress) gives the planner its
+worst-run band; the 134-second run sits beyond even that, a genuine outlier
+that coincided with the winter's single heaviest five minutes. A separate fit
+on the stressed runs alone (R² 0.37, against 0.05 before) confirms rain carries
+the signal there too, though its slope is flattened by selecting on the outcome
+and it should not be read as a capacity line.
+
+The "what rate would overwhelm the pump" question is therefore still
+extrapolation. The typical-run line reaches capacity near 2.6 in/hr sustained
+over ten minutes, and the heaviest ten minutes ever recorded here is 1.56
+in/hr. Treat the edge as above anything seen, and expect the first run that
+never ends to come inside a short burst rather than a long steady rate.
 
 ---
 

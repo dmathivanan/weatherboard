@@ -17,7 +17,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 SRC = HERE / "report.md"
 OUT = ROOT / "docs" / "analysis.html"
-ASSET_V = 9
+ASSET_V = 12
 
 PAGES = [("planner.html", "Planner"), ("wetness.html", "Wetness"), ("storms.html", "Storms"),
          ("creek.html", "Creek (live)"), ("storm.html", "Radar"), ("report.html", "Report")]

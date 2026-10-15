@@ -119,22 +119,34 @@ function rossEquivalent(M, bridge) {
   const ross = (bridge - r.intercept) / r.slope;
   return { ross, inRange: ross <= r.fitted_ross_range_ft[1] };
 }
-/* Sump at the peak rate. inflow from the event fit, then the pit identity:
-   run_s = V/(Qp-Qin), cycle = run + refill (V/Qin). */
-function sumpAt(M, peak1h, api) {
+/* Sump at the peak rate.
+   Event level: peak 15-min inflow from the heaviest 10 minutes and wetness, then
+   the pit identity run_s = V/(Qp-Qin), cycle = run + refill (V/Qin).
+   Run level: the typical single run at that rate (sump_stress_run, 10 min of
+   rain ending 5 min after the run starts) and a worst-run estimate at the 95 %
+   edge of the residual spread on stressed runs. */
+function sumpAt(M, peak1h, api, season) {
   const r10 = lin(M.r10_from_r1h, peak1h);
   const Qp = M.pump.rated_gpm, V = M.pump.drawdown_gal, tmin = M.pump.min_run_s;
-  const one = gpm => {
-    const q = clamp(gpm, 0, Qp * 0.98);
-    const stress = q / Qp;
+  const fromStress = st => {
+    const stress = clamp(st, 0, 0.98);
     const run = tmin / (1 - stress);
+    const q = stress * Qp;
     const refill = q > 0.5 ? V / q * 60 : Infinity;
-    const perHr = isFinite(refill) ? 3600 / (run + refill) : 0;
-    return { gpm: q, stress, run_s: run, runs_per_hr: perHr, capacity: stress >= 0.98 };
+    return { gpm: q, stress, run_s: run, runs_per_hr: isFinite(refill) ? 3600 / (run + refill) : 0, capacity: stress >= 0.98 };
   };
-  const base = Math.max(0, lin(M.sump_inflow, r10, api));
-  return { r10, mean: one(base), tail: one(base * 2),
-           extrapolated: peak1h > M.observed_maxima.peak_1h_in };
+  const inflow = Math.max(0, lin(M.sump_inflow, r10, api));
+  const out = { r10, mean: fromStress(inflow / Qp), extrapolated: peak1h > M.observed_maxima.peak_1h_in };
+  const R = M.sump_stress_run;
+  if (R && R.beta) {
+    const typ = R.beta[0] + R.beta[1] * r10 + R.beta[2] * api + (R.beta[3] || 0) * (season || 0);
+    out.typical = fromStress(typ);
+    // worst single run: the typical run plus the 95 % residual spread seen on
+    // stressed runs. Last winter's 134 s outlier sat beyond even this.
+    const band = 1.96 * (R.residual_sd_stressed || 0.08);
+    out.worst = fromStress(typ + band);
+  }
+  return out;
 }
 
 /* Tier for a planned storm, on the config ladder. The ladder was written for
@@ -152,13 +164,14 @@ function planTier(M, inp, out) {
     up(2, `~${fmt(peak24, 1)}" in the heaviest 24 h`);
   if (out.bridge.pt >= T.prepare.bridge_ft_with_rain.bridge_ft && inp.total >= T.prepare.bridge_ft_with_rain.qpf_24h_corrected_in)
     up(2, `Bridge St expected ${fmt(out.bridge.pt, 1)} ft`);
-  if (out.sump.mean.run_s >= T.prepare.sump_run_s) up(2, `sump runs ~${fmt(out.sump.mean.run_s, 0)} s`);
+  const runS = out.sump.typical ? out.sump.typical.run_s : out.sump.mean.run_s;   // single-run rules want the run-level model
+  if (runS >= T.prepare.sump_run_s) up(2, `sump runs ~${fmt(runS, 0)} s`);
   if (out.bridge.pt >= T.act.predicted_bridge_ft) up(3, `Bridge St expected ${fmt(out.bridge.pt, 1)} ft, past the 6.5 ft notify line`);
   if (out.ross.ross >= T.act.ross_ft) up(3, `Ross equivalent ${fmt(out.ross.ross, 1)} ft`);
-  if (out.sump.mean.run_s >= T.act.sump_run_s) up(3, `sump runs ~${fmt(out.sump.mean.run_s, 0)} s`);
+  if (runS >= T.act.sump_run_s) up(3, `sump runs ~${fmt(runS, 0)} s`);
   if (out.bridge.pt >= 13) up(4, "Bridge St expected at the 13 ft flood-horn line");
   if (out.ross.ross >= T.emergency.ross_ft) up(4, `Ross equivalent ${fmt(out.ross.ross, 1)} ft, above NWS action stage`);
-  if (out.sump.mean.run_s >= T.emergency.primary_run_no_stop_s || out.sump.mean.capacity)
+  if (runS >= T.emergency.primary_run_no_stop_s || out.sump.mean.capacity || (out.sump.typical && out.sump.typical.capacity))
     up(4, "primary pump at capacity");
   return { tier: TIER_ORDER[level], level, reasons };
 }
@@ -178,7 +191,7 @@ function evaluatePlan(M, inp) {
   const bridge = predictBridge(M, inp.total, inp.api);
   const cross = crossCheck(M, inp.total, inp.peak1h, inp.api);
   const ross = rossEquivalent(M, bridge.pt);
-  const sump = sumpAt(M, inp.peak1h, inp.api);
+  const sump = sumpAt(M, inp.peak1h, inp.api, inp.season);
   const out = { bridge, cross, ross, sump };
   out.tier = planTier(M, inp, out);
   const lag = (M.timing && M.timing.lag_peak_rain_to_crest_h) || M.planner.lag_peak_rain_to_crest_h || 1;

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>52 Storm Planner — Planner</title>
-<link rel="stylesheet" href="assets/app.css?v=11">
+<link rel="stylesheet" href="assets/app.css?v=12">
 <style>
 .inputs label{display:block;font-size:.82rem;color:var(--mute);margin:10px 0 2px}
 .inputs label b{color:var(--ink);font-size:1.05rem;font-weight:600;margin-left:6px}
@@ -138,7 +138,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   </section>
 </main>
 
-<script src="assets/planner.js?v=11"></script>
+<script src="assets/planner.js?v=12"></script>
 <script>
 (async () => {
   renderNav("planner");
@@ -207,6 +207,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   function inputs() {
     return {
       total: +$("totaln").value || 0, peak1h: +$("peakn").value || 0, api: +$("apin").value || 0,
+      season: (F.prefill && F.prefill.season_rain_in) || 0,
       onset: parseLocal($("onset").value), peakAt: parseLocal($("peakat").value), end: parseLocal($("end").value),
       ar_category: $("ar").value ? +$("ar").value : null, flood_watch: $("fw").value === "1",
     };
@@ -257,9 +258,14 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     $("run").innerHTML = fmt(s.mean.run_s, 0) + "<small>s</small>";
     $("rph").textContent = s.mean.runs_per_hr > 0 ? fmt(s.mean.runs_per_hr, 0) : "0";
     $("sumpfit").textContent = `${fmt(s.mean.gpm, 0)} GPM of ${M.pump.rated_gpm} · R² ${M.sump_inflow.r2}`;
-    $("sumptail").innerHTML = `Tail case (model under-reads the worst runs ~2×): <b>${fmt(100 * s.tail.stress, 0)}%</b> capacity, runs of <b>${fmt(s.tail.run_s, 0)} s</b>`
-      + (s.tail.capacity ? ' — <b class="bad">at capacity; backup pump would start</b>' : "")
-      + `. Last winter's worst: 15-min avg ${M.observed_maxima.inflow_gpm_15min} GPM, single run 134 s.`;
+    const R = M.sump_stress_run || {};
+    $("sumptail").innerHTML = s.worst
+      ? (s.typical.capacity
+          ? `Typical run at this rate <b class="bad">does not end</b>: inflow is at pump capacity and the backup pump would start`
+          : `Typical single run at this rate <b>${fmt(s.typical.run_s, 0)} s</b>; worst run about <b>${s.worst.capacity ? "no end" : fmt(s.worst.run_s, 0) + " s"}</b> (95 % edge of the spread on stressed runs)`
+            + (s.worst.capacity ? ' — <b class="bad">reaching capacity; the backup pump would start</b>' : ""))
+        + `. Run-level fit R² ${R.r2} on ${R.n} runs. Last winter's one outlier was a 134 s run inside a 2.4 in/hr five-minute burst; the Act rule fires at 93 s.`
+      : `Last winter's worst: 15-min avg ${M.observed_maxima.inflow_gpm_15min} GPM, single run 134 s.`;
     $("swarn").textContent = s.extrapolated ? `Peak rate above anything recorded here (${M.observed_maxima.peak_1h_in} in/hr); the sump model has no data in this regime.` : "";
 
     // checklist

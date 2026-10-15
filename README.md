@@ -73,9 +73,10 @@ All from `models.json`:
 - **Distance to 6.5 and 13 ft**, and the rain still needed to reach each.
 - **Sump at the peak rate**: peak 15-minute inflow from the heaviest 10 minutes
   (`0.31 × peak_1h`) and the index (R² 0.89), then the pit identity
-  `run_s = 14 / (1 − Qin/Qp)` and runs per hour from run + refill. A 2× tail
-  case is shown because the run-level model under-reads the worst runs by about
-  that much (report §3).
+  `run_s = 14 / (1 − Qin/Qp)` and runs per hour from run + refill. The
+  run-level model (10 min of rain ending 5 min after the run starts, R² 0.72)
+  gives the typical run, and its stressed-run variant the worst single run
+  with a band (report §3).
 - **Tier** on the `config.json` ladder, each rule fed the planner's equivalent
   (the 48-h total × 0.8 stands in for the heaviest 24 h).
 - **Checklist** from `config.json → planner.checklist`: each item is anchored to

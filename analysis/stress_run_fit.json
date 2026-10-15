@@ -1,0 +1,45 @@
+{
+ "tail": {
+  "beta": [
+   0.204493,
+   1.183862,
+   0.006789
+  ],
+  "cols": [
+   "rain_10min_aligned_in",
+   "api"
+  ],
+  "r2": 0.3682,
+  "residual_sd": 0.0726,
+  "n": 235,
+  "_note": "fit on runs with stress >= 0.3 only; the worst-run estimate in the planner"
+ },
+ "beta": [
+  0.041721,
+  2.107531,
+  0.011457,
+  0.000437
+ ],
+ "cols": [
+  "rain_10min_aligned_in",
+  "api",
+  "season_rain_in"
+ ],
+ "window": "10 min ending 5 min after the run start",
+ "r2_weighted": 0.7214,
+ "r2": 0.6723,
+ "r2_stressed_runs": -0.0228,
+ "n": 3553,
+ "n_stressed": 235,
+ "residual_sd": 0.0476,
+ "residual_sd_stressed": 0.0835,
+ "old_misaligned": {
+  "beta": [
+   0.066389,
+   1.889134,
+   0.009237,
+   0.000236
+  ],
+  "r2_weighted": 0.5201
+ }
+}
