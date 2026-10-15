@@ -73,7 +73,11 @@
         "gpm": 55,
         "url": ""
       }
-    ]
+    ],
+    "excluded_run_dates": [
+      "2025-10-13"
+    ],
+    "_excluded_note": "Local dates whose PumpFuse runs are left out of every fit: 2025-10-13 was a pump test (three 36-43 s runs with no rain)."
   },
   "_pump_spec_note": "Nameplate specs for the two pumps - the single source of truth for GPM. sump.pumps[].gpm mirrors rated_gpm and sump.pumps[].spec names the block it mirrors. Measured draw over 3,674 runs (Sep 2025-Jun 2026) averaged 1394 W against the 1380 W rating, so the primary runs at its rated duty point and 84 GPM is the right constant for inflow. 'hp' was dropped: the old 1.0/0.75 values did not match these models and no verified figure replaced them.",
   "primary_pump": {
@@ -271,7 +275,8 @@
         "qpf_24h_corrected_in": 1.0
       },
       "ross_ft": 9.0,
-      "sump_run_s": 35
+      "sump_run_s": 35,
+      "sump_rate_10min_inhr": 1.0
     },
     "act": {
       "ross_ft": 11.0,
@@ -279,12 +284,15 @@
       "sump_run_s": 93,
       "sump_increasing_runs": 3,
       "sump_increasing_min_final_s": 25,
-      "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm."
+      "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm.",
+      "sump_rate_10min_inhr": 1.25
     },
     "emergency": {
       "backup_pump_start": true,
       "primary_run_no_stop_s": 180,
-      "ross_ft": 15.0
-    }
+      "ross_ft": 15.0,
+      "sump_rate_10min_inhr": 2.2
+    },
+    "_sump_rate_note": "Rain rate over the 10 minutes ending 5 min after a run starts (station gauge). From 3,630 runs Sep 2025-Jun 2026 (stress_model.py rate_bins): below 1.0 in/hr the longest run ever was 33 s; 1.0-1.25 in/hr runs stretch to ~30 s; from 1.25 in/hr up half the runs pass 35 s and one in eight passes 93 s. A run that never ends was never observed; the fitted model puts it near 2.1-2.7 in/hr sustained over 10 min, and the 134 s outlier came inside a 2.4 in/hr five-minute burst. 2.2 is the 95% worst-run edge at index 3."
   }
 }

@@ -165,14 +165,20 @@ function planTier(M, inp, out) {
   if (out.bridge.pt >= T.prepare.bridge_ft_with_rain.bridge_ft && inp.total >= T.prepare.bridge_ft_with_rain.qpf_24h_corrected_in)
     up(2, `Bridge St expected ${fmt(out.bridge.pt, 1)} ft`);
   const runS = out.sump.typical ? out.sump.typical.run_s : out.sump.mean.run_s;   // single-run rules want the run-level model
-  if (runS >= T.prepare.sump_run_s) up(2, `sump runs ~${fmt(runS, 0)} s`);
+  const rate10 = out.sump.r10 * 6;   // the storm's heaviest 10 min, in/hr: the observed thresholds
+  if (T.emergency.sump_rate_10min_inhr && rate10 >= T.emergency.sump_rate_10min_inhr)
+    up(4, `${fmt(rate10, 1)} in/hr over 10 min: pump expected to run without stopping`);
+  else if (T.act.sump_rate_10min_inhr && rate10 >= T.act.sump_rate_10min_inhr)
+    up(3, `${fmt(rate10, 1)} in/hr over 10 min: long sump runs start`);
+  else if (T.prepare.sump_rate_10min_inhr && rate10 >= T.prepare.sump_rate_10min_inhr)
+    up(2, `${fmt(rate10, 1)} in/hr over 10 min: pump runs lengthen`);
+  if (runS >= T.emergency.primary_run_no_stop_s || (out.sump.typical && out.sump.typical.capacity)) up(4, "primary pump at capacity");
+  else if (runS >= T.act.sump_run_s) up(3, `sump runs ~${fmt(runS, 0)} s`);
+  else if (runS >= T.prepare.sump_run_s) up(2, `sump runs ~${fmt(runS, 0)} s`);
   if (out.bridge.pt >= T.act.predicted_bridge_ft) up(3, `Bridge St expected ${fmt(out.bridge.pt, 1)} ft, past the 6.5 ft notify line`);
   if (out.ross.ross >= T.act.ross_ft) up(3, `Ross equivalent ${fmt(out.ross.ross, 1)} ft`);
-  if (runS >= T.act.sump_run_s) up(3, `sump runs ~${fmt(runS, 0)} s`);
   if (out.bridge.pt >= 13) up(4, "Bridge St expected at the 13 ft flood-horn line");
   if (out.ross.ross >= T.emergency.ross_ft) up(4, `Ross equivalent ${fmt(out.ross.ross, 1)} ft, above NWS action stage`);
-  if (runS >= T.emergency.primary_run_no_stop_s || out.sump.mean.capacity || (out.sump.typical && out.sump.typical.capacity))
-    up(4, "primary pump at capacity");
   return { tier: TIER_ORDER[level], level, reasons };
 }
 

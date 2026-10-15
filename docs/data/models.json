@@ -63,6 +63,100 @@
   "_note": "Peak 15-minute inflow (GPM) from the heaviest 10 minutes of rain and wetness. Last winter's max was 42.65 GPM; the run-level model under-reads the worst single runs by about 2x (report sec. 3), so the planner shows a 2x tail band."
  },
  "sump_stress_run": {
+  "rate_bins": [
+   {
+    "lo": 0.0,
+    "hi": 0.1,
+    "n": 1647,
+    "median_s": 15.0,
+    "p90_s": 17.0,
+    "max_s": 22.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 0.1,
+    "hi": 0.25,
+    "n": 1139,
+    "median_s": 16.0,
+    "p90_s": 18.0,
+    "max_s": 21.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 0.25,
+    "hi": 0.5,
+    "n": 577,
+    "median_s": 18.0,
+    "p90_s": 20.0,
+    "max_s": 24.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 0.5,
+    "hi": 0.75,
+    "n": 202,
+    "median_s": 19.0,
+    "p90_s": 23.0,
+    "max_s": 33.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 0.75,
+    "hi": 1.0,
+    "n": 45,
+    "median_s": 20.0,
+    "p90_s": 26.6,
+    "max_s": 28.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 1.0,
+    "hi": 1.25,
+    "n": 5,
+    "median_s": 28.0,
+    "p90_s": 31.0,
+    "max_s": 31.0,
+    "pct_ge35": 0.0,
+    "pct_ge93": 0.0
+   },
+   {
+    "lo": 1.25,
+    "hi": 1.5,
+    "n": 8,
+    "median_s": 32.0,
+    "p90_s": 74.1,
+    "max_s": 100.0,
+    "pct_ge35": 50.0,
+    "pct_ge93": 12.5
+   },
+   {
+    "lo": 1.5,
+    "hi": 2.0,
+    "n": 7,
+    "median_s": 23.0,
+    "p90_s": 75.20000000000003,
+    "max_s": 134.0,
+    "pct_ge35": 28.57142857142857,
+    "pct_ge93": 14.285714285714285
+   }
+  ],
+  "thresholds": {
+   "prepare_inhr": 1.0,
+   "act_inhr": 1.25,
+   "continuous_inhr": 2.2,
+   "continuous_fit_inhr_api3": 2.61,
+   "continuous_fit_worst_inhr_api3": 2.15,
+   "max_observed_10min_inhr": 1.62,
+   "max_observed_5min_inhr": 2.4,
+   "longest_run_s": 134,
+   "runs_in_record": 3630,
+   "_note": "rate = station rain in the 10 min ending 5 min after the run starts, in/hr. Continuous running never observed."
+  },
   "tail": {
    "beta": [
     0.204493,
@@ -176,7 +270,8 @@
     "qpf_24h_corrected_in": 1.0
    },
    "ross_ft": 9.0,
-   "sump_run_s": 35
+   "sump_run_s": 35,
+   "sump_rate_10min_inhr": 1.0
   },
   "act": {
    "ross_ft": 11.0,
@@ -184,13 +279,16 @@
    "sump_run_s": 93,
    "sump_increasing_runs": 3,
    "sump_increasing_min_final_s": 25,
-   "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm."
+   "_escalation_note": "The bare 3-increasing-runs rule fires on 2.6% of all runs (94 triggers, 21 days) and 78 of those 94 land on runs still under 25 s - a 62% false-alarm rate at Act. Requiring the third run to be at least 25 s cuts it to 16 triggers on 8 days while keeping every real storm.",
+   "sump_rate_10min_inhr": 1.25
   },
   "emergency": {
    "backup_pump_start": true,
    "primary_run_no_stop_s": 180,
-   "ross_ft": 15.0
-  }
+   "ross_ft": 15.0,
+   "sump_rate_10min_inhr": 2.2
+  },
+  "_sump_rate_note": "Rain rate over the 10 minutes ending 5 min after a run starts (station gauge). From 3,630 runs Sep 2025-Jun 2026 (stress_model.py rate_bins): below 1.0 in/hr the longest run ever was 33 s; 1.0-1.25 in/hr runs stretch to ~30 s; from 1.25 in/hr up half the runs pass 35 s and one in eight passes 93 s. A run that never ends was never observed; the fitted model puts it near 2.1-2.7 in/hr sustained over 10 min, and the 134 s outlier came inside a 2.4 in/hr five-minute burst. 2.2 is the 95% worst-run edge at index 3."
  },
  "qpf_bias": {
   "_note": "Open-Meteo runs dry here. Measured against station totals over Nov 2025-Apr 2026: day-ahead QPF captured 75.5% of observed rain, 3-day lead 49.6%, and the five wettest events were under-forecast 41% and 68%. Every QPF used in a rule is multiplied by these before comparison.",
@@ -324,6 +422,6 @@
   "moderate": 16.3,
   "major": 17.8
  },
- "generated": "2026-10-15T00:04:36Z",
+ "generated": "2026-10-15T14:31:11Z",
  "_source": "analysis/export_models.py"
 }

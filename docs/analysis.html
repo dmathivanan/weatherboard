@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>52 Storm Planner &mdash; Winter 2025-26 analysis</title>
-<link rel="stylesheet" href="assets/app.css?v=12">
+<link rel="stylesheet" href="assets/app.css?v=13">
 <style>
 /* Report-specific: a reading column, not a dashboard grid. */
 .doc{max-width:820px;margin-inline:auto;padding:0 16px 64px}
@@ -294,11 +294,76 @@ that coincided with the winter's single heaviest five minutes. A separate fit
 on the stressed runs alone (R² 0.37, against 0.05 before) confirms rain carries
 the signal there too, though its slope is flattened by selecting on the outcome
 and it should not be read as a capacity line.</p>
-<p>The "what rate would overwhelm the pump" question is therefore still
-extrapolation. The typical-run line reaches capacity near 2.6 in/hr sustained
-over ten minutes, and the heaviest ten minutes ever recorded here is 1.56
-in/hr. Treat the edge as above anything seen, and expect the first run that
-never ends to come inside a short burst rather than a long steady rate.</p>
+<h3>The threshold, from the runs themselves</h3>
+<p>Rather than ask the model where the pump gives out, bin every run in the record
+(3,630 runs, September 2025 to June 2026, the 13 October pump test excluded) by
+the station's rain rate over the ten minutes ending five minutes after the run
+started:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>10-min rate (in/hr)</th>
+<th style="text-align: right;">runs</th>
+<th style="text-align: right;">median run</th>
+<th style="text-align: right;">90th pct</th>
+<th style="text-align: right;">longest</th>
+<th style="text-align: right;">share ≥ 93 s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>under 0.5</td>
+<td style="text-align: right;">3,365</td>
+<td style="text-align: right;">15–18 s</td>
+<td style="text-align: right;">20 s</td>
+<td style="text-align: right;">24 s</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>0.5 – 1.0</td>
+<td style="text-align: right;">245</td>
+<td style="text-align: right;">19–20 s</td>
+<td style="text-align: right;">27 s</td>
+<td style="text-align: right;">33 s</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>1.0 – 1.25</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">28 s</td>
+<td style="text-align: right;">31 s</td>
+<td style="text-align: right;">31 s</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>1.25 – 1.5</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">32 s</td>
+<td style="text-align: right;">74 s</td>
+<td style="text-align: right;">100 s</td>
+<td style="text-align: right;">13 %</td>
+</tr>
+<tr>
+<td>1.5 – 2.0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">23 s</td>
+<td style="text-align: right;">75 s</td>
+<td style="text-align: right;">134 s</td>
+<td style="text-align: right;">14 %</td>
+</tr>
+</tbody>
+</table></div>
+<p>Below <strong>1.0 in/hr</strong> nothing beyond 33 seconds has ever happened. Between 1.0 and
+1.25 the runs stretch to about 30 seconds. From <strong>1.25 in/hr</strong> up, half the runs
+pass 35 seconds (the Prepare line) and one in eight passes 93 seconds (the Act
+line). Those are the thresholds in <code>config.json</code> (<code>sump_rate_10min_inhr</code>).</p>
+<p>A pump that never stops has <strong>never been observed</strong>. The fitted model places it
+near 2.1 to 2.7 in/hr sustained over ten minutes, depending on wetness and on
+whether the typical or the worst run is meant; the config uses <strong>2.2</strong>. The
+hardest ten minutes on record is 1.62 in/hr, and the 134-second run came inside
+a five-minute burst at 2.4 in/hr, so the edge is above everything seen here but
+not by a wide margin. The threshold question is settled by the next storm that
+exceeds 1.6 in/hr, not by this fit.</p>
 <hr />
 <h2 id="4-the-creek">4. The creek</h2>
 <h3>Rain to creek level</h3>

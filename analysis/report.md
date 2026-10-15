@@ -173,11 +173,33 @@ on the stressed runs alone (R² 0.37, against 0.05 before) confirms rain carries
 the signal there too, though its slope is flattened by selecting on the outcome
 and it should not be read as a capacity line.
 
-The "what rate would overwhelm the pump" question is therefore still
-extrapolation. The typical-run line reaches capacity near 2.6 in/hr sustained
-over ten minutes, and the heaviest ten minutes ever recorded here is 1.56
-in/hr. Treat the edge as above anything seen, and expect the first run that
-never ends to come inside a short burst rather than a long steady rate.
+### The threshold, from the runs themselves
+
+Rather than ask the model where the pump gives out, bin every run in the record
+(3,630 runs, September 2025 to June 2026, the 13 October pump test excluded) by
+the station's rain rate over the ten minutes ending five minutes after the run
+started:
+
+| 10-min rate (in/hr) | runs | median run | 90th pct | longest | share ≥ 93 s |
+|---|--:|--:|--:|--:|--:|
+| under 0.5 | 3,365 | 15–18 s | 20 s | 24 s | 0 |
+| 0.5 – 1.0 | 245 | 19–20 s | 27 s | 33 s | 0 |
+| 1.0 – 1.25 | 5 | 28 s | 31 s | 31 s | 0 |
+| 1.25 – 1.5 | 8 | 32 s | 74 s | 100 s | 13 % |
+| 1.5 – 2.0 | 7 | 23 s | 75 s | 134 s | 14 % |
+
+Below **1.0 in/hr** nothing beyond 33 seconds has ever happened. Between 1.0 and
+1.25 the runs stretch to about 30 seconds. From **1.25 in/hr** up, half the runs
+pass 35 seconds (the Prepare line) and one in eight passes 93 seconds (the Act
+line). Those are the thresholds in `config.json` (`sump_rate_10min_inhr`).
+
+A pump that never stops has **never been observed**. The fitted model places it
+near 2.1 to 2.7 in/hr sustained over ten minutes, depending on wetness and on
+whether the typical or the worst run is meant; the config uses **2.2**. The
+hardest ten minutes on record is 1.62 in/hr, and the 134-second run came inside
+a five-minute burst at 2.4 in/hr, so the edge is above everything seen here but
+not by a wide margin. The threshold question is settled by the next storm that
+exceeds 1.6 in/hr, not by this fit.
 
 ---
 

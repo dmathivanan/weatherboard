@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>52 Storm Planner — Planner</title>
-<link rel="stylesheet" href="assets/app.css?v=12">
+<link rel="stylesheet" href="assets/app.css?v=13">
 <style>
 .inputs label{display:block;font-size:.82rem;color:var(--mute);margin:10px 0 2px}
 .inputs label b{color:var(--ink);font-size:1.05rem;font-weight:600;margin-left:6px}
@@ -121,6 +121,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
           <div class="tile"><div class="v" id="rph">–</div><div class="k">runs per hour</div></div>
         </div>
         <div class="secondary" id="sumptail"></div>
+        <div class="secondary" id="sumpthr"></div>
         <div class="warn" id="swarn"></div>
       </section>
     </div>
@@ -138,7 +139,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   </section>
 </main>
 
-<script src="assets/planner.js?v=12"></script>
+<script src="assets/planner.js?v=13"></script>
 <script>
 (async () => {
   renderNav("planner");
@@ -266,6 +267,18 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
             + (s.worst.capacity ? ' — <b class="bad">reaching capacity; the backup pump would start</b>' : ""))
         + `. Run-level fit R² ${R.r2} on ${R.n} runs. Last winter's one outlier was a 134 s run inside a 2.4 in/hr five-minute burst; the Act rule fires at 93 s.`
       : `Last winter's worst: 15-min avg ${M.observed_maxima.inflow_gpm_15min} GPM, single run 134 s.`;
+    const th = (M.sump_stress_run || {}).thresholds, T = M.tiers;
+    if (th) {
+      const r10 = s.r10 * 6;
+      const where = r10 >= T.emergency.sump_rate_10min_inhr ? "continuous" : r10 >= T.act.sump_rate_10min_inhr ? "act" : r10 >= T.prepare.sump_rate_10min_inhr ? "prepare" : "quiet";
+      const mark = k => where === k ? "<b>◀ this plan</b>" : "";
+      $("sumpthr").innerHTML = `<b>Rate thresholds</b>, station rain over 10 min (this plan's heaviest 10 min ≈ <b>${fmt(r10, 1)} in/hr</b>):<br>`
+        + `below ${T.prepare.sump_rate_10min_inhr} in/hr nothing beyond 33 s ever ${mark("quiet")}<br>`
+        + `${T.prepare.sump_rate_10min_inhr} – ${T.act.sump_rate_10min_inhr} in/hr runs stretch to ~30 s ${mark("prepare")}<br>`
+        + `${T.act.sump_rate_10min_inhr} in/hr and up: half the runs pass 35 s, one in eight passes 93 s (Act) ${mark("act")}<br>`
+        + `~${T.emergency.sump_rate_10min_inhr} in/hr: pump expected to run without stopping; never observed (fit says ${th.continuous_fit_worst_inhr_api3}–${th.continuous_fit_inhr_api3}) ${mark("continuous")}<br>`
+        + `<span class="u">Worst seen: ${th.max_observed_10min_inhr} in/hr over 10 min, ${th.max_observed_5min_inhr} in/hr in a 5-min burst, longest run ${th.longest_run_s} s. ${th.runs_in_record} runs, pump test excluded.</span>`;
+    }
     $("swarn").textContent = s.extrapolated ? `Peak rate above anything recorded here (${M.observed_maxima.peak_1h_in} in/hr); the sump model has no data in this regime.` : "";
 
     // checklist

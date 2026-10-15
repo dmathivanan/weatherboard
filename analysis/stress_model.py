@@ -41,6 +41,9 @@ pf["ts"] = (pd.to_datetime(pf["Time"])
             .dt.tz_localize(TZ, ambiguous=True, nonexistent="shift_forward")
             .dt.tz_convert("UTC"))
 pf = pf.sort_values("ts").reset_index(drop=True)
+# pump tests etc. (config sump.excluded_run_dates, local dates)
+_excl = set(CFG.get("sump", {}).get("excluded_run_dates", []))
+pf = pf[~pf["ts"].dt.tz_convert(TZ).dt.strftime("%Y-%m-%d").isin(_excl)].reset_index(drop=True)
 pf["dur"] = pf["Duration"].astype(float)
 pf["stress"] = 1.0 - DUR_MIN / pf["dur"]
 pf["inflow_gpm"] = pf["stress"] * QP
@@ -166,7 +169,30 @@ if __name__ == "__main__":
         "points": [{"t": t.tz_convert(TZ).strftime("%Y-%m-%dT%H:%M"), "r10": round(float(r), 3), "api": round(float(a), 2),
                     "stress": round(float(st), 3), "dur": int(d)}
                    for t, r, a, st, d in zip(W.ts, W.r10a, W.api, W.stress, W.dur)]}, separators=(",", ":")))
+    # run length by aligned 10-min rate, over the whole record (not just Nov-Apr)
+    A = pf.copy()
+    A["rate10"] = rain_window(pd.DatetimeIndex(A.ts), 10, -5) * 6
+    A["rate5"] = rain_window(pd.DatetimeIndex(A.ts), 5, -5) * 12
+    edges = [0, 0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0]
+    A["bin"] = pd.cut(A.rate10, edges, right=False)
+    gb = A.groupby("bin", observed=True).dur
+    rate_bins = [{"lo": float(iv.left), "hi": float(iv.right), "n": int(n), "median_s": float(m), "p90_s": float(p),
+                  "max_s": float(mx), "pct_ge35": float(a35), "pct_ge93": float(a93)}
+                 for iv, n, m, p, mx, a35, a93 in zip(gb.size().index, gb.size(), gb.median(), gb.quantile(.9), gb.max(),
+                                                      gb.apply(lambda x: 100 * (x >= 35).mean()),
+                                                      gb.apply(lambda x: 100 * (x >= 93).mean()))]
+    TT = CFG["tiers"]
+    thresholds = {
+        "prepare_inhr": TT["prepare"].get("sump_rate_10min_inhr"), "act_inhr": TT["act"].get("sump_rate_10min_inhr"),
+        "continuous_inhr": TT["emergency"].get("sump_rate_10min_inhr"),
+        "continuous_fit_inhr_api3": round(float((1 - beta[0] - beta[2] * 3 - beta[3] * 15) / beta[1] * 6), 2),
+        "continuous_fit_worst_inhr_api3": round(float((1 - beta[0] - beta[2] * 3 - beta[3] * 15 - 1.96 * sd_stressed) / beta[1] * 6), 2),
+        "max_observed_10min_inhr": round(float(A.rate10.max()), 2), "max_observed_5min_inhr": round(float(A.rate5.max()), 2),
+        "longest_run_s": int(A.dur.max()), "runs_in_record": int(len(A)),
+        "_note": "rate = station rain in the 10 min ending 5 min after the run starts, in/hr. Continuous running never observed.",
+    }
     (HERE / "stress_run_fit.json").write_text(json.dumps({
+        "rate_bins": rate_bins, "thresholds": thresholds,
         "tail": {"beta": [round(float(b), 6) for b in beta_s], "cols": ["rain_10min_aligned_in", "api"],
                  "r2": round(float(r2_s), 4), "residual_sd": round(float(np.std(res_s)), 4), "n": int(len(S)),
                  "_note": "fit on runs with stress >= 0.3 only; the worst-run estimate in the planner"},

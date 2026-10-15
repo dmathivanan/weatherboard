@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>52 Storm Planner — Report</title>
-<link rel="stylesheet" href="assets/app.css?v=12">
+<link rel="stylesheet" href="assets/app.css?v=13">
 <style>
 :root{--c1:#2563eb;--c2:#c77f0a;--fit:#1a2332;--ref:#94a3b8;--bandfill:rgba(37,99,235,.10)}
 @media (prefers-color-scheme:dark){:root{--c1:#4f8fe6;--c2:#b3861e;--fit:#e6edf5;--ref:#64748b;--bandfill:rgba(79,143,230,.14)}}
@@ -41,6 +41,10 @@
 .legend i.line{width:18px;height:2px;border-radius:0;vertical-align:2px}
 .legend i.dash{border-top:2px dashed var(--ref);height:0;background:none}
 .warn{color:var(--amber);font-size:.82rem}
+table.bins{border-collapse:collapse;font-size:.78rem;margin-top:10px;width:100%}
+table.bins th,table.bins td{padding:3px 6px;border-bottom:1px solid var(--rule);text-align:right;font-variant-numeric:tabular-nums}
+table.bins th:first-child,table.bins td:first-child{text-align:left}
+table.bins th{color:var(--mute);font-weight:600}
 </style>
 </head>
 <body>
@@ -76,7 +80,7 @@
     <div class="fig"><div class="chart" id="c8"></div><div class="cap" id="t8"></div></div></section>
 </main>
 
-<script src="assets/planner.js?v=12"></script>
+<script src="assets/planner.js?v=13"></script>
 <script>
 (async () => {
   renderNav("report");
@@ -137,6 +141,10 @@
         svg.appendChild(svgEl("text", { x: lx, y: ly, "text-anchor": "end", class: "line-label" }, ln.label));
       }
     });
+    for (const v of (o.vlines || [])) {
+      svg.appendChild(svgEl("line", { x1: x(v.x), x2: x(v.x), y1: T, y2: H - B, class: "hline " + (v.cls || "") }));
+      svg.appendChild(svgEl("text", { x: x(v.x) + 4, y: T + 10, class: "line-label" }, v.label));
+    }
     for (const h of (o.hlines || [])) {
       svg.appendChild(svgEl("line", { x1: L, x2: W - R, y1: y(h.y), y2: y(h.y), class: "hline " + (h.cls || "") }));
       svg.appendChild(svgEl("text", { x: L + 4, y: y(h.y) - 4, class: "line-label" }, h.label));
@@ -261,17 +269,24 @@
     const g = R.beta || [0, 0, 0, 0], tb = (R.tail || {}).beta;
     const stressedPts = runs.filter(p => p.stress >= 0.3), quietPts = runs.filter(p => p.stress < 0.3);
     scatter($("c9"), {
-      xlabel: "Rain in the 10 min ending 5 min after the run starts, in/hr", ylabel: "Run stress = 1 − 14 / run s", xmax: 2, ymax: 1,
+      xlabel: "Rain in the 10 min ending 5 min after the run starts, in/hr", ylabel: "Run stress = 1 − 14 / run s", ymax: 1,
       series: [{ pts: quietPts.map(p => ({ x: p.r10 * 6, y: p.stress, r: 2.5, cls: "dim", tip: `<b>${p.t.replace("T", " ")}</b><br>${p.dur} s run · ${fmt(p.r10 * 6)} in/hr<br>wetness ${fmt(p.api)} in` })) },
                { pts: stressedPts.map(p => ({ x: p.r10 * 6, y: p.stress, r: 4, tip: `<b>${p.t.replace("T", " ")}</b><br>${p.dur} s run · ${fmt(p.r10 * 6)} in/hr<br>wetness ${fmt(p.api)} in` })) }],
       lines: [{ fn: x => g[0] + g[1] * (x / 6) + g[2] * med + (g[3] || 0) * 10, label: "typical run" }]
         .concat(tb ? [{ fn: x => tb[0] + tb[1] * (x / 6) + tb[2] * med, cls: "dash", label: "stressed runs only" }] : []),
       hlines: [{ y: 1 - 14 / 93, label: "93 s run = Act" }, { y: 1 - 14 / 35, label: "35 s run = Prepare" }],
+      vlines: [{ x: M.tiers.prepare.sump_rate_10min_inhr, label: `${M.tiers.prepare.sump_rate_10min_inhr} in/hr` },
+               { x: M.tiers.act.sump_rate_10min_inhr, label: `${M.tiers.act.sump_rate_10min_inhr}` },
+               { x: M.tiers.emergency.sump_rate_10min_inhr, label: `~${M.tiers.emergency.sump_rate_10min_inhr}: continuous (est.)`, cls: "red" }],
+      xmax: 3,
     });
     legend($("c9"), [{ label: "run, stress < 0.3", style: "background:var(--c1);opacity:.35" }, { label: "run, stress ≥ 0.3", style: "background:var(--c1)" }, { label: "fit, all runs", cls: "line", style: "background:var(--fit)" }, { label: "fit, stressed runs only", cls: "line dash" }]);
     $("s9").textContent = `R² ${R.r2} · n=${R.n} runs`;
     $("t9").innerHTML = `Each dot is one pump run last winter. Stress is the share of pump capacity the inflow was using, read straight off the run length. The first version of this analysis measured rain in the ten minutes <em>before</em> each run and concluded rain could not explain the stressful ones; the winter's 134-second run appeared to follow only 0.08 inches. The pit answers within about five minutes, so the window now ends five minutes <em>after</em> the run starts, and the picture changes: <b>stress = ${g[0].toFixed(3)} + ${g[1].toFixed(2)} × rain₁₀ₘ + ${g[2].toFixed(3)} × wetness</b>, R² ${R.r2} across all runs and ${(R.tail || {}).r2} on the stressed ones alone, against 0.05 before. The worst runs still sit above the typical-run line; the dashed fit on stressed runs alone is flatter because it selects on the outcome, so the planner's worst-run estimate uses the solid line plus the residual spread on stressed runs instead.`
-      + stat([["Residual sd, all runs", `${R.residual_sd}`], ["Residual sd, stressed runs", `${R.residual_sd_stressed}`], ["Stressed runs (≥ 0.3)", `${R.n_stressed} of ${R.n}`], ["Worst run", "134 s at 1.6 in/hr, 16 Nov 23:33"]]);
+      + ` The vertical lines are the thresholds the planner uses: below <b>${M.tiers.prepare.sump_rate_10min_inhr} in/hr</b> nothing beyond 33 s was ever recorded; from <b>${M.tiers.act.sump_rate_10min_inhr} in/hr</b> half the runs pass 35 s and one in eight passes 93 s; a pump that never stops is expected near <b>${M.tiers.emergency.sump_rate_10min_inhr} in/hr</b>, which has never happened here.`
+      + stat([["Residual sd, all runs", `${R.residual_sd}`], ["Residual sd, stressed runs", `${R.residual_sd_stressed}`], ["Stressed runs (≥ 0.3)", `${R.n_stressed} of ${R.n}`], ["Worst run", "134 s at 1.6 in/hr, 16 Nov 23:33"], ["Hardest 10 min seen", `${((R.thresholds || {}).max_observed_10min_inhr) || "–"} in/hr`]])
+      + `<table class="bins"><tr><th>10-min rate, in/hr</th><th>runs</th><th>median</th><th>p90</th><th>max</th><th>≥ 93 s</th></tr>`
+      + (R.rate_bins || []).filter(b => b.n).map(b => `<tr><td>${b.lo} – ${b.hi}</td><td>${b.n}</td><td>${b.median_s.toFixed(0)} s</td><td>${b.p90_s.toFixed(0)} s</td><td>${b.max_s.toFixed(0)} s</td><td>${b.pct_ge93.toFixed(0)} %</td></tr>`).join("") + "</table>";
   }
 
   /* ---- 6. starts per 15 min vs inflow ---- */

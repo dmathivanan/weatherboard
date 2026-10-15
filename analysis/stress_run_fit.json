@@ -1,4 +1,98 @@
 {
+ "rate_bins": [
+  {
+   "lo": 0.0,
+   "hi": 0.1,
+   "n": 1647,
+   "median_s": 15.0,
+   "p90_s": 17.0,
+   "max_s": 22.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 0.1,
+   "hi": 0.25,
+   "n": 1139,
+   "median_s": 16.0,
+   "p90_s": 18.0,
+   "max_s": 21.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 0.25,
+   "hi": 0.5,
+   "n": 577,
+   "median_s": 18.0,
+   "p90_s": 20.0,
+   "max_s": 24.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 0.5,
+   "hi": 0.75,
+   "n": 202,
+   "median_s": 19.0,
+   "p90_s": 23.0,
+   "max_s": 33.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 0.75,
+   "hi": 1.0,
+   "n": 45,
+   "median_s": 20.0,
+   "p90_s": 26.6,
+   "max_s": 28.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 1.0,
+   "hi": 1.25,
+   "n": 5,
+   "median_s": 28.0,
+   "p90_s": 31.0,
+   "max_s": 31.0,
+   "pct_ge35": 0.0,
+   "pct_ge93": 0.0
+  },
+  {
+   "lo": 1.25,
+   "hi": 1.5,
+   "n": 8,
+   "median_s": 32.0,
+   "p90_s": 74.1,
+   "max_s": 100.0,
+   "pct_ge35": 50.0,
+   "pct_ge93": 12.5
+  },
+  {
+   "lo": 1.5,
+   "hi": 2.0,
+   "n": 7,
+   "median_s": 23.0,
+   "p90_s": 75.20000000000003,
+   "max_s": 134.0,
+   "pct_ge35": 28.57142857142857,
+   "pct_ge93": 14.285714285714285
+  }
+ ],
+ "thresholds": {
+  "prepare_inhr": 1.0,
+  "act_inhr": 1.25,
+  "continuous_inhr": 2.2,
+  "continuous_fit_inhr_api3": 2.61,
+  "continuous_fit_worst_inhr_api3": 2.15,
+  "max_observed_10min_inhr": 1.62,
+  "max_observed_5min_inhr": 2.4,
+  "longest_run_s": 134,
+  "runs_in_record": 3630,
+  "_note": "rate = station rain in the 10 min ending 5 min after the run starts, in/hr. Continuous running never observed."
+ },
  "tail": {
   "beta": [
    0.204493,
