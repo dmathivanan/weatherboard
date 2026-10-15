@@ -342,9 +342,17 @@ while keeping every real storm.
 
 Three rules could not be replayed and are flagged rather than quietly skipped:
 the CW3E atmospheric-river outlook and NWS Flood Watch have no local archive, and
-**the backup pump has never been instrumented at all** — every one of the 3,674
-exported runs sits in one power mode matching the primary. Backup-pump start is
-the top of the ladder and nothing can currently raise it.
+**the backup pump never ran.** The export analysed here is the primary's
+PumpFuse (every one of the 3,674 runs sits at its 1,380 W rating); the backup
+has its own PumpFuse unit and it recorded no runs all winter. That is
+consistent with the physics: the backup's float sits above the primary's
+switch-on level and only lifts once inflow exceeds the primary's 84 GPM, which
+never happened (peak sustained inflow 42.65 GPM, peak single run 75 GPM).
+Backup-pump start is the top of the ladder; it is a sharp signal that the
+primary has already been beaten, and it arrives a minute or less after the fact.
+*(Corrected 15 October 2026; an earlier draft called the backup "never
+instrumented".)* Note that PumpFuse is cloud-only: both units' records reach
+this analysis as CSV exports from the app, not as a live feed.
 
 ---
 
@@ -406,8 +414,9 @@ travel is the highest-value thing left to do**, and it takes a tape measure.
 
 ### Everything else worth measuring
 
-1. **Instrument the backup pump.** It is the top alert tier and currently cannot
-   fire. Either it never ran last winter or nothing was watching.
+1. **Export the backup pump's PumpFuse record after each storm** alongside the
+   primary's. It never ran last winter; the first time it does is the most
+   important single data point this project can collect.
 2. **Get the FEMA FIS flood profile** for San Anselmo Creek near Woodland Ave,
    for a real water-surface elevation at the house.
 3. **Log rival rain forecasts.** The board now records NWS gridded QPF, CNRFC

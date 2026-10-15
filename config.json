@@ -46,7 +46,7 @@
     }
   },
   "sump": {
-    "_note": "Two PumpFuse PF03 units (ESP32/Espressif), identified on the LAN by MAC (kept out of this public repo). The PF03 exposes NO local API: the reachable unit had zero open TCP ports (full 1-1024 + IoT scan), no mDNS/Bonjour advert, no Tuya broadcast; the manufacturer confirms cloud-only operation. So there is nothing to poll locally today. Set each pump's 'url' to a JSON endpoint once one exists - a future PF03 local REST endpoint, or a bridge (Home Assistant, an MQTT->HTTP shim, or a cloud export). Env overrides: SUMP_PRIMARY_URL, SUMP_BACKUP_URL. Empty url = disabled. PumpFuse is energy-based (no pit-level sensor); it reports on/off, watts, runtime, cycles, gallons.",
+    "_note": "Two PumpFuse PF03 units, one per pump (the backup's recorded no runs in winter 2025-26), identified on the LAN by MAC (kept out of this public repo). Data reaches the repo only as CSV exports from the app (imports/PumpFuse.csv is the primary's). The PF03 exposes NO local API: the reachable unit had zero open TCP ports (full 1-1024 + IoT scan), no mDNS/Bonjour advert, no Tuya broadcast; the manufacturer confirms cloud-only operation. So there is nothing to poll locally today. Set each pump's 'url' to a JSON endpoint once one exists - a future PF03 local REST endpoint, or a bridge (Home Assistant, an MQTT->HTTP shim, or a cloud export). Env overrides: SUMP_PRIMARY_URL, SUMP_BACKUP_URL. Empty url = disabled. PumpFuse is energy-based (no pit-level sensor); it reports on/off, watts, runtime, cycles, gallons.",
     "pit_diameter_in": 36,
     "float_model": "Zoeller 10-2041",
     "float_differential_in": 4.5,
