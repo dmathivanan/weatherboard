@@ -154,7 +154,11 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     st.classList.add("stale");
   } else {
     const age = (Date.now() - Date.parse(F.generated_utc)) / 3600e3;
-    st.textContent = `Forecast inputs from ${whenStr(Date.parse(F.generated_utc))} (${age.toFixed(1)} h ago)`
+    const sw = F.storm || {}, ol = F.outlook || {};
+    const winTxt = sw.dry || !sw.onset ? ` · no rain in the next ${F.prefill_horizon_h || 72} h, sliders start at zero`
+      : ` · pre-filled from the wettest 48 h inside the next ${F.prefill_horizon_h || 72} h (rain from ${whenStr(parseLocal(sw.onset))}${sw.pop_mean_pct != null ? ", " + sw.pop_mean_pct + " % chance" : ""}; NWS grid has ${fmt(sw.nws_total_in_window)}" there)`;
+    const olTxt = ol.onset && !ol.dry ? ` · outlook beyond 3 days: ${fmt(ol.total_48h_in)}" raw around ${whenStr(parseLocal(ol.onset))}${ol.pop_mean_pct != null ? ", " + ol.pop_mean_pct + " % chance" : ""}, NWS ${fmt(ol.nws_total_in_window)}", not pre-filled` : "";
+    st.textContent = `Forecast inputs from ${whenStr(Date.parse(F.generated_utc))} (${age.toFixed(1)} h ago)` + winTxt + olTxt
       + (Object.keys(F.errors || {}).length ? " · feeds down: " + Object.keys(F.errors).join(", ") : "");
     st.classList.toggle("stale", age > 9);
   }
@@ -321,7 +325,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   // ---- sources ----
   const src = [];
   if (!F._missing) {
-    src.push(`<b>Open-Meteo</b> hourly, bias-corrected ×${M.qpf_bias.lead_24h} (≤24 h) to ×${M.qpf_bias.lead_72h} (72 h+): ${fmt(q.omc_48h_in)}" / 48 h (raw ${fmt(q.om_48h_in)}").`);
+    src.push(`<b>Open-Meteo</b> hourly at ${M.lat}, ${M.lon} (52 Woodland), bias-corrected ×${M.qpf_bias.lead_24h} (≤24 h) sliding to ×${M.qpf_bias.lead_72h} at 72 h, uncorrected beyond: ${fmt(q.omc_48h_in)}" / 48 h (raw ${fmt(q.om_48h_in)}"), ${fmt(q.om_7d_in)}" raw over 7 days.`);
     src.push(`<b>NWS grid QPF</b> ${fmt(q.nws_48h_in)}" / 48 h${q.nws_grid_updated ? ", issued " + whenStr(Date.parse(q.nws_grid_updated)) : ""}.`);
     const cn = q.cnrfc_points || {};
     src.push(`<b>CNRFC point QPF</b> (no Marin point; Napa and Venado bracket us): Napa ${fmt((cn.APC || {}).qpf_48h_in)}", Venado ${fmt((cn.VENC1 || {}).qpf_48h_in)}" / 48 h.`);

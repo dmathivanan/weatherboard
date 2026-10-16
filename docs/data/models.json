@@ -416,12 +416,14 @@
    "color": "#dc2626"
   }
  ],
+ "lat": 37.9726,
+ "lon": -122.564,
  "bridge_flood_categories": {
   "action": 11.3,
   "minor": 13.3,
   "moderate": 16.3,
   "major": 17.8
  },
- "generated": "2026-10-15T14:31:11Z",
+ "generated": "2026-10-16T02:13:43Z",
  "_source": "analysis/export_models.py"
 }

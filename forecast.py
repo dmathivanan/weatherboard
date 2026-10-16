@@ -42,14 +42,18 @@ HORIZON_H = 168
 
 # ---------------------------------------------------------------- helpers
 
+PREFILL_H = 72   # the bias factors were measured at 1- and 3-day leads; beyond that is outlook
+
+
 def lead_factor(lead_h):
-    """Open-Meteo bias factor by lead: flat to 24 h, linear to 72 h, flat beyond."""
+    """Open-Meteo bias factor by lead: flat to 24 h, linear to 72 h. Beyond 72 h
+    the correction is unmeasured, so the factor is 1 and the hours are outlook."""
     a, b = BIAS["lead_24h"], BIAS["lead_72h"]
     if lead_h <= 24:
         return a
-    if lead_h >= 72:
-        return b
-    return a + (b - a) * (lead_h - 24) / 48.0
+    if lead_h <= 72:
+        return a + (b - a) * (lead_h - 24) / 48.0
+    return 1.0
 
 
 def local_hour_str(dt):
@@ -238,14 +242,15 @@ def peak(hourly, key, hours):
     return r3(max(vals)) if vals else None
 
 
-def storm_window(hourly):
-    """The wettest 48 h in the horizon (bias-corrected Open-Meteo), and the
-    onset / heaviest-hour / end inside it. Everything is editable on the page;
-    this just gives the sliders a sensible starting point."""
+def storm_window(hourly, key="omc_in", lo_h=0, hi_h=PREFILL_H):
+    """The wettest 48 h between lo_h and hi_h (bias-corrected Open-Meteo by
+    default), and the onset / heaviest-hour / end inside it. Everything is
+    editable on the page; this just gives the sliders a starting point."""
     win = P.get("storm_window_h", 48)
     thr = P.get("rain_threshold_in", 0.02)
-    vals = [h["omc_in"] or 0 for h in hourly]
-    if not vals:
+    hourly = [h for h in hourly if lo_h <= h["lead_h"] < hi_h]
+    vals = [h[key] or 0 for h in hourly]
+    if len(vals) < win:
         return None
     best_i, best_s = 0, -1
     run = sum(vals[:win])
@@ -268,11 +273,15 @@ def storm_window(hourly):
         end = j
         j += 1
     tot_from_onset = sum(vals[onset:onset + win])
+    seg = hourly[onset:onset + win]
+    probs = [h["prob"] for h in seg if h["prob"] is not None and (h[key] or 0) >= thr]
     return {
         "total_48h_in": r2(tot_from_onset), "peak_1h_inhr": r3(vals[pk]),
+        "raw_total_48h_in": r2(sum((h["om_in"] or 0) for h in seg)),
         "onset": hourly[onset]["t"], "peak_at": hourly[pk]["t"], "end": hourly[end]["t"],
-        "nws_total_in_window": r2(sum((h["nws_in"] or 0) for h in hourly[onset:onset + win])),
-        "window_start_lead_h": onset, "dry": False,
+        "nws_total_in_window": r2(sum((h["nws_in"] or 0) for h in seg)),
+        "pop_mean_pct": round(sum(probs) / len(probs)) if probs else None,
+        "window_start_lead_h": hourly[onset]["lead_h"], "dry": False,
     }
 
 
@@ -295,7 +304,13 @@ def main():
     wet = wetness_from_ledger(ledger, usgs, models)
 
     hourly = build_hourly(om, nws)
-    window = storm_window(hourly)
+    window = storm_window(hourly)                                   # next 72 h, bias-corrected: the prefill
+    outlook = storm_window(hourly, key="om_in", lo_h=PREFILL_H, hi_h=HORIZON_H)   # days 4-7, raw: shown, not prefilled
+    if outlook and not outlook.get("dry"):
+        cn_pts = (cnrfc or {}).get("points") or {}
+        outlook["cnrfc_6d_in"] = {k: v.get("qpf_6d_in") for k, v in cn_pts.items()}
+        outlook["_note"] = ("Beyond 72 h. Open-Meteo raw, no bias correction (unmeasured at this lead), "
+                            "with the mean chance of rain over the wet hours. Not used to pre-fill the planner.")
     alerts = (nws or {}).get("alerts", [])
     events = [(a.get("event") or "").lower() for a in alerts]
     flood_watch = any("flood watch" in e for e in events)
@@ -325,6 +340,8 @@ def main():
         },
         "hourly": hourly,
         "storm": window,
+        "outlook": outlook,
+        "prefill_horizon_h": PREFILL_H,
         "ar": cw3e,
         "alerts": alerts, "flood_watch": flood_watch, "flood_warning": flood_warning,
         "wetness": wet,
@@ -347,6 +364,9 @@ def main():
             "api_in": wet.get("api_in"), "season_rain_in": wet.get("season_rain_in"),
             "ar_category": (cw3e or {}).get("ar_category"),
             "flood_watch": flood_watch,
+            "window_start_lead_h": (window or {}).get("window_start_lead_h"),
+            "pop_mean_pct": (window or {}).get("pop_mean_pct"),
+            "nws_total_in_window": (window or {}).get("nws_total_in_window"),
             "alternatives": {
                 "open_meteo_raw_48h": totals(hourly, "om_in", 48),
                 "open_meteo_corrected_48h": totals(hourly, "omc_in", 48),

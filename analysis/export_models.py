@@ -112,6 +112,7 @@ def main():
     for k in ("ross_to_bridge", "creek_predictor", "tiers", "qpf_bias", "wetness", "planner"):
         m[k] = CFG[k]
     m["town_stages"] = CFG["bridge_street"]["town_stages"]["lines"]
+    m["lat"], m["lon"] = CFG["lat"], CFG["lon"]
     m["bridge_flood_categories"] = {"action": 11.3, "minor": 13.3, "moderate": 16.3, "major": 17.8}
     m["generated"] = pd.Timestamp.now("UTC").strftime("%Y-%m-%dT%H:%M:%SZ")
     m["_source"] = "analysis/export_models.py"

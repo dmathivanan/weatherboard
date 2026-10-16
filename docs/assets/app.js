@@ -2,7 +2,7 @@
    The planner pages use assets/planner.js instead. data/latest.json is no longer
    refreshed by a poller; these pages overlay live feeds on that last snapshot. */
 const TZ = "America/Los_Angeles";
-const SITE = { lat: 37.9745, lon: -122.5625, zip: "94960", name: "San Anselmo" };
+const SITE = { lat: 37.9726, lon: -122.5640, zip: "94960", name: "San Anselmo" };
 
 /* Optional proxy for the one feed that cannot be read from the browser: Ambient
    needs an account key, and a public page cannot hold one. Leave it empty and

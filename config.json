@@ -1,7 +1,7 @@
 {
   "site_name": "52 Woodland",
-  "lat": 37.9745,
-  "lon": -122.5625,
+  "lat": 37.9726,
+  "lon": -122.564,
   "timezone": "America/Los_Angeles",
   "usgs_site": "11460000",
   "nwps_gauge": "CMDC1",
@@ -294,5 +294,6 @@
       "sump_rate_10min_inhr": 2.2
     },
     "_sump_rate_note": "Rain rate over the 10 minutes ending 5 min after a run starts (station gauge). From 3,630 runs Sep 2025-Jun 2026 (stress_model.py rate_bins): below 1.0 in/hr the longest run ever was 33 s; 1.0-1.25 in/hr runs stretch to ~30 s; from 1.25 in/hr up half the runs pass 35 s and one in eight passes 93 s. A run that never ends was never observed; the fitted model puts it near 2.1-2.7 in/hr sustained over 10 min, and the 134 s outlier came inside a 2.4 in/hr five-minute burst. 2.2 is the 95% worst-run edge at index 3."
-  }
+  },
+  "_latlon_note": "52 Woodland Ave per OpenStreetMap geocode, 2026-10-15 (was 37.9745/-122.5625, ~220 m off; same NWS grid cell)."
 }

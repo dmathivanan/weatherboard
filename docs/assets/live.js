@@ -19,7 +19,7 @@
 */
 
 const LIVE = {
-  lat: 37.9745, lon: -122.5625, tz: "America/Los_Angeles",
+  lat: 37.9726, lon: -122.5640, tz: "America/Los_Angeles",
   usgsSite: "11460000",      // Ross Creek — downstream reference
   rossLid: "CMDC1",
   bridgeLid: "SBSC1",        // San Anselmo at Bridge St — the one that floods first
