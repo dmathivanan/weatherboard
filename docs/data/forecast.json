@@ -1,21 +1,21 @@
 {
- "generated_utc": "2026-10-18T20:53:15+00:00",
- "generated_local": "2026-10-18 13:53 PDT",
+ "generated_utc": "2026-10-19T04:52:14+00:00",
+ "generated_local": "2026-10-18 21:52 PDT",
  "site": "52 Woodland",
  "qpf": {
   "om_24h_in": 0,
   "om_48h_in": 0,
-  "om_72h_in": 0,
-  "om_7d_in": 0.48,
+  "om_72h_in": 0.38,
+  "om_7d_in": 0.4,
   "omc_24h_in": 0.0,
   "omc_48h_in": 0.0,
-  "omc_72h_in": 0.0,
-  "omc_7d_in": 0.48,
+  "omc_72h_in": 0.7,
+  "omc_7d_in": 0.71,
   "nws_24h_in": 0.0,
   "nws_48h_in": 0.0,
-  "nws_72h_in": 0.2,
-  "peak_1h_om_inhr": 0,
-  "peak_1h_omc_inhr": 0.0,
+  "nws_72h_in": 0.23,
+  "peak_1h_om_inhr": 0.091,
+  "peak_1h_omc_inhr": 0.165,
   "peak_1h_nws_inhr": 0.018,
   "bias": {
    "_note": "Open-Meteo runs dry here. Measured against station totals over Nov 2025-Apr 2026: day-ahead QPF captured 75.5% of observed rain, 3-day lead 49.6%, and the five wettest events were under-forecast 41% and 68%. Every QPF used in a rule is multiplied by these before comparison.",
@@ -47,77 +47,13 @@
    "qpf_gfs_24h_in": 0,
    "qpf_hrrr_6h_in": 0
   },
-  "nws_grid_updated": "2026-10-18T20:47:14+00:00",
+  "nws_grid_updated": "2026-10-19T03:41:44+00:00",
   "cnrfc_issued_utc": "2026-10-18T18:00:00+00:00"
  },
  "hourly": [
   {
-   "t": "2026-10-18T13:00",
-   "lead_h": 0,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T14:00",
-   "lead_h": 1,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T15:00",
-   "lead_h": 2,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T16:00",
-   "lead_h": 3,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T17:00",
-   "lead_h": 4,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T18:00",
-   "lead_h": 5,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T19:00",
-   "lead_h": 6,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 0
-  },
-  {
-   "t": "2026-10-18T20:00",
-   "lead_h": 7,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 1
-  },
-  {
    "t": "2026-10-18T21:00",
-   "lead_h": 8,
+   "lead_h": 0,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -125,7 +61,7 @@
   },
   {
    "t": "2026-10-18T22:00",
-   "lead_h": 9,
+   "lead_h": 1,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -133,7 +69,7 @@
   },
   {
    "t": "2026-10-18T23:00",
-   "lead_h": 10,
+   "lead_h": 2,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -141,7 +77,7 @@
   },
   {
    "t": "2026-10-19T00:00",
-   "lead_h": 11,
+   "lead_h": 3,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -149,7 +85,7 @@
   },
   {
    "t": "2026-10-19T01:00",
-   "lead_h": 12,
+   "lead_h": 4,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -157,7 +93,7 @@
   },
   {
    "t": "2026-10-19T02:00",
-   "lead_h": 13,
+   "lead_h": 5,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -165,7 +101,7 @@
   },
   {
    "t": "2026-10-19T03:00",
-   "lead_h": 14,
+   "lead_h": 6,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -173,7 +109,7 @@
   },
   {
    "t": "2026-10-19T04:00",
-   "lead_h": 15,
+   "lead_h": 7,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -181,7 +117,7 @@
   },
   {
    "t": "2026-10-19T05:00",
-   "lead_h": 16,
+   "lead_h": 8,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -189,7 +125,7 @@
   },
   {
    "t": "2026-10-19T06:00",
-   "lead_h": 17,
+   "lead_h": 9,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -197,7 +133,7 @@
   },
   {
    "t": "2026-10-19T07:00",
-   "lead_h": 18,
+   "lead_h": 10,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -205,7 +141,7 @@
   },
   {
    "t": "2026-10-19T08:00",
-   "lead_h": 19,
+   "lead_h": 11,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -213,7 +149,7 @@
   },
   {
    "t": "2026-10-19T09:00",
-   "lead_h": 20,
+   "lead_h": 12,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -221,7 +157,7 @@
   },
   {
    "t": "2026-10-19T10:00",
-   "lead_h": 21,
+   "lead_h": 13,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -229,7 +165,7 @@
   },
   {
    "t": "2026-10-19T11:00",
-   "lead_h": 22,
+   "lead_h": 14,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -237,23 +173,23 @@
   },
   {
    "t": "2026-10-19T12:00",
-   "lead_h": 23,
+   "lead_h": 15,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 0
   },
   {
    "t": "2026-10-19T13:00",
-   "lead_h": 24,
+   "lead_h": 16,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 0
   },
   {
    "t": "2026-10-19T14:00",
-   "lead_h": 25,
+   "lead_h": 17,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -261,23 +197,23 @@
   },
   {
    "t": "2026-10-19T15:00",
-   "lead_h": 26,
+   "lead_h": 18,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 0
   },
   {
    "t": "2026-10-19T16:00",
-   "lead_h": 27,
+   "lead_h": 19,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 0
   },
   {
    "t": "2026-10-19T17:00",
-   "lead_h": 28,
+   "lead_h": 20,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -285,23 +221,23 @@
   },
   {
    "t": "2026-10-19T18:00",
-   "lead_h": 29,
+   "lead_h": 21,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 2
+   "prob": 1
   },
   {
    "t": "2026-10-19T19:00",
-   "lead_h": 30,
+   "lead_h": 22,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 2
+   "prob": 1
   },
   {
    "t": "2026-10-19T20:00",
-   "lead_h": 31,
+   "lead_h": 23,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -309,15 +245,15 @@
   },
   {
    "t": "2026-10-19T21:00",
-   "lead_h": 32,
+   "lead_h": 24,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 7
+   "prob": 5
   },
   {
    "t": "2026-10-19T22:00",
-   "lead_h": 33,
+   "lead_h": 25,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -325,31 +261,31 @@
   },
   {
    "t": "2026-10-19T23:00",
-   "lead_h": 34,
+   "lead_h": 26,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 6
+  },
+  {
+   "t": "2026-10-20T00:00",
+   "lead_h": 27,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
    "prob": 4
   },
   {
-   "t": "2026-10-20T00:00",
-   "lead_h": 35,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 7
-  },
-  {
    "t": "2026-10-20T01:00",
-   "lead_h": 36,
+   "lead_h": 28,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 5
+   "prob": 3
   },
   {
    "t": "2026-10-20T02:00",
-   "lead_h": 37,
+   "lead_h": 29,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -357,175 +293,175 @@
   },
   {
    "t": "2026-10-20T03:00",
+   "lead_h": 30,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 3
+  },
+  {
+   "t": "2026-10-20T04:00",
+   "lead_h": 31,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-20T05:00",
+   "lead_h": 32,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-20T06:00",
+   "lead_h": 33,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-20T07:00",
+   "lead_h": 34,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-20T08:00",
+   "lead_h": 35,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-20T09:00",
+   "lead_h": 36,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 3
+  },
+  {
+   "t": "2026-10-20T10:00",
+   "lead_h": 37,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 3
+  },
+  {
+   "t": "2026-10-20T11:00",
    "lead_h": 38,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 5
+   "prob": 3
   },
   {
-   "t": "2026-10-20T04:00",
+   "t": "2026-10-20T12:00",
    "lead_h": 39,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 5
+   "prob": 2
   },
   {
-   "t": "2026-10-20T05:00",
+   "t": "2026-10-20T13:00",
    "lead_h": 40,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 5
+   "prob": 2
   },
   {
-   "t": "2026-10-20T06:00",
+   "t": "2026-10-20T14:00",
    "lead_h": 41,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 2
   },
   {
-   "t": "2026-10-20T07:00",
+   "t": "2026-10-20T15:00",
    "lead_h": 42,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 2
   },
   {
-   "t": "2026-10-20T08:00",
+   "t": "2026-10-20T16:00",
    "lead_h": 43,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 2
   },
   {
-   "t": "2026-10-20T09:00",
+   "t": "2026-10-20T17:00",
    "lead_h": 44,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 2
   },
   {
-   "t": "2026-10-20T10:00",
+   "t": "2026-10-20T18:00",
    "lead_h": 45,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 7
   },
   {
-   "t": "2026-10-20T11:00",
+   "t": "2026-10-20T19:00",
    "lead_h": 46,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 17
+   "prob": 7
   },
   {
-   "t": "2026-10-20T12:00",
+   "t": "2026-10-20T20:00",
    "lead_h": 47,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
+   "prob": 7
   },
   {
-   "t": "2026-10-20T13:00",
+   "t": "2026-10-20T21:00",
    "lead_h": 48,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
+   "prob": 7
   },
   {
-   "t": "2026-10-20T14:00",
+   "t": "2026-10-20T22:00",
    "lead_h": 49,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-20T15:00",
-   "lead_h": 50,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-20T16:00",
-   "lead_h": 51,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-20T17:00",
-   "lead_h": 52,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-20T18:00",
-   "lead_h": 53,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 11
-  },
-  {
-   "t": "2026-10-20T19:00",
-   "lead_h": 54,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 11
-  },
-  {
-   "t": "2026-10-20T20:00",
-   "lead_h": 55,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 11
-  },
-  {
-   "t": "2026-10-20T21:00",
-   "lead_h": 56,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 11
-  },
-  {
-   "t": "2026-10-20T22:00",
-   "lead_h": 57,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 11
+   "prob": 7
   },
   {
    "t": "2026-10-20T23:00",
-   "lead_h": 58,
+   "lead_h": 50,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.018,
-   "prob": 11
+   "prob": 7
   },
   {
    "t": "2026-10-21T00:00",
-   "lead_h": 59,
+   "lead_h": 51,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.018,
@@ -533,7 +469,7 @@
   },
   {
    "t": "2026-10-21T01:00",
-   "lead_h": 60,
+   "lead_h": 52,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.018,
@@ -541,7 +477,7 @@
   },
   {
    "t": "2026-10-21T02:00",
-   "lead_h": 61,
+   "lead_h": 53,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.018,
@@ -549,183 +485,183 @@
   },
   {
    "t": "2026-10-21T03:00",
-   "lead_h": 62,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 54,
+   "om_in": 0.004,
+   "omc_in": 0.007,
    "nws_in": 0.018,
    "prob": 39
   },
   {
    "t": "2026-10-21T04:00",
-   "lead_h": 63,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 55,
+   "om_in": 0.02,
+   "omc_in": 0.035,
    "nws_in": 0.018,
    "prob": 39
   },
   {
    "t": "2026-10-21T05:00",
-   "lead_h": 64,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 56,
+   "om_in": 0.035,
+   "omc_in": 0.062,
    "nws_in": 0.015,
    "prob": 39
   },
   {
    "t": "2026-10-21T06:00",
-   "lead_h": 65,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 57,
+   "om_in": 0.024,
+   "omc_in": 0.043,
    "nws_in": 0.015,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T07:00",
-   "lead_h": 66,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 58,
+   "om_in": 0.091,
+   "omc_in": 0.165,
    "nws_in": 0.015,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T08:00",
-   "lead_h": 67,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 59,
+   "om_in": 0.043,
+   "omc_in": 0.078,
    "nws_in": 0.015,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T09:00",
-   "lead_h": 68,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 60,
+   "om_in": 0.067,
+   "omc_in": 0.123,
    "nws_in": 0.015,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T10:00",
-   "lead_h": 69,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 61,
+   "om_in": 0.055,
+   "omc_in": 0.102,
    "nws_in": 0.015,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T11:00",
-   "lead_h": 70,
-   "om_in": 0,
-   "omc_in": 0.0,
+   "lead_h": 62,
+   "om_in": 0.012,
+   "omc_in": 0.022,
    "nws_in": 0.003,
-   "prob": 49
+   "prob": 51
   },
   {
    "t": "2026-10-21T12:00",
+   "lead_h": 63,
+   "om_in": 0.008,
+   "omc_in": 0.015,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T13:00",
+   "lead_h": 64,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T14:00",
+   "lead_h": 65,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T15:00",
+   "lead_h": 66,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T16:00",
+   "lead_h": 67,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T17:00",
+   "lead_h": 68,
+   "om_in": 0.008,
+   "omc_in": 0.016,
+   "nws_in": 0.003,
+   "prob": 34
+  },
+  {
+   "t": "2026-10-21T18:00",
+   "lead_h": 69,
+   "om_in": 0.012,
+   "omc_in": 0.024,
+   "nws_in": 0.003,
+   "prob": 26
+  },
+  {
+   "t": "2026-10-21T19:00",
+   "lead_h": 70,
+   "om_in": 0.004,
+   "omc_in": 0.008,
+   "nws_in": 0.003,
+   "prob": 26
+  },
+  {
+   "t": "2026-10-21T20:00",
    "lead_h": 71,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.003,
-   "prob": 28
+   "prob": 26
   },
   {
-   "t": "2026-10-21T13:00",
+   "t": "2026-10-21T21:00",
    "lead_h": 72,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.003,
-   "prob": 28
+   "prob": 26
   },
   {
-   "t": "2026-10-21T14:00",
+   "t": "2026-10-21T22:00",
    "lead_h": 73,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T15:00",
-   "lead_h": 74,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T16:00",
-   "lead_h": 75,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T17:00",
-   "lead_h": 76,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T18:00",
-   "lead_h": 77,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T19:00",
-   "lead_h": 78,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T20:00",
-   "lead_h": 79,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T21:00",
-   "lead_h": 80,
-   "om_in": 0.043,
-   "omc_in": 0.043,
-   "nws_in": 0.003,
-   "prob": 28
-  },
-  {
-   "t": "2026-10-21T22:00",
-   "lead_h": 81,
-   "om_in": 0.189,
-   "omc_in": 0.189,
-   "nws_in": 0.003,
-   "prob": 28
+   "prob": 26
   },
   {
    "t": "2026-10-21T23:00",
-   "lead_h": 82,
-   "om_in": 0.059,
-   "omc_in": 0.059,
+   "lead_h": 74,
+   "om_in": 0.004,
+   "omc_in": 0.004,
    "nws_in": 0.003,
-   "prob": 28
+   "prob": 26
   },
   {
    "t": "2026-10-22T00:00",
-   "lead_h": 83,
-   "om_in": 0.004,
-   "omc_in": 0.004,
+   "lead_h": 75,
+   "om_in": 0,
+   "omc_in": 0.0,
    "nws_in": 0.003,
    "prob": 25
   },
   {
    "t": "2026-10-22T01:00",
-   "lead_h": 84,
+   "lead_h": 76,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.003,
@@ -733,23 +669,23 @@
   },
   {
    "t": "2026-10-22T02:00",
-   "lead_h": 85,
-   "om_in": 0.067,
-   "omc_in": 0.067,
+   "lead_h": 77,
+   "om_in": 0,
+   "omc_in": 0.0,
    "nws_in": 0.003,
    "prob": 25
   },
   {
    "t": "2026-10-22T03:00",
-   "lead_h": 86,
-   "om_in": 0.083,
-   "omc_in": 0.083,
+   "lead_h": 78,
+   "om_in": 0.004,
+   "omc_in": 0.004,
    "nws_in": 0.003,
    "prob": 25
   },
   {
    "t": "2026-10-22T04:00",
-   "lead_h": 87,
+   "lead_h": 79,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.003,
@@ -757,7 +693,7 @@
   },
   {
    "t": "2026-10-22T05:00",
-   "lead_h": 88,
+   "lead_h": 80,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -765,151 +701,151 @@
   },
   {
    "t": "2026-10-22T06:00",
+   "lead_h": 81,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T07:00",
+   "lead_h": 82,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T08:00",
+   "lead_h": 83,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T09:00",
+   "lead_h": 84,
+   "om_in": 0.004,
+   "omc_in": 0.004,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T10:00",
+   "lead_h": 85,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T11:00",
+   "lead_h": 86,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 18
+  },
+  {
+   "t": "2026-10-22T12:00",
+   "lead_h": 87,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 6
+  },
+  {
+   "t": "2026-10-22T13:00",
+   "lead_h": 88,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 6
+  },
+  {
+   "t": "2026-10-22T14:00",
    "lead_h": 89,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 6
   },
   {
-   "t": "2026-10-22T07:00",
+   "t": "2026-10-22T15:00",
    "lead_h": 90,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 6
   },
   {
-   "t": "2026-10-22T08:00",
+   "t": "2026-10-22T16:00",
    "lead_h": 91,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 6
   },
   {
-   "t": "2026-10-22T09:00",
+   "t": "2026-10-22T17:00",
    "lead_h": 92,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 6
   },
   {
-   "t": "2026-10-22T10:00",
+   "t": "2026-10-22T18:00",
    "lead_h": 93,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 1
   },
   {
-   "t": "2026-10-22T11:00",
+   "t": "2026-10-22T19:00",
    "lead_h": 94,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 8
+   "prob": 1
   },
   {
-   "t": "2026-10-22T12:00",
+   "t": "2026-10-22T20:00",
    "lead_h": 95,
-   "om_in": 0.012,
-   "omc_in": 0.012,
+   "om_in": 0,
+   "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 18
+   "prob": 1
   },
   {
-   "t": "2026-10-22T13:00",
+   "t": "2026-10-22T21:00",
    "lead_h": 96,
-   "om_in": 0.012,
-   "omc_in": 0.012,
+   "om_in": 0,
+   "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 18
+   "prob": 1
   },
   {
-   "t": "2026-10-22T14:00",
+   "t": "2026-10-22T22:00",
    "lead_h": 97,
-   "om_in": 0.004,
-   "omc_in": 0.004,
+   "om_in": 0,
+   "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 18
+   "prob": 1
   },
   {
-   "t": "2026-10-22T15:00",
+   "t": "2026-10-22T23:00",
    "lead_h": 98,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 18
-  },
-  {
-   "t": "2026-10-22T16:00",
-   "lead_h": 99,
-   "om_in": 0.004,
-   "omc_in": 0.004,
-   "nws_in": 0.0,
-   "prob": 18
-  },
-  {
-   "t": "2026-10-22T17:00",
-   "lead_h": 100,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 18
-  },
-  {
-   "t": "2026-10-22T18:00",
-   "lead_h": 101,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
-  },
-  {
-   "t": "2026-10-22T19:00",
-   "lead_h": 102,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
-  },
-  {
-   "t": "2026-10-22T20:00",
-   "lead_h": 103,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
-  },
-  {
-   "t": "2026-10-22T21:00",
-   "lead_h": 104,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
-  },
-  {
-   "t": "2026-10-22T22:00",
-   "lead_h": 105,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
-  },
-  {
-   "t": "2026-10-22T23:00",
-   "lead_h": 106,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 2
+   "prob": 1
   },
   {
    "t": "2026-10-23T00:00",
-   "lead_h": 107,
+   "lead_h": 99,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -917,7 +853,7 @@
   },
   {
    "t": "2026-10-23T01:00",
-   "lead_h": 108,
+   "lead_h": 100,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -925,7 +861,7 @@
   },
   {
    "t": "2026-10-23T02:00",
-   "lead_h": 109,
+   "lead_h": 101,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -933,7 +869,7 @@
   },
   {
    "t": "2026-10-23T03:00",
-   "lead_h": 110,
+   "lead_h": 102,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -941,7 +877,7 @@
   },
   {
    "t": "2026-10-23T04:00",
-   "lead_h": 111,
+   "lead_h": 103,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -949,7 +885,7 @@
   },
   {
    "t": "2026-10-23T05:00",
-   "lead_h": 112,
+   "lead_h": 104,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -957,7 +893,7 @@
   },
   {
    "t": "2026-10-23T06:00",
-   "lead_h": 113,
+   "lead_h": 105,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -965,7 +901,7 @@
   },
   {
    "t": "2026-10-23T07:00",
-   "lead_h": 114,
+   "lead_h": 106,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -973,7 +909,7 @@
   },
   {
    "t": "2026-10-23T08:00",
-   "lead_h": 115,
+   "lead_h": 107,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -981,7 +917,7 @@
   },
   {
    "t": "2026-10-23T09:00",
-   "lead_h": 116,
+   "lead_h": 108,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -989,7 +925,7 @@
   },
   {
    "t": "2026-10-23T10:00",
-   "lead_h": 117,
+   "lead_h": 109,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -997,7 +933,7 @@
   },
   {
    "t": "2026-10-23T11:00",
-   "lead_h": 118,
+   "lead_h": 110,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1005,7 +941,7 @@
   },
   {
    "t": "2026-10-23T12:00",
-   "lead_h": 119,
+   "lead_h": 111,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1013,7 +949,7 @@
   },
   {
    "t": "2026-10-23T13:00",
-   "lead_h": 120,
+   "lead_h": 112,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1021,7 +957,7 @@
   },
   {
    "t": "2026-10-23T14:00",
-   "lead_h": 121,
+   "lead_h": 113,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1029,7 +965,7 @@
   },
   {
    "t": "2026-10-23T15:00",
-   "lead_h": 122,
+   "lead_h": 114,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1037,7 +973,7 @@
   },
   {
    "t": "2026-10-23T16:00",
-   "lead_h": 123,
+   "lead_h": 115,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1045,7 +981,7 @@
   },
   {
    "t": "2026-10-23T17:00",
-   "lead_h": 124,
+   "lead_h": 116,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1053,7 +989,7 @@
   },
   {
    "t": "2026-10-23T18:00",
-   "lead_h": 125,
+   "lead_h": 117,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1061,7 +997,7 @@
   },
   {
    "t": "2026-10-23T19:00",
-   "lead_h": 126,
+   "lead_h": 118,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1069,7 +1005,7 @@
   },
   {
    "t": "2026-10-23T20:00",
-   "lead_h": 127,
+   "lead_h": 119,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1077,7 +1013,7 @@
   },
   {
    "t": "2026-10-23T21:00",
-   "lead_h": 128,
+   "lead_h": 120,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1085,7 +1021,7 @@
   },
   {
    "t": "2026-10-23T22:00",
-   "lead_h": 129,
+   "lead_h": 121,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1093,7 +1029,7 @@
   },
   {
    "t": "2026-10-23T23:00",
-   "lead_h": 130,
+   "lead_h": 122,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1101,7 +1037,7 @@
   },
   {
    "t": "2026-10-24T00:00",
-   "lead_h": 131,
+   "lead_h": 123,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1109,7 +1045,7 @@
   },
   {
    "t": "2026-10-24T01:00",
-   "lead_h": 132,
+   "lead_h": 124,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1117,7 +1053,7 @@
   },
   {
    "t": "2026-10-24T02:00",
-   "lead_h": 133,
+   "lead_h": 125,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1125,7 +1061,7 @@
   },
   {
    "t": "2026-10-24T03:00",
-   "lead_h": 134,
+   "lead_h": 126,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1133,7 +1069,7 @@
   },
   {
    "t": "2026-10-24T04:00",
-   "lead_h": 135,
+   "lead_h": 127,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1141,7 +1077,7 @@
   },
   {
    "t": "2026-10-24T05:00",
-   "lead_h": 136,
+   "lead_h": 128,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
@@ -1149,151 +1085,151 @@
   },
   {
    "t": "2026-10-24T06:00",
+   "lead_h": 129,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T07:00",
+   "lead_h": 130,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T08:00",
+   "lead_h": 131,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T09:00",
+   "lead_h": 132,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T10:00",
+   "lead_h": 133,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T11:00",
+   "lead_h": 134,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 2
+  },
+  {
+   "t": "2026-10-24T12:00",
+   "lead_h": 135,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 10
+  },
+  {
+   "t": "2026-10-24T13:00",
+   "lead_h": 136,
+   "om_in": 0,
+   "omc_in": 0.0,
+   "nws_in": 0.0,
+   "prob": 10
+  },
+  {
+   "t": "2026-10-24T14:00",
    "lead_h": 137,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 10
   },
   {
-   "t": "2026-10-24T07:00",
+   "t": "2026-10-24T15:00",
    "lead_h": 138,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 10
   },
   {
-   "t": "2026-10-24T08:00",
+   "t": "2026-10-24T16:00",
    "lead_h": 139,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 10
   },
   {
-   "t": "2026-10-24T09:00",
+   "t": "2026-10-24T17:00",
    "lead_h": 140,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 10
   },
   {
-   "t": "2026-10-24T10:00",
+   "t": "2026-10-24T18:00",
    "lead_h": 141,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 17
   },
   {
-   "t": "2026-10-24T11:00",
+   "t": "2026-10-24T19:00",
    "lead_h": 142,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 1
+   "prob": 17
   },
   {
-   "t": "2026-10-24T12:00",
+   "t": "2026-10-24T20:00",
    "lead_h": 143,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
+   "prob": 17
   },
   {
-   "t": "2026-10-24T13:00",
+   "t": "2026-10-24T21:00",
    "lead_h": 144,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
+   "prob": 17
   },
   {
-   "t": "2026-10-24T14:00",
+   "t": "2026-10-24T22:00",
    "lead_h": 145,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-24T15:00",
-   "lead_h": 146,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-24T16:00",
-   "lead_h": 147,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-24T17:00",
-   "lead_h": 148,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 4
-  },
-  {
-   "t": "2026-10-24T18:00",
-   "lead_h": 149,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 14
-  },
-  {
-   "t": "2026-10-24T19:00",
-   "lead_h": 150,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 14
-  },
-  {
-   "t": "2026-10-24T20:00",
-   "lead_h": 151,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 14
-  },
-  {
-   "t": "2026-10-24T21:00",
-   "lead_h": 152,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 14
-  },
-  {
-   "t": "2026-10-24T22:00",
-   "lead_h": 153,
-   "om_in": 0,
-   "omc_in": 0.0,
-   "nws_in": 0.0,
-   "prob": 14
+   "prob": 17
   },
   {
    "t": "2026-10-24T23:00",
-   "lead_h": 154,
+   "lead_h": 146,
    "om_in": 0,
    "omc_in": 0.0,
    "nws_in": 0.007,
-   "prob": 14
+   "prob": 17
   },
   {
    "t": "2026-10-25T00:00",
-   "lead_h": 155,
+   "lead_h": 147,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.007,
@@ -1301,7 +1237,7 @@
   },
   {
    "t": "2026-10-25T01:00",
-   "lead_h": 156,
+   "lead_h": 148,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.007,
@@ -1309,7 +1245,7 @@
   },
   {
    "t": "2026-10-25T02:00",
-   "lead_h": 157,
+   "lead_h": 149,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.007,
@@ -1317,7 +1253,7 @@
   },
   {
    "t": "2026-10-25T03:00",
-   "lead_h": 158,
+   "lead_h": 150,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.007,
@@ -1325,7 +1261,7 @@
   },
   {
    "t": "2026-10-25T04:00",
-   "lead_h": 159,
+   "lead_h": 151,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.007,
@@ -1333,7 +1269,7 @@
   },
   {
    "t": "2026-10-25T05:00",
-   "lead_h": 160,
+   "lead_h": 152,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1341,7 +1277,7 @@
   },
   {
    "t": "2026-10-25T06:00",
-   "lead_h": 161,
+   "lead_h": 153,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1349,7 +1285,7 @@
   },
   {
    "t": "2026-10-25T07:00",
-   "lead_h": 162,
+   "lead_h": 154,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1357,7 +1293,7 @@
   },
   {
    "t": "2026-10-25T08:00",
-   "lead_h": 163,
+   "lead_h": 155,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1365,7 +1301,7 @@
   },
   {
    "t": "2026-10-25T09:00",
-   "lead_h": 164,
+   "lead_h": 156,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1373,7 +1309,7 @@
   },
   {
    "t": "2026-10-25T10:00",
-   "lead_h": 165,
+   "lead_h": 157,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.015,
@@ -1381,7 +1317,7 @@
   },
   {
    "t": "2026-10-25T11:00",
-   "lead_h": 166,
+   "lead_h": 158,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.008,
@@ -1389,37 +1325,96 @@
   },
   {
    "t": "2026-10-25T12:00",
-   "lead_h": 167,
+   "lead_h": 159,
    "om_in": null,
    "omc_in": null,
    "nws_in": 0.008,
    "prob": null
+  },
+  {
+   "t": "2026-10-25T13:00",
+   "lead_h": 160,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.008,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T14:00",
+   "lead_h": 161,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.008,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T15:00",
+   "lead_h": 162,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.008,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T16:00",
+   "lead_h": 163,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.008,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T17:00",
+   "lead_h": 164,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.003,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T18:00",
+   "lead_h": 165,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.003,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T19:00",
+   "lead_h": 166,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.003,
+   "prob": null
+  },
+  {
+   "t": "2026-10-25T20:00",
+   "lead_h": 167,
+   "om_in": null,
+   "omc_in": null,
+   "nws_in": 0.003,
+   "prob": null
   }
  ],
  "storm": {
-  "total_48h_in": 0,
-  "peak_1h_inhr": 0,
+  "total_48h_in": 0.69,
+  "peak_1h_inhr": 0.165,
+  "raw_total_48h_in": 0.38,
+  "onset": "2026-10-21T04:00",
+  "peak_at": "2026-10-21T07:00",
+  "end": "2026-10-21T18:00",
+  "nws_total_in_window": 0.14,
+  "pop_mean_pct": 46,
+  "window_start_lead_h": 55,
+  "dry": false
+ },
+ "outlook": {
+  "total_48h_in": 0.01,
+  "peak_1h_inhr": 0.004,
   "onset": null,
   "peak_at": null,
   "end": null,
   "dry": true
- },
- "outlook": {
-  "total_48h_in": 0.48,
-  "peak_1h_inhr": 0.189,
-  "raw_total_48h_in": 0.48,
-  "onset": "2026-10-21T21:00",
-  "peak_at": "2026-10-21T22:00",
-  "end": "2026-10-22T03:00",
-  "nws_total_in_window": 0.02,
-  "pop_mean_pct": 27,
-  "window_start_lead_h": 80,
-  "dry": false,
-  "cnrfc_6d_in": {
-   "VENC1": 0.16,
-   "APC": 0.17
-  },
-  "_note": "Beyond 72 h. Open-Meteo raw, no bias correction (unmeasured at this lead), with the mean chance of rain over the wet hours. Not used to pre-fill the planner."
  },
  "prefill_horizon_h": 72,
  "ar": null,
@@ -1444,9 +1439,9 @@
   "gauge_days_in_window": 35
  },
  "creek_now": {
-  "ross_stage_ft": 4.24,
-  "ross_flow_cfs": 0.27,
-  "ross_observed": "2026-10-18T13:30:00.000-07:00",
+  "ross_stage_ft": 4.21,
+  "ross_flow_cfs": 0.08,
+  "ross_observed": "2026-10-18T21:30:00.000-07:00",
   "ross_nws_forecast_peak_ft": null,
   "bridge_stage_ft": 1.21,
   "bridge_observed": "2026-10-18T19:50:00Z",
@@ -1459,34 +1454,34 @@
   }
  },
  "station": {
-  "observed_utc": "2026-10-18T20:52:00.000Z",
+  "observed_utc": "2026-10-19T04:51:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 0,
   "rain_yearly_in": 0.14,
-  "baro_inhg": 29.976,
-  "temp_f": 80.2,
-  "humidity_pct": 46,
-  "wind_mph": 2.91,
-  "wind_gust_mph": 3.58,
+  "baro_inhg": 30,
+  "temp_f": 56.3,
+  "humidity_pct": 80,
+  "wind_mph": 0,
+  "wind_gust_mph": 3.36,
   "device": "DMATStation",
   "mac": "48:E7:29:69:67:D5"
  },
  "prefill": {
-  "total_48h_in": 0,
-  "peak_1h_inhr": 0,
-  "onset": null,
-  "peak_at": null,
-  "end": null,
+  "total_48h_in": 0.69,
+  "peak_1h_inhr": 0.165,
+  "onset": "2026-10-21T04:00",
+  "peak_at": "2026-10-21T07:00",
+  "end": "2026-10-21T18:00",
   "api_in": 0.0,
   "season_rain_in": 0.0,
   "ar_category": null,
   "flood_watch": false,
-  "window_start_lead_h": null,
-  "pop_mean_pct": null,
-  "nws_total_in_window": null,
+  "window_start_lead_h": 55,
+  "pop_mean_pct": 46,
+  "nws_total_in_window": 0.14,
   "alternatives": {
    "open_meteo_raw_48h": 0,
    "open_meteo_corrected_48h": 0.0,
