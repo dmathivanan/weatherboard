@@ -27,7 +27,7 @@ docs/
   planner.html         the planner
   wetness.html         the ground wetness index
   storms.html          the storm catalog (forecast vs predicted vs actual)
-  data/storms.json     hand-maintained catalog for the current season
+  data/storms.json     this season's storm catalog, written by analysis/storm.py
   assets/planner.js    the models, tier ladder and checklist, client-side
   creek.html, storm.html   legacy live pages (browser-fetched gauges, alerts, radar)
   report.html          the winter 2025-26 analysis write-up
@@ -88,10 +88,12 @@ All from `models.json`:
   offset in hours and a minimum tier.
 
 **Save this plan** stores the inputs and outputs in the browser; `storms.html`
-shows saved plans with a JSON row to paste into `data/storms.json`. After the
-storm, fill the `actual` block there from the station, NWPS `SBSC1`, USGS and
-the PumpFuse app. The PumpFuse live feed stays out on purpose; the app's own
-alerts cover the pump.
+lists saved plans under the storm tables. The tables themselves need no hand
+entry: `data/storms.json` holds one row per storm of 0.10 in or more this
+season, in the same shape as last winter's catalog, and is rebuilt from the
+station, the creek gauges and the pump log every time
+`analysis/update_data.py` runs. The PumpFuse live feed stays out on purpose;
+the app's own alerts cover the pump.
 
 ## Setup
 

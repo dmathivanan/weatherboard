@@ -55,21 +55,13 @@ dl.defs dd{margin:0;color:var(--mute)}
 <body>
 <header class="top"></header>
 <main>
-  <p class="stamp">One row per storm: what was forecast, what the models predicted from it, and what actually happened. Click a column heading to sort; click again to reverse. Fill the actual columns in <code>data/storms.json</code> after each storm.</p>
+  <p class="stamp">One row per storm of 0.10 in or more: what was forecast, what the crest model makes of the rain that fell, and what actually happened. Click a column heading to sort; click again to reverse. This season's rows are rebuilt from the station, the two creek gauges and the pump log each time the data is refreshed.</p>
 
   <section class="card">
-    <h2>This season <span class="sub" id="seasonsub"></span></h2>
+    <h2><span id="curtitle">This season</span> <span class="sub" id="seasonsub"></span></h2>
+    <div class="sumline" id="cursum"></div>
     <div class="tw"><table class="t" id="cur"></table></div>
-    <div class="legend">
-      <span><span class="chip prepare">Prepare</span> tier from the planner / reached</span>
-      <span><span class="err">+0.4</span> crest error, predicted − actual, ft</span>
-      <span><span class="err bad">+2.1</span> outside the model's ±<span id="bandv"></span> ft band</span>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>Plans saved in this browser <span class="sub">from the planner · not yet in storms.json</span></h2>
-    <div id="plans"></div>
+    <p class="note" id="curnote"></p>
   </section>
 
   <section class="card">
@@ -77,6 +69,15 @@ dl.defs dd{margin:0;color:var(--mute)}
     <div class="sumline" id="histsum"></div>
     <div class="tw"><table class="t" id="hist"></table></div>
     <p class="note">Forecast columns are Open-Meteo's own archive of what it said one and three days ahead (raw, before bias correction), summed over the storm's days. Predicted applies the crest model to the rain that <em>actually</em> fell, so its error measures the model, not the forecast. Rows in red crossed the 6.5 ft notify line.</p>
+    <div class="legend">
+      <span><span class="err">+0.4</span> crest error, predicted − actual, ft</span>
+      <span><span class="err bad">+2.1</span> outside the model's ±<span id="bandv"></span> ft band</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Plans saved in this browser <span class="sub">from the planner · kept in this browser only</span></h2>
+    <div id="plans"></div>
   </section>
 
   <section class="card">
@@ -87,8 +88,7 @@ dl.defs dd{margin:0;color:var(--mute)}
       <dt>Wetness</dt><dd>Antecedent precipitation index at the moment the storm began (0.9/day decay), in inches.</dd>
       <dt>Inflow</dt><dd>Water arriving at the sump pit, derived from the pump: seconds the primary pump ran in the busiest 15 minutes × 84 GPM rated capacity, averaged over that window. 84 is the ceiling; last winter's max was 42.65.</dd>
       <dt>Runs</dt><dd>Primary-pump starts during the storm and the 12 h after it.</dd>
-      <dt>Run (this season)</dt><dd>The single longest primary-pump run, in seconds. Run length, not run count, is the signal that tracks load: stress = 1 − 14 / run_s.</dd>
-      <dt>Ross eq</dt><dd>The Ross gauge (USGS 11460000) reading that corresponds to the predicted Bridge Street crest, via bridge = 0.767 × ross − 1.96.</dd>
+      <dt>Predicted</dt><dd>The crest model applied to the storm's actual rain total and starting wetness, in both tables. This season's storms were not used to fit it.</dd>
       <dt>Error</dt><dd>Predicted crest minus actual crest. Red when outside the model's 95 % band.</dd>
     </dl>
   </section>
@@ -117,9 +117,9 @@ dl.defs dd{margin:0;color:var(--mute)}
     const bad = Math.abs(v) > band;
     return `<td class="n ${cls}"><span class="err${bad ? " bad" : ""}">${v >= 0 ? "+" : ""}${v.toFixed(1)}</span></td>`;
   };
-  const tierCell = (t, cls = "") => t ? `<td class="${cls}"><span class="chip ${t}">${TIER_LABEL[t] || t}</span></td>` : `<td class="miss ${cls}">–</td>`;
   const parseD = x => { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(x || ""); return m ? { y: +m[1], mo: +m[2], d: +m[3], h: +m[4], mi: m[5] } : null; };
-  const dateCell = (s, e) => {
+  const esc = t => String(t).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const dateCell = (s, e, live) => {
     const a = parseD(s), b = parseD(e);
     if (!a) return '<td class="miss">–</td>';
     const hm = o => `${((o.h + 11) % 12) + 1}:${o.mi} ${o.h < 12 ? "am" : "pm"}`;
@@ -129,6 +129,7 @@ dl.defs dd{margin:0;color:var(--mute)}
       const hrs = (Date.parse(e) - Date.parse(s)) / 3600e3;
       txt += `<br>→ ${same ? "" : `${months[b.mo - 1]} ${b.d} `}${hm(b)}` + (isFinite(hrs) && hrs > 0 ? ` · ${hrs.toFixed(0)} h` : "");
     }
+    if (live) txt += "<br><i>may still be raining</i>";
     return `<td class="date">${txt}</td>`;
   };
   const barCell = (max, cls = "") => v => v == null ? `<td class="miss ${cls}">–</td>`
@@ -194,43 +195,6 @@ dl.defs dd{margin:0;color:var(--mute)}
     render();
   }
 
-  /* ---- this season ---- */
-  const curRows = (cur.storms || []).map(s => {
-    const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
-    return {
-      name: s.name || s.id, start: s.start_local, end: s.end_local,
-      f_total: f.total_48h_in, f_peak: f.peak_1h_inhr, f_api: f.api_in, f_ar: f.ar_category,
-      p_bridge: p.bridge_peak_ft, p_ross: p.ross_equivalent_ft, p_tier: p.tier,
-      a_rain: a.total_rain_in, a_peak1h: a.peak_1h_in, a_peak10: a.peak_10min_in != null ? a.peak_10min_in * 6 : null,
-      a_bridge: a.bridge_peak_ft, a_ross: a.ross_peak_ft, a_run: a.sump_peak_run_s, a_inflow: a.sump_peak_inflow_gpm, a_tier: a.tier_reached,
-      err: p.bridge_peak_ft != null && a.bridge_peak_ft != null ? p.bridge_peak_ft - a.bridge_peak_ft : null,
-    };
-  });
-  const tierRank = t => t ? TIER_ORDER.indexOf(t) : null;
-  const curCols = [
-    { key: "name", label: "Storm", group: "", sub: "", first: true, cell: (v, r, cls) => `<td class="${cls}">${v}</td>` },
-    { key: "start", label: "Dates", unit: "local", group: "", sub: "", cell: (v, r) => dateCell(r.start, r.end) },
-    { key: "f_total", label: "48 h", unit: "in", group: "Forecast", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "f_peak", label: "Peak", unit: "in/hr", group: "Forecast", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "f_api", label: "Wetness", unit: "API in", group: "Forecast", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "f_ar", label: "AR", unit: "scale", group: "Forecast", sub: "", cls: "n", cell: (v, r, c) => intCell(c)(v) },
-    { key: "p_bridge", label: "Bridge St", unit: "ft", group: "Predicted", sub: "", cls: "n", cell: (v, r, c) => numCell(1, c)(v) },
-    { key: "p_ross", label: "Ross eq", unit: "ft", group: "Predicted", sub: "", cls: "n", cell: (v, r, c) => numCell(1, c)(v) },
-    { key: "p_tier", label: "Tier", group: "Predicted", sub: "", cell: (v, r, c) => tierCell(v, c), sortValue: r => tierRank(r.p_tier) },
-    { key: "a_rain", label: "Total", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_peak1h", label: "Peak 1 h", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_peak10", label: "Peak 10 min", unit: "in/hr", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_bridge", label: "Bridge St", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_ross", label: "Ross", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_run", label: "Run", unit: "s", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
-    { key: "a_inflow", label: "Inflow", unit: "GPM", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
-    { key: "a_tier", label: "Tier", group: "Actual", sub: "", cell: (v, r, c) => tierCell(v, c), sortValue: r => tierRank(r.a_tier) },
-    { key: "err", label: "Error", unit: "ft", group: "", sub: "", cls: "n", cell: (v, r, c) => errCell(v, c) },
-  ];
-  buildTable($("cur"), curCols, curRows, { sortKey: "start", desc: true,
-    empty: "No storms logged yet. Save a plan on the planner, paste its row into data/storms.json, then fill the actuals afterwards." });
-  $("seasonsub").textContent = curRows.length + " storms";
-
   /* ---- saved plans ---- */
   const plans = loadPlans();
   const host = $("plans");
@@ -241,65 +205,77 @@ dl.defs dd{margin:0;color:var(--mute)}
         Bridge St <b>${fmt(p.predicted.bridge_peak_ft, 1)} ft</b> (${fmt(p.predicted.lo_ft, 1)}–${fmt(p.predicted.hi_ft, 1)}) <span class="chip ${p.predicted.tier}">${TIER_LABEL[p.predicted.tier] || ""}</span>
         <span class="u">saved ${p.saved_local.replace("T", " ")}</span></div>
       <div style="margin-top:6px;display:flex;gap:6px">
-        <button class="btn" data-copy="${i}">Copy JSON row</button>
         <button class="btn ghost" data-show="${i}">Show</button>
         <button class="btn ghost" data-del="${i}">Delete</button>
       </div>
       <pre class="json" id="json${i}" style="display:none"></pre>
     </div>`).join("");
   const rev = plans.slice().reverse();
-  const rowOf = p => JSON.stringify({ id: p.id, season: seasonOf(p.start_local), name: "", start_local: p.start_local, end_local: p.end_local,
-    forecast: { issued_local: p.saved_local, ...p.forecast }, predicted: p.predicted,
-    actual: { total_rain_in: null, peak_1h_in: null, peak_10min_in: null, bridge_peak_ft: null, ross_peak_ft: null, sump_peak_run_s: null, sump_peak_inflow_gpm: null, tier_reached: null },
-    notes: p.notes }, null, 1);
-  host.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
-    const txt = rowOf(rev[+b.dataset.copy]);
-    try { await navigator.clipboard.writeText(txt); b.textContent = "Copied"; } catch { $("json" + b.dataset.copy).style.display = "block"; }
-  }));
+  const rowOf = p => JSON.stringify({ id: p.id, saved_local: p.saved_local, start_local: p.start_local, end_local: p.end_local,
+    forecast: p.forecast, predicted: p.predicted, notes: p.notes }, null, 1);
   host.querySelectorAll("[data-show]").forEach(b => b.addEventListener("click", () => {
     const pre = $("json" + b.dataset.show); pre.textContent = rowOf(rev[+b.dataset.show]); pre.style.display = pre.style.display === "none" ? "block" : "none";
   }));
   host.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => {
     const idx = plans.indexOf(rev[+b.dataset.del]); plans.splice(idx, 1); savePlans(plans); location.reload();
   }));
-  function seasonOf(s) { if (!s) return ""; const y = +s.slice(0, 4), m = +s.slice(5, 7); return m >= 10 ? `${y}-${String(y + 1).slice(2)}` : `${y - 1}-${String(y).slice(2)}`; }
+
+  /* ---- one table for both winters ----
+     Both catalogs have the same shape: storms_2025_26.json from export_models.py,
+     storms.json (this season) from storm.py build_catalog. */
+  function seasonTable(tableEl, sumEl, storms, opts = {}) {
+    const rows = (storms || []).map(s => {
+      const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
+      return {
+        num: +s.id.slice(-2), start: s.start_local, end: s.end_local, live: !!s.in_progress,
+        f_day: f.day_ahead_total_in, f_3d: f.three_day_total_in,
+        p_bridge: p.bridge_peak_ft,
+        a_rain: a.total_rain_in, a_peak1h: a.peak_1h_in, a_peak10: a.peak_10min_in != null ? a.peak_10min_in * 6 : null, a_api: a.api_at_start,
+        a_bridge: a.bridge_peak_ft, a_ross: a.ross_peak_ft, a_inflow: a.sump_peak_inflow_gpm, a_runs: a.sump_runs,
+        err: p.bridge_peak_ft != null && a.bridge_peak_ft != null ? p.bridge_peak_ft - a.bridge_peak_ft : null,
+      };
+    });
+    const maxRain = Math.max(0.1, ...rows.map(r => r.a_rain || 0));
+    const errs = rows.map(r => r.err).filter(e => e != null);
+    const within = errs.filter(e => Math.abs(e) <= band).length;
+    sumEl.innerHTML = !rows.length ? "" : `<span>Rain <b>${rows.reduce((a, r) => a + (r.a_rain || 0), 0).toFixed(1)} in</b></span>`
+      + `<span>Crests over 6.5 ft <b>${rows.filter(r => r.a_bridge >= 6.5).length}</b></span>`
+      + `<span>Model within ±${band.toFixed(1)} ft <b>${within} of ${errs.length}</b></span>`
+      + `<span>Mean error <b>${(errs.reduce((a, e) => a + e, 0) / (errs.length || 1)).toFixed(2)} ft</b></span>`;
+    const cols = [
+      { key: "num", label: "#", group: "", sub: "", first: true, cell: (v, r, cls) => `<td class="${cls}">${v}</td>` },
+      { key: "start", label: "Dates", unit: "local", group: "", sub: "", cell: (v, r) => dateCell(r.start, r.end, r.live) },
+      { key: "f_day", label: "Day ahead", unit: "in", group: "Forecast (raw)", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "f_3d", label: "3 days", unit: "in", group: "Forecast (raw)", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "p_bridge", label: "Bridge St", unit: "ft", group: "Predicted", sub: "", cls: "n", cell: (v, r, c) => numCell(1, c)(v) },
+      { key: "a_rain", label: "Total", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => barCell(maxRain, c)(v) },
+      { key: "a_peak1h", label: "Peak 1 h", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "a_peak10", label: "Peak 10 min", unit: "in/hr", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "a_api", label: "Wetness", unit: "API in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "a_bridge", label: "Bridge St", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "a_ross", label: "Ross", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
+      { key: "a_inflow", label: "Inflow", unit: "GPM", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
+      { key: "a_runs", label: "Runs", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
+      { key: "err", label: "Error", unit: "ft", group: "", sub: "", cls: "n", cell: (v, r, c) => errCell(v, c) },
+    ];
+    buildTable(tableEl, cols, rows, { sortKey: opts.sortKey || "a_bridge", desc: true, empty: opts.empty,
+      rowClass: r => r.a_bridge >= 6.5 ? "big" : "" });
+    return rows;
+  }
+
+  /* ---- this season ---- */
+  const curStorms = cur.storms || [];
+  const curRows = seasonTable($("cur"), $("cursum"), curStorms, { sortKey: "start",
+    empty: "No storm of 0.10 in or more yet this season." });
+  if (cur.season) $("curtitle").textContent = "Winter " + cur.season;
+  $("seasonsub").textContent = `this season · ${curRows.length} storm${curRows.length === 1 ? "" : "s"} over 0.10 in`;
+  const flags = [...new Set(curStorms.map(s => s.notes).filter(Boolean))];
+  $("curnote").innerHTML = "Same columns as last winter, newest first. These storms were not used to fit the crest model, so the error column is an out-of-sample check. "
+    + "A blank forecast means Open-Meteo's archive has not been read for those days yet; blank sump columns mean the pump log does not reach that storm."
+    + (flags.length ? "<br>" + flags.map(esc).join("<br>") : "");
 
   /* ---- last winter ---- */
-  const histRows = (hist.storms || []).map(s => {
-    const f = s.forecast || {}, p = s.predicted || {}, a = s.actual || {};
-    return {
-      num: +s.id.slice(-2), start: s.start_local, end: s.end_local,
-      f_day: f.day_ahead_total_in, f_3d: f.three_day_total_in,
-      p_bridge: p.bridge_peak_ft,
-      a_rain: a.total_rain_in, a_peak1h: a.peak_1h_in, a_peak10: a.peak_10min_in != null ? a.peak_10min_in * 6 : null, a_api: a.api_at_start,
-      a_bridge: a.bridge_peak_ft, a_ross: a.ross_peak_ft, a_inflow: a.sump_peak_inflow_gpm, a_runs: a.sump_runs,
-      err: p.bridge_peak_ft != null && a.bridge_peak_ft != null ? p.bridge_peak_ft - a.bridge_peak_ft : null,
-    };
-  });
-  const maxRain = Math.max(0.1, ...histRows.map(r => r.a_rain || 0));
-  const errs = histRows.map(r => r.err).filter(e => e != null);
-  const within = errs.filter(e => Math.abs(e) <= band).length;
-  $("histsum").innerHTML = `<span>Rain <b>${histRows.reduce((a, r) => a + (r.a_rain || 0), 0).toFixed(1)} in</b></span>`
-    + `<span>Crests over 6.5 ft <b>${histRows.filter(r => r.a_bridge >= 6.5).length}</b></span>`
-    + `<span>Model within ±${band.toFixed(1)} ft <b>${within} of ${errs.length}</b></span>`
-    + `<span>Mean error <b>${(errs.reduce((a, e) => a + e, 0) / (errs.length || 1)).toFixed(2)} ft</b></span>`;
-  const histCols = [
-    { key: "num", label: "#", group: "", sub: "", first: true, cell: (v, r, cls) => `<td class="${cls}">${v}</td>` },
-    { key: "start", label: "Dates", unit: "local", group: "", sub: "", cell: (v, r) => dateCell(r.start, r.end) },
-    { key: "f_day", label: "Day ahead", unit: "in", group: "Forecast (raw)", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "f_3d", label: "3 days", unit: "in", group: "Forecast (raw)", sub: "", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "p_bridge", label: "Bridge St", unit: "ft", group: "Predicted", sub: "", cls: "n", cell: (v, r, c) => numCell(1, c)(v) },
-    { key: "a_rain", label: "Total", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => barCell(maxRain, c)(v) },
-    { key: "a_peak1h", label: "Peak 1 h", unit: "in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_peak10", label: "Peak 10 min", unit: "in/hr", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_api", label: "Wetness", unit: "API in", group: "Actual", sub: "Rain", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_bridge", label: "Bridge St", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_ross", label: "Ross", unit: "ft", group: "Actual", sub: "Creek", cls: "n", cell: (v, r, c) => numCell(2, c)(v) },
-    { key: "a_inflow", label: "Inflow", unit: "GPM", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
-    { key: "a_runs", label: "Runs", group: "Actual", sub: "Sump", cls: "n", cell: (v, r, c) => intCell(c)(v) },
-    { key: "err", label: "Error", unit: "ft", group: "", sub: "", cls: "n", cell: (v, r, c) => errCell(v, c) },
-  ];
-  buildTable($("hist"), histCols, histRows, { sortKey: "a_bridge", desc: true, rowClass: r => r.a_bridge >= 6.5 ? "big" : "" });
+  seasonTable($("hist"), $("histsum"), hist.storms);
 })();
 </script>
 </body>

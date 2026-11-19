@@ -9,8 +9,9 @@ same data as the laptop. This script extends each one from its source:
   imports/bridge_street.csv    creek stage at Bridge Street  Marin OneRain    bridge
   analysis/cache/usgs_*.json   Ross stage and flow by month  USGS             usgs
   imports/PumpFuse.csv         one row per pump run          app export only  pump FILE
+  analysis/cache/fcst_daily_<season>.csv   what Open-Meteo forecast 1-3 days ahead   forecast
 
-    python analysis/update_data.py                 # station + bridge + usgs, then status
+    python analysis/update_data.py                 # station + bridge + usgs + forecast, then status
     python analysis/update_data.py station bridge  # just those
     python analysis/update_data.py pump imports/pump_runs_2026-11-19.csv
     python analysis/update_data.py status
@@ -19,7 +20,12 @@ Each source is appended after its own last reading, so re-running is cheap and
 never rewrites history. The PumpFuse has no API (config.json, sump._note): its
 runs arrive only as a CSV exported from the app, merged here by timestamp.
 
-Hosts needed: rt.ambientweather.net, marin.onerain.com, waterservices.usgs.gov.
+After any update it rebuilds docs/data/storms.json, this season's table on the
+storms page, from the files on disk (storm.py build_catalog). That file is part
+of the live site, so commit and push it with the data.
+
+Hosts needed: rt.ambientweather.net, marin.onerain.com, waterservices.usgs.gov,
+previous-runs-api.open-meteo.com.
 """
 import importlib.util
 import re
@@ -38,6 +44,7 @@ sys.path.insert(0, str(HERE))
 
 import fetchers as F          # noqa: E402  (keys, User-Agent, err_text)
 import build_timeline as bt   # noqa: E402  (USGS month cache)
+import storm                  # noqa: E402  (the storm catalog)
 
 IMPORTS = ROOT / "imports"
 STATION = IMPORTS / "station.csv"
@@ -206,14 +213,58 @@ def status():
     line("pump runs", p.min(), p.max(), len(p), "  manual export: ask for a new one when stale")
 
 
+PREV_RUNS = "https://previous-runs-api.open-meteo.com/v1/forecast"
+PREV_COLS = ["precipitation", "precipitation_previous_day1", "precipitation_previous_day2",
+             "precipitation_previous_day3"]
+
+
+def daily_forecast(hourly):
+    """Open-Meteo previous-runs hourly block -> one row per local day, summed.
+    The same table as cache/fcst_daily.csv, which last winter's catalog reads."""
+    df = pd.DataFrame({c: hourly.get(c) for c in PREV_COLS}, index=pd.to_datetime(hourly["time"]))
+    daily = df.resample("1D").sum(min_count=1)      # a day with no forecast stays empty, not 0
+    daily.index.name = "time"
+    return daily
+
+
+def update_forecast():
+    """What Open-Meteo forecast for each day of this season one, two and three
+    days ahead (its own archive of earlier runs). Feeds the forecast columns of
+    the storm catalog. The whole season is re-read each time: it is one request."""
+    now = pd.Timestamp.now(tz="UTC")
+    label, first_day = storm.season_of(now)
+    path = storm.forecast_cache(label)
+    r = requests.get(PREV_RUNS, headers=F.UA, timeout=40, params={
+        "latitude": F.LAT, "longitude": F.LON, "hourly": ",".join(PREV_COLS),
+        "start_date": first_day.strftime("%Y-%m-%d"), "end_date": now.tz_convert(TZ).strftime("%Y-%m-%d"),
+        "precipitation_unit": "inch", "timezone": TZ})
+    if r.status_code == 429:
+        raise RuntimeError("Open-Meteo's request limit for this address is used up (try again later)")
+    r.raise_for_status()
+    daily = daily_forecast(r.json()["hourly"]).round(3)
+    text = daily.to_csv(date_format="%Y-%m-%d")
+    changed = not path.exists() or path.read_text(encoding="utf-8") != text
+    if changed:
+        path.write_text(text, encoding="utf-8")
+    print(f"forecast: {len(daily)} days of {label} -> {path.name}" + ("" if changed else " (unchanged)"))
+
+
+def rebuild_catalog():
+    n, changed = storm.write_catalog()
+    print(f"storm catalog: {n} storms this season -> docs/data/storms.json"
+          + ("  (changed: commit and push it, the storms page reads it)" if changed else "  (unchanged)"))
+
+
 if __name__ == "__main__":
     args = sys.argv[1:]
     if args[:1] == ["pump"]:
         if len(args) != 2:
             raise SystemExit("usage: update_data.py pump <export.csv>")
         merge_pump(args[1])
+        rebuild_catalog()
     elif args[:1] != ["status"]:
-        steps = {"station": update_station, "bridge": update_bridge, "usgs": update_usgs}
+        steps = {"station": update_station, "bridge": update_bridge, "usgs": update_usgs,
+                 "forecast": update_forecast}
         failed = []
         for name in (args or list(steps)):
             if name not in steps:
@@ -225,4 +276,8 @@ if __name__ == "__main__":
                 print(f"{name}: FAILED  {F.err_text(e)}")
         if failed:
             print(f"\nnot updated: {', '.join(failed)}")
+        try:
+            rebuild_catalog()
+        except Exception as e:  # noqa: BLE001  the data is updated either way
+            print(f"storm catalog: FAILED  {F.err_text(e)}")
     status()

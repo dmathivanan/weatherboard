@@ -7,6 +7,7 @@ What happened in a storm: rain, creek and sump, straight from the raw inputs.
     python analysis/storm.py list              # every storm on record
     python analysis/storm.py list --since 2026-10-01
     python analysis/storm.py last --json       # same facts, machine-readable
+    python analysis/storm.py catalog           # rewrite docs/data/storms.json (the storms page)
 
 Options: --min IN   smallest storm total to count (default 0.25 in)
          --json     JSON instead of text
@@ -40,6 +41,8 @@ SINCE = pd.Timestamp("2025-10-01", tz="UTC")     # start of the record (water ye
 CFG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
 GPM = CFG["primary_pump"]["rated_gpm"]
 MODELS = ROOT / "docs" / "data" / "models.json"
+CATALOG = ROOT / "docs" / "data" / "storms.json"
+CATALOG_MIN_IN = 0.10         # as last winter's catalog (export_models.py)
 
 
 def local(t, fmt="%a %b %d %H:%M"):
@@ -263,6 +266,97 @@ def text(o):
     return "\n".join(L)
 
 
+def season_of(t):
+    """Water year of a UTC timestamp: (label, first local day), e.g. ('2026-27', 2026-10-01)."""
+    lt = t.tz_convert(TZ)
+    y = lt.year if lt.month >= 10 else lt.year - 1
+    return f"{y}-{str(y + 1)[2:]}", pd.Timestamp(year=y, month=10, day=1, tz=TZ)
+
+
+def forecast_cache(label):
+    """Open-Meteo's archive of its own earlier forecasts, per local day, for a season."""
+    return HERE / "cache" / f"fcst_daily_{label.replace('-', '_')}.csv"
+
+
+def build_catalog(d, events, models):
+    """This season's storms in the shape of storms_2025_26.json, so storms.html
+    draws both winters with the same table. Everything is read from the tracked
+    files; update_data.py calls this after each refresh."""
+    label, first_day = season_of(d["rain10"].index[-1])
+    since = first_day.tz_convert("UTC")
+    picks = [i for i, (s, e) in enumerate(events)
+             if s >= since and d["rain10"].loc[s:e].sum() >= CATALOG_MIN_IN]
+    fc = None
+    if forecast_cache(label).exists():
+        fc = pd.read_csv(forecast_cache(label), parse_dates=["time"]).set_index("time")
+    ep = (models or {}).get("event_peak")
+    rows = []
+    for n, i in enumerate(picks, 1):
+        o = describe(d, i, events, models)
+        rn, su = o["rain"], o["sump"]
+        br, ro, rf = o["bridge_street_ft"] or {}, o["ross_stage_ft"] or {}, o["ross_flow_cfs"] or {}
+        f1 = f3 = None
+        if fc is not None:
+            seg = fc.loc[o["start"][:10]:o["end"][:10]]
+            if len(seg) and seg["precipitation_previous_day1"].notna().any():
+                f1 = r(seg["precipitation_previous_day1"].sum())
+            if len(seg) and seg["precipitation_previous_day3"].notna().any():
+                f3 = r(seg["precipitation_previous_day3"].sum())
+        pred = None
+        if ep:
+            pred = r(ep["beta"][0] + ep["beta"][1] * rn["total_in"] + ep["beta"][2] * rn["wetness_index_at_start_in"])
+        notes = []
+        if o["in_progress"]:
+            notes.append("Rain within the last 6 h of the station record: totals can still grow.")
+        if not su["covered"]:
+            notes.append(f"Pump log ends {su['log_ends']}, before this storm: sump columns need a new PumpFuse export.")
+        elif not su["complete"]:
+            notes.append(f"Pump log ends {su['log_ends']}: sump columns may be short until a new PumpFuse export.")
+        got = su["covered"]
+        rows.append({
+            "id": f"{label}-{n:02d}", "season": label,
+            "start_local": o["start"].replace(" ", "T"), "end_local": o["end"].replace(" ", "T"),
+            "duration_h": o["duration_h"], "in_progress": o["in_progress"],
+            "forecast": {"day_ahead_total_in": f1, "three_day_total_in": f3,
+                         "_note": "Open-Meteo previous-run archive, summed over the storm's local days"},
+            "predicted": {"bridge_peak_ft": pred, "kind": "hindcast",
+                          "_note": "event_peak model applied to the ACTUAL total and API"},
+            "actual": {"total_rain_in": rn["total_in"], "peak_1h_in": rn["peak_1h_in"],
+                       "peak_10min_in": rn["peak_10min_in"], "peak_30min_in": rn["peak_30min_in"],
+                       "peak_6h_in": rn["peak_6h_in"], "api_at_start": rn["wetness_index_at_start_in"],
+                       "bridge_peak_ft": br.get("crest"), "ross_peak_ft": ro.get("crest"),
+                       "ross_peak_cfs": rf.get("peak"),
+                       "sump_peak_inflow_gpm": su.get("peak_inflow_gpm_15min") if got else None,
+                       "sump_runs": su.get("runs") if got else None,
+                       "sump_peak_run_s": su.get("longest_run_s") if got else None,
+                       "sump_peak_runs_per_15min": su.get("peak_runs_per_15min") if got else None,
+                       "sump_gallons": su.get("gallons") if got else None},
+            "notes": " ".join(notes),
+        })
+    return {
+        "_how": "Generated by analysis/storm.py (build_catalog) every time analysis/update_data.py runs; "
+                "do not edit by hand. One row per storm of 0.10 in or more this water year, in the same "
+                "shape as storms_2025_26.json. Actuals come from the station, the Bridge Street and Ross "
+                "gauges and the PumpFuse log; predicted is the crest model applied to the rain that fell.",
+        "season": label,
+        "storms": rows,
+    }
+
+
+def write_catalog(d=None, events=None, models=None):
+    """Rewrite docs/data/storms.json if its content changed. Returns (rows, changed)."""
+    if d is None:
+        d = load()
+        events = segment(d["rain10"])
+        models = json.loads(MODELS.read_text(encoding="utf-8")) if MODELS.exists() else None
+    cat = build_catalog(d, events, models)
+    text = json.dumps(cat, indent=1) + "\n"
+    changed = not CATALOG.exists() or CATALOG.read_text(encoding="utf-8") != text
+    if changed:
+        CATALOG.write_text(text, encoding="utf-8")
+    return len(cat["storms"]), changed
+
+
 def freshness(d):
     now = pd.Timestamp.now(tz="UTC")
 
@@ -296,6 +390,11 @@ def main(argv):
            and (since is None or s >= since)]
     fresh = freshness(d)
 
+    if cmd == "catalog":
+        n, changed = write_catalog(d, events, models)
+        print(f"storm catalog: {n} storms this season -> docs/data/storms.json"
+              + ("" if changed else " (unchanged)"))
+        return
     if cmd == "list":
         rows = [describe(d, i, events, models) for i in big]
         if as_json:

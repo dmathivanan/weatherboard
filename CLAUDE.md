@@ -22,8 +22,8 @@ Live site: https://dmathivanan.github.io/weatherboard/ (Pages deploys `main` →
 Questions like "what was the peak rainfall rate in the last storm", "how much did the creek
 rise", "how hard did the pump work" are answered from the raw data, not from memory:
 
-1. `python analysis/update_data.py` — brings station rain, Bridge Street and Ross up to now
-   and prints how fresh each source is.
+1. `python analysis/update_data.py` — brings station rain, Bridge Street and Ross up to now,
+   rebuilds the storms page's catalog (below), and prints how fresh each source is.
 2. `python analysis/storm.py last` (or a date, `2026-11-13`, or `list --since 2026-10-01`;
    add `--json` for every field). One storm gives the rain total and peak 5-min / 10-min /
    1-h rates with times, the Bridge Street and Ross stage before, crest, rise and timing,
@@ -42,8 +42,9 @@ rise", "how hard did the pump work" are answered from the raw data, not from mem
      rate of 2.4 in/hr for those 5 minutes; 1.5 in/hr over the heaviest 10").
    - "heaviest 5 min" is a single 5-minute reading of the rain counter. "station peak
      rate" is the console's own number, which is a 10-minute rate and so reads lower.
-4. If `update_data.py` changed files, commit them (`imports/`, `analysis/cache/`) and push,
-   so the next session starts current. Data-only commits do not change the live site.
+4. If `update_data.py` changed files, commit them (`imports/`, `analysis/cache/`,
+   `docs/data/storms.json`) and push, so the next session starts current. `imports/` and
+   `analysis/cache/` do not change the live site; `storms.json` is the storms page.
 
 For anything `storm.py` does not print, read the same files with pandas (below).
 
@@ -55,6 +56,14 @@ For anything `storm.py` does not print, read the same files with pandas (below).
 | `imports/bridge_street.csv` | San Anselmo Creek at Bridge Street, stage ft (UTC) | `update_data.py bridge` (marin.onerain.com) |
 | `analysis/cache/usgs_YYYYMM.json` | Ross stage and flow, 15 min, one file per month | `update_data.py usgs` |
 | `analysis/cache/fcst_daily.csv`, `openmeteo_prevruns.json` | last winter's archived forecasts, for the forecast-skill work | fixed |
+| `analysis/cache/fcst_daily_2026_27.csv` | this season's archived Open-Meteo forecasts per day (one file per season) | `update_data.py forecast` |
+
+**The storms page** (`docs/storms.html`) shows this season in the same table as last winter.
+Its rows are `docs/data/storms.json`, written by `storm.py` (`build_catalog`) at the end of
+every `update_data.py` run and by `python analysis/storm.py catalog`: one row per storm of
+0.10 in or more this water year. Do not edit it by hand; a new storm appears the next time
+the data is refreshed and pushed. Its forecast columns stay blank until `update_data.py
+forecast` has read Open-Meteo's archive for those days.
 
 **New pump runs** arrive only when Deepak exports them from the PumpFuse app. Save what he
 sends (an attached file, or rows pasted into the chat) as a file and run
@@ -95,7 +104,7 @@ running out-of-sample check: this season's storms were not in the fit.
 ## Where things are
 - `docs/*.html`, `docs/assets/planner.js` — the pages; all models run client-side.
 - `config.json` — thresholds, tier ladder, checklist, bias factors.
-- `docs/data/storms.json` — hand-maintained storm catalog for the current season.
+- `docs/data/storms.json` — this season's storm catalog, generated (see "The storms page").
 - `docs/data/models.json`, `storms_2025_26.json` — written by `analysis/export_models.py`.
 - `forecast.py`, `fetchers.py` — the six-hour job; each feed is isolated by `safe()`.
 - `analysis/` — the data tools above, last winter's fits and `report.md`.
@@ -112,8 +121,13 @@ running out-of-sample check: this season's storms were not in the fit.
   `pip install requests python-dotenv pandas pyarrow numpy markdown`
 - Hosts the environment must allow: api.weather.gov, api.open-meteo.com, www.cnrfc.noaa.gov,
   cw3e.ucsd.edu, waterservices.usgs.gov, api.water.noaa.gov, rt.ambientweather.net
-  (`forecast.py`), and marin.onerain.com (`update_data.py bridge`). A blocked host shows
-  up as one failed source; the others still update.
+  (`forecast.py`), marin.onerain.com (`update_data.py bridge`),
+  previous-runs-api.open-meteo.com (`update_data.py forecast`) and dmathivanan.github.io
+  (to check the live site after a push). A blocked host shows up as one failed source; the
+  others still update.
+- Open-Meteo limits requests per address per day, and cloud sessions share addresses, so
+  `update_data.py forecast` can fail with "request limit used up". It keeps the last file;
+  run it again in a later session.
 - Ambient allows one request per second per key. `update_data.py` paces itself and retries
   a 429; a full backfill of a month is about 30 requests.
 - **Not in the clone:** `nowcast/mrms.sqlite` (~130 MB, over GitHub's file limit). The
