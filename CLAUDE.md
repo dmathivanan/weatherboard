@@ -36,8 +36,12 @@ rise", "how hard did the pump work" are answered from the raw data, not from mem
      it sent. Ross (USGS) is a continuous 15-minute record.
    - The pump log is a manual export. If `storm.py` says the log ends before or during
      the storm, say so and ask for a new export rather than reporting zero runs.
-   - "heaviest 5 min" comes from the rain counter; "station peak rate" is the console's
-     own smoothed reading and is lower. Quote the one that was asked for and name it.
+   - All times are Pacific. A storm's start is its first trace of rain, which can be hours
+     before the real rain: never put a peak rate next to the start time. Give every peak
+     its own time and its averaging window ("0.20 in in the 5 minutes ending 9:45 PM, a
+     rate of 2.4 in/hr for those 5 minutes; 1.5 in/hr over the heaviest 10").
+   - "heaviest 5 min" is a single 5-minute reading of the rain counter. "station peak
+     rate" is the console's own number, which is a 10-minute rate and so reads lower.
 4. If `update_data.py` changed files, commit them (`imports/`, `analysis/cache/`) and push,
    so the next session starts current. Data-only commits do not change the live site.
 

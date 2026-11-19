@@ -130,11 +130,23 @@ def describe(d, i, events, models):
             (("10min", 1), ("30min", 3), ("1h", 6), ("3h", 18), ("6h", 36), ("24h", 144))}
     w = slice(s, e)
     total = float(r10.loc[w].sum())
-    pk1h_t = roll["1h"].loc[w].idxmax()                    # start of the bin that closes the wettest hour
-    pk1h_end = pk1h_t + step
-    pk10_t = roll["10min"].loc[w].idxmax()                 # start of the heaviest 10 minutes
+    # The station stamps each 5-min record at the END of the interval it covers,
+    # so a value labelled 21:45 is the rain that fell 21:40-21:45, and the grid
+    # bin labelled 21:40 (records 21:40 and 21:45) is the rain of 21:35-21:45.
+    half = pd.Timedelta(minutes=5)
+    pk1h_t = roll["1h"].loc[w].idxmax()                    # label of the bin that closes the wettest hour
+    pk1h_end = pk1h_t + half
+    pk10_t = roll["10min"].loc[w].idxmax()                 # label of the heaviest 10-minute bin
+    pk10_from, pk10_to = pk10_t - half, pk10_t + half
     five = d["rain5"].loc[s:rain_end]
     rate = d["amb"]["rain_rate_inhr"].loc[s:rain_end].dropna()
+    # A storm "starts" at its first trace, which can be hours before the real
+    # rain. The middle 80% of the total says when it actually fell.
+    core_from = core_to = None
+    cum = five.cumsum()
+    if len(cum) and cum.iloc[-1] > 0:
+        core_from = cum[cum >= 0.1 * cum.iloc[-1]].index[0] - pd.Timedelta(minutes=5)
+        core_to = cum[cum >= 0.9 * cum.iloc[-1]].index[0]
 
     out = dict(
         start=local(s, "%Y-%m-%d %H:%M"), start_day=local(s, "%a %b %d %Y"),
@@ -143,11 +155,15 @@ def describe(d, i, events, models):
         in_progress=bool((data_end - rain_end) < pd.Timedelta(hours=DRY_GAP_H)),
         rain=dict(
             total_in=r(total),
+            middle_80pct_from=local(core_from), middle_80pct_to=local(core_to),
+            middle_80pct_hours=r((core_to - core_from).total_seconds() / 3600, 1) if core_to is not None else None,
+            peak_5min_in=r(five.max()) if len(five) else None,
             peak_10min_in=r(roll["10min"].loc[w].max()), peak_30min_in=r(roll["30min"].loc[w].max()),
             peak_1h_in=r(roll["1h"].loc[w].max()), wettest_hour_ended=local(pk1h_end),
             peak_3h_in=r(roll["3h"].loc[w].max()), peak_6h_in=r(roll["6h"].loc[w].max()),
             peak_24h_in=r(roll["24h"].loc[w].max()),
-            peak_10min_rate_inhr=r(roll["10min"].loc[w].max() * 6), heaviest_10min_began=local(pk10_t),
+            peak_10min_rate_inhr=r(roll["10min"].loc[w].max() * 6),
+            heaviest_10min_from=local(pk10_from), heaviest_10min_to=local(pk10_to, "%H:%M"),
             peak_5min_rate_inhr=r(five.max() * 12) if len(five) else None,
             peak_5min_at=local(five.idxmax()) if len(five) and five.max() > 0 else None,
             peak_station_rate_inhr=r(rate.max()) if len(rate) else None,
@@ -157,9 +173,9 @@ def describe(d, i, events, models):
         response_window_end=local(resp_end, "%Y-%m-%d %H:%M"),
     )
 
-    out["bridge_street_ft"] = creek(d["bridge"], s, resp_end, pk1h_t, pk10_t)
-    out["ross_stage_ft"] = creek(d["ross"]["ross_stage_ft"], s, resp_end, pk1h_t, pk10_t)
-    rf = creek(d["ross"]["ross_flow_cfs"], s, resp_end, pk1h_t, pk10_t)
+    out["bridge_street_ft"] = creek(d["bridge"], s, resp_end, pk1h_t, pk10_from)
+    out["ross_stage_ft"] = creek(d["ross"]["ross_stage_ft"], s, resp_end, pk1h_t, pk10_from)
+    rf = creek(d["ross"]["ross_flow_cfs"], s, resp_end, pk1h_t, pk10_from)
     out["ross_flow_cfs"] = None if rf is None else dict(before=r(rf["before"], 0), peak=r(rf["crest"], 0),
                                                          peak_at=rf["crest_at"])
 
@@ -207,11 +223,15 @@ def text(o):
     L = []
     A = L.append
     rn = o["rain"]
-    A(f"STORM  {o['start_day']}   rain {o['start'][11:]} -> {o['end']}  ({o['duration_h']} h)"
+    A(f"STORM  {o['start_day']}   first rain {o['start'][11:]} -> last rain {o['end']}  ({o['duration_h']} h, Pacific time)"
       + ("   ** STILL IN PROGRESS **" if o["in_progress"] else ""))
     A(f"  rain total          {rn['total_in']} in   (wetness index at start {rn['wetness_index_at_start_in']} in)")
-    A(f"  heaviest 5 min      {rn['peak_5min_rate_inhr']} in/hr at {rn['peak_5min_at']}")
-    A(f"  heaviest 10 min     {rn['peak_10min_rate_inhr']} in/hr  ({rn['peak_10min_in']} in), beginning {rn['heaviest_10min_began']}")
+    A(f"  when it fell        80% of it between {rn['middle_80pct_from']} and {rn['middle_80pct_to']} "
+      f"({rn['middle_80pct_hours']} h); the first rain can be a trace hours earlier")
+    A(f"  heaviest 5 min      {rn['peak_5min_in']} in in the 5 min ending {rn['peak_5min_at']}, "
+      f"a rate of {rn['peak_5min_rate_inhr']} in/hr for those 5 minutes only")
+    A(f"  heaviest 10 min     {rn['peak_10min_in']} in from {rn['heaviest_10min_from']} to {rn['heaviest_10min_to']}, "
+      f"a rate of {rn['peak_10min_rate_inhr']} in/hr")
     A(f"  heaviest hour       {rn['peak_1h_in']} in, ending {rn['wettest_hour_ended']}")
     A(f"  heaviest 3/6/24 h   {rn['peak_3h_in']} / {rn['peak_6h_in']} / {rn['peak_24h_in']} in")
     A(f"  station peak rate   {rn['peak_station_rate_inhr']} in/hr at {rn['peak_station_rate_at']}"
@@ -282,8 +302,8 @@ def main(argv):
             print(json.dumps({"data": fresh, "storms": rows}, indent=1))
             return
         print(f"{len(rows)} storms of {min_in} in or more"
-              + (f" since {local(since, '%Y-%m-%d')}" if since is not None else "") + " (local time)")
-        print(f"  {'start':<17}{'h':>5}{'rain':>6}{'pk 1h':>7}{'pk5 in/hr':>10}{'wet':>6}"
+              + (f" since {local(since, '%Y-%m-%d')}" if since is not None else "") + " (Pacific time)")
+        print(f"  {'first rain':<17}{'h':>5}{'rain':>6}{'pk 1h':>7}{'pk5 in/hr':>10}{'5 min ending':>18}{'wet':>6}"
               f"{'Bridge':>8}{'rise':>6}{'Ross':>7}{'runs':>6}{'gpm15':>7}{'model':>7}{'err':>7}")
         for o in rows:
             b, ro, s, m = o["bridge_street_ft"] or {}, o["ross_stage_ft"] or {}, o["sump"], o.get("planner_crest_model") or {}
@@ -292,11 +312,14 @@ def main(argv):
                 return f"{'-':>{w}}" if v is None else f"{v:>{w}.{p}f}"
             rn = o["rain"]
             print(f"  {o['start']:<17}{o['duration_h']:>5.1f}{f(rn['total_in'], 6)}{f(rn['peak_1h_in'], 7)}"
-                  f"{f(rn['peak_5min_rate_inhr'], 10)}{f(rn['wetness_index_at_start_in'], 6)}"
+                  f"{f(rn['peak_5min_rate_inhr'], 10)}{(rn['peak_5min_at'] or '-'):>18}"
+                  f"{f(rn['wetness_index_at_start_in'], 6)}"
                   f"{f(b.get('crest'), 8)}{f(b.get('rise'), 6)}{f(ro.get('crest'), 7)}"
                   f"{(str(s['runs']) if s['covered'] else '-'):>6}"
                   f"{f(s.get('peak_inflow_gpm_15min'), 7, 1)}{f(m.get('predicted_ft'), 7)}{f(m.get('error_ft'), 7)}"
                   + ("  *in progress" if o["in_progress"] else ""))
+        print("  first rain = the first trace, not the peak; pk5 = the heaviest 5 minutes as an hourly rate, "
+              "at the time in the next column")
         print("  rain in inches; wet = wetness index at the start; Bridge/Ross = crest ft; "
               "model/err = planner crest hindcast and observed minus predicted")
     else:
