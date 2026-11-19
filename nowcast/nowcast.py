@@ -14,11 +14,14 @@ with extra steps.
 
     python nowcast/nowcast.py run                    # one nowcast from live data
     python nowcast/nowcast.py replay Nov16 Dec24     # historical replay
+    python nowcast/nowcast.py sweep 30               # issue every 30 min over the store
     python nowcast/nowcast.py verify                 # score past nowcasts
+    python nowcast/nowcast.py score                  # re-print the scorecard
 """
 import json
 import sqlite3
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -41,6 +44,10 @@ MM = mrms.MM_PER_IN
 # margin at a quarter of the cells, which is the difference between a nowcast
 # that finishes inside the 4-minute cadence and one that does not.
 NOWCAST_HALF_KM = 125
+
+
+class SkipEnsemble(Exception):
+    """Raised to take the no-ensemble path out of make_nowcast."""
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS nowcasts (
@@ -141,13 +148,20 @@ def make_nowcast(stack, times, n_ens=N_ENS, lead=LEAD_MIN, step=STEP_MIN):
     det = from_dbr(det_in)
 
     ens = None
+    # The STEPS ensemble is ~130 s per nowcast at 2-minute frames (45 steps x 20
+    # members); the deterministic extrapolation is ~2 s. A verification sweep
+    # scores `det` only, so it asks for n_ens=0 and skips this entirely.
     try:
+        if not n_ens:
+            raise SkipEnsemble
         steps = nowcasts.get_method("steps")
         ens_in = steps(dbr[-3:], V, n_in, n_ens_members=n_ens, n_cascade_levels=6,
                        precip_thr=-10.0, kmperpixel=1.0, timestep=dt_min,
                        noise_method="nonparametric", vel_pert_method=None,
                        mask_method="incremental", seed=42)
         ens = from_dbr(ens_in)
+    except SkipEnsemble:
+        pass
     except Exception as e:  # noqa: BLE001
         print(f"  STEPS ensemble unavailable: {type(e).__name__}: {str(e)[:110]}")
 
@@ -219,9 +233,10 @@ def hrrr_house(hours=3):
 
 
 # ---------------------------------------------------------------- drive
-def run_one(con, issue_time, kind="live", with_hrrr=True, quiet=False):
+def run_one(con, issue_time, kind="live", with_hrrr=True, quiet=False,
+            n_ens=N_ENS):
     times, stack = load_crops(con, issue_time)
-    det, ens, V, dt_min, house = make_nowcast(stack, times)
+    det, ens, V, dt_min, house = make_nowcast(stack, times, n_ens=n_ens)
     s = sample_house(det, ens, dt_min, house)
     u, v, speed, direction = motion_summary(V)
     kmh = speed * (60 / dt_min)
@@ -300,6 +315,263 @@ def replay(names):
     con.close()
 
 
+# ---------------------------------------------------------------- sweep
+def crop_blocks(con, gap_min=4):
+    """Contiguous runs of stored crops, as [(t0, t1, n), ...].
+
+    `load_crops` refuses a stack that splices across a gap, so the only issue
+    times worth attempting are the ones sitting at least N_FRAMES deep inside
+    one of these runs.
+    """
+    rows = [r[0] for r in con.execute(
+        "SELECT valid_utc FROM frames WHERE product='PrecipRate'"
+        " AND crop IS NOT NULL ORDER BY valid_utc")]
+    if not rows:
+        return []
+    ts = [datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+          for t in rows]
+    blocks, cur = [], [ts[0]]
+    for a, b in zip(ts, ts[1:]):
+        if (b - a).total_seconds() <= gap_min * 60:
+            cur.append(b)
+        else:
+            blocks.append(cur)
+            cur = [b]
+    blocks.append(cur)
+    return [(b[0], b[-1], len(b)) for b in blocks]
+
+
+def sweep(cadence_min=30, kind="sweep", n_ens=0):
+    """Issue a nowcast every `cadence_min` across every contiguous crop block.
+
+    Two replayed episodes make an anecdote, not a score. Verification needs a
+    sample, and the stored crops already cover ~46 hours of the two storms, so
+    walk them on a fixed cadence and let `verify` sort out which ones mattered.
+
+    Stored under kind='sweep' and without the ensemble: these exist to be
+    scored, not read, and the two `replay` rows stay as they were.
+    """
+    con = connect()
+    blocks = crop_blocks(con)
+    lead_in = timedelta(minutes=N_FRAMES * 2)      # crops are 2-minutely
+    todo = []
+    for t0, t1, _ in blocks:
+        t = t0 + lead_in
+        while t <= t1:
+            todo.append(t)
+            t += timedelta(minutes=cadence_min)
+    print(f"{len(blocks)} crop blocks -> {len(todo)} issue points "
+          f"at {cadence_min}-min cadence", flush=True)
+    ok = skipped = failed = 0
+    t_start = time.time()
+    for k, issue in enumerate(todo, 1):
+        try:
+            run_one(con, issue, kind=kind, with_hrrr=False, quiet=True,
+                    n_ens=n_ens)
+            ok += 1
+        except ValueError as e:                     # not contiguous / too few
+            skipped += 1
+            print(f"  [{k}/{len(todo)}] {issue:%m-%d %H:%M}Z skipped: {e}", flush=True)
+        except Exception as e:                      # noqa: BLE001
+            failed += 1
+            print(f"  [{k}/{len(todo)}] {issue:%m-%d %H:%M}Z FAILED: "
+                  f"{type(e).__name__}: {str(e)[:90]}", flush=True)
+        if k % 10 == 0 or k == len(todo):
+            el = time.time() - t_start
+            print(f"  [{k}/{len(todo)}] {ok} stored  {el/k:.1f}s/nowcast  "
+                  f"eta {(len(todo)-k)*el/k/60:.0f} min", flush=True)
+    print(f"\nsweep done: {ok} stored, {skipped} skipped, {failed} failed "
+          f"({(time.time()-t_start)/60:.1f} min)")
+    con.close()
+
+
+# ---------------------------------------------------------------- verify
+VERIFY_LEADS = (10, 20, 30, 40, 50, 60, 70, 80, 90)
+WET_INHR = 0.06                  # 0.01 in inside a 10-minute slot
+
+
+def _gauge_inhr():
+    """Ambient gauge as a 10-minute step function in in/hr."""
+    import pandas as pd
+    tl = pd.read_parquet(HERE.parent / "analysis" / "timeline.parquet")
+    tl.index = pd.to_datetime(tl.index, utc=True)
+    # build_timeline sums rain into the bin, so the slot labelled T covers
+    # [T, T+10) and 6x turns the 10-minute total into a rate.
+    return tl["rain_in"] * 6.0
+
+
+def _radar_inhr(con):
+    """MRMS station pixel on the same 10-minute clock, in in/hr."""
+    import pandas as pd
+    df = pd.read_sql("SELECT valid_utc, station FROM frames"
+                     " WHERE product='PrecipRate' AND station IS NOT NULL"
+                     " ORDER BY valid_utc", con)
+    if df.empty:
+        return None
+    s = pd.Series(df.station.to_numpy() / MM,
+                  index=pd.to_datetime(df.valid_utc, utc=True))
+    return s.resample("10min").mean()
+
+
+def _slot_mean(step, t0, t1):
+    """Mean of a 10-minute step function over [t0, t1).
+
+    Issue times sit on the 2-minute radar clock, so the scoring window rarely
+    aligns with the gauge's 10-minute bins. Sampling the step function every
+    minute weights the straddled bins correctly. The tolerance stops a forward
+    fill from carrying a value across one of the store's month-long gaps.
+    """
+    import numpy as np
+    import pandas as pd
+    if step is None:
+        return float("nan")
+    idx = pd.date_range(t0, t1, freq="1min", inclusive="left", tz="UTC")
+    v = step.reindex(idx, method="ffill", tolerance=pd.Timedelta("10min"))
+    return float(v.mean()) if bool(v.notna().all()) else float("nan")
+
+
+def verify(kinds=("live", "replay", "sweep")):
+    """Score stored nowcasts against the gauge, and against MRMS itself."""
+    import numpy as np
+    con = connect()
+    gauge = _gauge_inhr()
+    radar = _radar_inhr(con)
+    rows = con.execute(
+        "SELECT issued_utc, kind, curve_json FROM nowcasts"
+        f" WHERE kind IN ({','.join('?' * len(kinds))}) ORDER BY issued_utc",
+        tuple(kinds)).fetchall()
+    if not rows:
+        print("no nowcasts stored")
+        return
+    out, n_nan = [], 0
+    for issued_utc, kind, curve_json in rows:
+        issued = datetime.strptime(issued_utc, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc)
+        curve = json.loads(curve_json)
+        leads = np.array([c["lead"] for c in curve], dtype=float)
+        det = np.array([c["det_inhr"] for c in curve], dtype=float)
+        for L in VERIFY_LEADS:
+            # The prediction is an instantaneous rate every 5 min; average it
+            # over the same 10-minute window the observation covers.
+            tt = np.arange(L - 9, L + 1, dtype=float)
+            pred = float(np.interp(tt, leads, det).mean())
+            t1 = issued + timedelta(minutes=L)
+            t0 = t1 - timedelta(minutes=10)
+            g = _slot_mean(gauge, t0, t1)
+            m = _slot_mean(radar, t0, t1)
+            if np.isnan(g):
+                n_nan += 1
+                continue
+            out.append((issued_utc, kind, L, pred, g,
+                        None if np.isnan(m) else m))
+    con.executemany(
+        "INSERT OR REPLACE INTO verification (issued_utc,kind,lead_min,"
+        "pred_inhr,obs_gauge_inhr,obs_mrms_inhr) VALUES (?,?,?,?,?,?)", out)
+    con.commit()
+    print(f"verified {len(rows)} nowcasts -> {len(out)} scored pairs"
+          + (f" ({n_nan} dropped: no gauge coverage)" if n_nan else ""))
+    verify_report(con)
+    con.close()
+
+
+def verify_report(con=None):
+    """Skill by lead time, against persistence.
+
+    Persistence -- "it keeps doing what it is doing now" -- is the baseline a
+    nowcast has to beat. Bias and RMSE alone can look respectable simply because
+    most 10-minute slots are dry.
+    """
+    import numpy as np
+    import pandas as pd
+    close = con is None
+    con = con or connect()
+    df = pd.read_sql("SELECT * FROM verification", con)
+    if df.empty:
+        print("verification table is empty -- run `verify` first")
+        if close:
+            con.close()
+        return
+
+    # Persistence for an issue time is the observed rate in the 10 minutes
+    # ending at issue, which is the last thing the forecaster could have seen.
+    gauge = _gauge_inhr()
+    base = {u: _slot_mean(gauge,
+                          datetime.strptime(u, "%Y-%m-%dT%H:%M:%SZ").replace(
+                              tzinfo=timezone.utc) - timedelta(minutes=10),
+                          datetime.strptime(u, "%Y-%m-%dT%H:%M:%SZ").replace(
+                              tzinfo=timezone.utc))
+            for u in df.issued_utc.unique()}
+    df["persist_inhr"] = df.issued_utc.map(base)
+
+    print("=" * 82)
+    print("NOWCAST VERIFICATION AT THE HOUSE PIXEL")
+    print("=" * 82)
+    print(f"  {df.issued_utc.nunique()} nowcasts, {len(df)} scored pairs")
+    print(f"  {df.issued_utc.min()} -> {df.issued_utc.max()}")
+    print("  units are in/hr averaged over the 10 min ending at the lead")
+
+    print()
+    print("  BY LEAD TIME  (vs the Ambient gauge)")
+    print(f"    {'lead':>5}{'n':>6}{'obs':>8}{'pred':>8}{'bias':>9}"
+          f"{'MAE':>8}{'RMSE':>8}{'r':>7}{'persist':>9}{'skill':>8}")
+    for L, g in df.groupby("lead_min"):
+        d = g.pred_inhr - g.obs_gauge_inhr
+        rmse = float(np.sqrt((d ** 2).mean()))
+        pv = g.dropna(subset=["persist_inhr"])
+        prmse = float(np.sqrt(((pv.persist_inhr - pv.obs_gauge_inhr) ** 2).mean())) \
+            if len(pv) else float("nan")
+        skill = 1 - rmse / prmse if prmse else float("nan")
+        r = float(np.corrcoef(g.pred_inhr, g.obs_gauge_inhr)[0, 1]) \
+            if g.obs_gauge_inhr.std() > 0 and g.pred_inhr.std() > 0 else float("nan")
+        print(f"    {L:>5}{len(g):>6}{g.obs_gauge_inhr.mean():>8.4f}"
+              f"{g.pred_inhr.mean():>8.4f}{d.mean():>+9.4f}{d.abs().mean():>8.4f}"
+              f"{rmse:>8.4f}{r:>7.3f}{prmse:>9.4f}{skill:>+8.3f}")
+
+    wet = df[df.obs_gauge_inhr >= WET_INHR]
+    if len(wet):
+        print()
+        print(f"  RESTRICTED TO SLOTS THE GAUGE CALLED WET  (n={len(wet)})")
+        print(f"    {'lead':>5}{'n':>6}{'obs':>8}{'pred':>8}{'bias':>9}{'MAE':>8}{'r':>7}")
+        for L, g in wet.groupby("lead_min"):
+            d = g.pred_inhr - g.obs_gauge_inhr
+            r = float(np.corrcoef(g.pred_inhr, g.obs_gauge_inhr)[0, 1]) \
+                if len(g) > 2 and g.obs_gauge_inhr.std() > 0 and g.pred_inhr.std() > 0 \
+                else float("nan")
+            print(f"    {L:>5}{len(g):>6}{g.obs_gauge_inhr.mean():>8.4f}"
+                  f"{g.pred_inhr.mean():>8.4f}{d.mean():>+9.4f}"
+                  f"{d.abs().mean():>8.4f}{r:>7.3f}")
+
+    print()
+    print(f"  DETECTION OF A WET 10-MIN SLOT  (>= 0.01 in, i.e. {WET_INHR} in/hr)")
+    print(f"    {'lead':>5}{'hit':>6}{'miss':>6}{'FA':>6}{'POD':>7}{'FAR':>7}{'CSI':>7}")
+    for L, g in df.groupby("lead_min"):
+        gw = g.obs_gauge_inhr >= WET_INHR
+        pw = g.pred_inhr >= WET_INHR
+        hit = int((gw & pw).sum())
+        miss = int((gw & ~pw).sum())
+        fa = int((~gw & pw).sum())
+        pod = hit / (hit + miss) if hit + miss else float("nan")
+        far = fa / (hit + fa) if hit + fa else float("nan")
+        csi = hit / (hit + miss + fa) if hit + miss + fa else float("nan")
+        print(f"    {L:>5}{hit:>6}{miss:>6}{fa:>6}{pod:>7.3f}{far:>7.3f}{csi:>7.3f}")
+
+    mr = df.dropna(subset=["obs_mrms_inhr"])
+    if len(mr):
+        print()
+        print("  CEILING CHECK -- the same score against MRMS's own station pixel")
+        print("  (how well the nowcast reproduces the radar it was built from,")
+        print("   which bounds what it could ever score against the gauge)")
+        print(f"    {'lead':>5}{'n':>6}{'bias':>10}{'RMSE':>9}{'r':>7}")
+        for L, g in mr.groupby("lead_min"):
+            d = g.pred_inhr - g.obs_mrms_inhr
+            r = float(np.corrcoef(g.pred_inhr, g.obs_mrms_inhr)[0, 1]) \
+                if g.obs_mrms_inhr.std() > 0 and g.pred_inhr.std() > 0 else float("nan")
+            print(f"    {L:>5}{len(g):>6}{d.mean():>+10.4f}"
+                  f"{float(np.sqrt((d**2).mean())):>9.4f}{r:>7.3f}")
+    if close:
+        con.close()
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "run"
     con = connect()
@@ -309,3 +581,12 @@ if __name__ == "__main__":
         print(fmt(s))
     elif cmd == "replay":
         replay(sys.argv[2:] or list(EPISODES))
+    elif cmd == "sweep":
+        sweep(int(sys.argv[2]) if len(sys.argv) > 2 else 30)
+    elif cmd == "verify":
+        verify()
+    elif cmd == "score":
+        verify_report()
+    else:
+        print(f"unknown command {cmd!r}; "
+              "expected run | replay | sweep | verify | score")
