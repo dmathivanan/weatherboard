@@ -242,12 +242,12 @@ def peak(hourly, key, hours):
     return r3(max(vals)) if vals else None
 
 
-def storm_window(hourly, key="omc_in", lo_h=0, hi_h=PREFILL_H):
+def storm_window(hourly, key="omc_in", lo_h=0, hi_h=PREFILL_H, thr=None):
     """The wettest 48 h between lo_h and hi_h (bias-corrected Open-Meteo by
     default), and the onset / heaviest-hour / end inside it. Everything is
     editable on the page; this just gives the sliders a starting point."""
     win = P.get("storm_window_h", 48)
-    thr = P.get("rain_threshold_in", 0.02)
+    thr = P.get("rain_threshold_in", 0.02) if thr is None else thr
     hourly = [h for h in hourly if lo_h <= h["lead_h"] < hi_h]
     vals = [h[key] or 0 for h in hourly]
     if len(vals) < win:
@@ -275,13 +275,41 @@ def storm_window(hourly, key="omc_in", lo_h=0, hi_h=PREFILL_H):
     tot_from_onset = sum(vals[onset:onset + win])
     seg = hourly[onset:onset + win]
     probs = [h["prob"] for h in seg if h["prob"] is not None and (h[key] or 0) >= thr]
+    om_seg = [h["om_in"] for h in seg if h["om_in"] is not None]
     return {
         "total_48h_in": r2(tot_from_onset), "peak_1h_inhr": r3(vals[pk]),
-        "raw_total_48h_in": r2(sum((h["om_in"] or 0) for h in seg)),
+        "raw_total_48h_in": r2(sum(om_seg)) if om_seg else None,
         "onset": hourly[onset]["t"], "peak_at": hourly[pk]["t"], "end": hourly[end]["t"],
         "nws_total_in_window": r2(sum((h["nws_in"] or 0) for h in seg)),
         "pop_mean_pct": round(sum(probs) / len(probs)) if probs else None,
         "window_start_lead_h": hourly[onset]["lead_h"], "dry": False,
+    }
+
+
+def has_values(hourly, key, hi_h=PREFILL_H):
+    return any(h[key] is not None for h in hourly if h["lead_h"] < hi_h)
+
+
+def nws_peak(hourly, window):
+    """NWS spreads each period's QPF evenly over its hours (usually 6), so the
+    NWS hourly max is a 6-h mean and reads low as a peak rate. Estimate the peak
+    hour as the heaviest 6 h inside the storm window / 6 x the median ratio of
+    peak 1 h to heaviest-6-h mean over last winter's storms (config.json,
+    planner.nws_peak_1h_over_6h_mean). The heaviest hour is put at the start of
+    that 6-h block, since NWS cannot say where inside it the burst falls."""
+    ratio = P.get("nws_peak_1h_over_6h_mean", 2.5)
+    win = P.get("storm_window_h", 48)
+    start = window["window_start_lead_h"]
+    seg = [h for h in hourly if start <= h["lead_h"] < min(start + win, PREFILL_H)]
+    vals = [h["nws_in"] or 0 for h in seg]
+    if not vals:
+        return {}
+    best = max(range(max(1, len(vals) - 5)), key=lambda i: sum(vals[i:i + 6]))
+    r6 = sum(vals[best:best + 6])
+    return {
+        "peak_1h_inhr": r3(r6 / 6 * ratio), "peak_at": seg[best]["t"],
+        "nws_even_peak_1h_inhr": r3(max(vals)), "nws_heaviest_6h_in": r2(r6),
+        "peak_method": f"heaviest 6 h of NWS grid QPF / 6 x {ratio} (last winter's median peak-hour ratio)",
     }
 
 
@@ -304,7 +332,25 @@ def main():
     wet = wetness_from_ledger(ledger, usgs, models)
 
     hourly = build_hourly(om, nws)
-    window = storm_window(hourly)                                   # next 72 h, bias-corrected: the prefill
+    # The prefill: the next 72 h of bias-corrected Open-Meteo. If Open-Meteo is
+    # down, fall back to the NWS grid (raw; the bias factors are Open-Meteo's),
+    # rather than reading the missing hours as a dry forecast.
+    if has_values(hourly, "omc_in"):
+        source = "open_meteo_corrected"
+        window = storm_window(hourly)
+    elif has_values(hourly, "nws_in"):
+        source = "nws_grid"
+        # NWS hours are 6-h means: count one as wet when its estimated peak hour
+        # (mean x the same ratio nws_peak uses) clears the wet-hour threshold
+        ratio = P.get("nws_peak_1h_over_6h_mean", 2.5)
+        window = storm_window(hourly, key="nws_in", thr=P.get("rain_threshold_in", 0.02) / ratio)
+        if window and not window.get("dry"):
+            window.update(nws_peak(hourly, window))
+    else:
+        source, window = None, None
+    if window is not None:
+        window["source"] = source
+        window["bias_corrected"] = source == "open_meteo_corrected"
     outlook = storm_window(hourly, key="om_in", lo_h=PREFILL_H, hi_h=HORIZON_H)   # days 4-7, raw: shown, not prefilled
     if outlook and not outlook.get("dry"):
         cn_pts = (cnrfc or {}).get("points") or {}
@@ -357,6 +403,10 @@ def main():
         },
         "station": ambient,
         "prefill": {
+            "source": source,
+            "bias_corrected": source == "open_meteo_corrected",
+            "peak_method": (window or {}).get("peak_method"),
+            "nws_even_peak_1h_inhr": (window or {}).get("nws_even_peak_1h_inhr"),
             "total_48h_in": (window or {}).get("total_48h_in"),
             "peak_1h_inhr": (window or {}).get("peak_1h_inhr"),
             "onset": (window or {}).get("onset"), "peak_at": (window or {}).get("peak_at"),
@@ -378,7 +428,7 @@ def main():
         "errors": errors,
     }
     (DATA / "forecast.json").write_text(json.dumps(out, indent=1, default=str), encoding="utf-8")
-    print(f"{now.isoformat()} 48h={out['prefill']['total_48h_in']} in "
+    print(f"{now.isoformat()} source={source} 48h={out['prefill']['total_48h_in']} in "
           f"peak={out['prefill']['peak_1h_inhr']} in/hr api={wet['api_in']} ({wet['category']}, "
           f"{wet['source']}) ar={out['prefill']['ar_category']} errors={errors}")
 

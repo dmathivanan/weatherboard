@@ -46,6 +46,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
 <header class="top"></header>
 <main>
   <p class="stamp" id="stamp">Loading forecast…</p>
+  <p class="warn" id="srcwarn" hidden></p>
 
   <div class="tier quiet" id="tier"><b>Quiet</b><span class="tier-reasons" id="reasons"></span></div>
 
@@ -155,12 +156,24 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   } else {
     const age = (Date.now() - Date.parse(F.generated_utc)) / 3600e3;
     const sw = F.storm || {}, ol = F.outlook || {};
-    const winTxt = sw.dry || !sw.onset ? ` · no rain in the next ${F.prefill_horizon_h || 72} h, sliders start at zero`
+    const nwsSrc = pre.source === "nws_grid";
+    const winTxt = !pre.source ? ` · no rain forecast available (Open-Meteo and NWS both down), sliders start at zero`
+      : sw.dry || !sw.onset ? ` · no rain in the next ${F.prefill_horizon_h || 72} h${nwsSrc ? " (NWS grid)" : ""}, sliders start at zero`
+      : nwsSrc ? ` · pre-filled from the NWS grid's wettest 48 h inside the next ${F.prefill_horizon_h || 72} h (rain from ${whenStr(parseLocal(sw.onset))})`
       : ` · pre-filled from the wettest 48 h inside the next ${F.prefill_horizon_h || 72} h (rain from ${whenStr(parseLocal(sw.onset))}${sw.pop_mean_pct != null ? ", " + sw.pop_mean_pct + " % chance" : ""}; NWS grid has ${fmt(sw.nws_total_in_window)}" there)`;
     const olTxt = ol.onset && !ol.dry ? ` · outlook beyond 3 days: ${fmt(ol.total_48h_in)}" raw around ${whenStr(parseLocal(ol.onset))}${ol.pop_mean_pct != null ? ", " + ol.pop_mean_pct + " % chance" : ""}, NWS ${fmt(ol.nws_total_in_window)}", not pre-filled` : "";
     st.textContent = `Forecast inputs from ${whenStr(Date.parse(F.generated_utc))} (${age.toFixed(1)} h ago)` + winTxt + olTxt
       + (Object.keys(F.errors || {}).length ? " · feeds down: " + Object.keys(F.errors).join(", ") : "");
     st.classList.toggle("stale", age > 9);
+    if (nwsSrc) {
+      const sw2 = $("srcwarn");
+      sw2.hidden = false;
+      sw2.textContent = "Open-Meteo is down, so the sliders start from the NWS grid, not the bias-corrected Open-Meteo figure. "
+        + "NWS totals are uncorrected (the ×bias factors were measured on Open-Meteo, which ran dry here)."
+        + (pre.nws_even_peak_1h_inhr != null && !sw.dry
+          ? ` NWS spreads rain evenly over 6-h periods, so its own hourly peak is ${fmt(pre.nws_even_peak_1h_inhr, 2)} in/hr; the peak rate is estimated as ${pre.peak_method}.`
+          : "");
+    }
   }
 
   // ---- inputs ----

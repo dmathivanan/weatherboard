@@ -177,6 +177,8 @@
     "lag_peak_rain_to_crest_h": 1.5,
     "storm_window_h": 48,
     "rain_threshold_in": 0.02,
+    "nws_peak_1h_over_6h_mean": 2.5,
+    "_nws_peak_note": "Used only when Open-Meteo is down and the prefill falls back to the NWS grid. NWS spreads each period's QPF evenly over its hours (usually 6), so its hourly max is a 6-h mean. forecast.py estimates the peak hour as the heaviest 6 h / 6 x this factor: the median per-storm ratio of peak 1 h to the heaviest-6-h mean over last winter's 24 calibration storms (events.csv; IQR 2.0-3.1, range 1.4-3.9).",
     "checklist": [
       {
         "task": "Clear gutters, downspouts and the north-side yard drain",

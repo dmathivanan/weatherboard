@@ -54,7 +54,7 @@ ul.small li{margin:4px 0}
     setTierChip(out.tier.tier);
     $("now").innerHTML =
       `<span>Inputs <b>${whenStr(Date.parse(F.generated_utc))}</b></span>` +
-      `<span>Next 48 h <b>${fmt(p.total_48h_in)}"</b>${p.onset ? " from " + whenStr(parseLocal(p.onset)) : ""}</span>` +
+      `<span>Next 48 h <b>${fmt(p.total_48h_in)}"</b>${p.onset ? " from " + whenStr(parseLocal(p.onset)) : ""}${p.source === "nws_grid" ? " (NWS grid, Open-Meteo down)" : ""}</span>` +
       `<span>Peak <b>${fmt(p.peak_1h_inhr)} in/hr</b></span>` +
       `<span>Wetness <b>${fmt(w.api_in)} in</b> (${w.category})</span>` +
       `<span>AR scale <b>${p.ar_category ?? "–"}</b></span>` +
