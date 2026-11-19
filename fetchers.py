@@ -59,12 +59,29 @@ def get_backoff(url, headers=UA, attempts=3, timeout=25, **kw):
     raise last
 
 
+_SECRET_ENV = ("AMBIENT_APP_KEY", "AMBIENT_API_KEY", "FLOODBOARD_CONTACT")
+
+
+def err_text(e, limit=200):
+    """An exception as a short string that is safe to publish. Error strings
+    land in forecast.json, which is committed to a public repo, and requests
+    puts the full URL in its HTTP errors, Ambient's keys included. So drop every
+    query string, and blank any secret value that still shows up."""
+    s = f"{type(e).__name__}: {e}"
+    s = re.sub(r"\?[^\s'\"()]*=[^\s'\"()]*", "?<query redacted>", s)
+    for name in _SECRET_ENV:
+        v = os.environ.get(name)
+        if v and len(v) >= 6:
+            s = s.replace(v, "<redacted>")
+    return s[:limit]
+
+
 def safe(fn, *a, **kw):
     """Run a fetcher; return (result, error) so one failure never kills the run."""
     try:
         return fn(*a, **kw), None
     except Exception as e:  # noqa: BLE001
-        return None, f"{type(e).__name__}: {e}"[:200]
+        return None, err_text(e)
 
 
 # ---------------------------------------------------------------- Ambient
@@ -243,7 +260,7 @@ def fetch_model_qpf():
             out[f"qpf_{key}_{hours}h_in"] = round(sum(pr), 3)
         except Exception as e:  # noqa: BLE001
             out[f"qpf_{key}_{hours}h_in"] = None
-            out.setdefault("errors", {})[key] = f"{type(e).__name__}: {e}"[:120]
+            out.setdefault("errors", {})[key] = err_text(e, 120)
     return out
 
 
@@ -293,7 +310,7 @@ def fetch_cnrfc_qpf():
         for k, v in d46.items():
             periods.setdefault(k, []).extend(v)
     except Exception as e:  # noqa: BLE001
-        err = f"{type(e).__name__}: {e}"[:120]
+        err = err_text(e, 120)
     out = {"issued_utc": issued.isoformat(), "points": {}, "source": prods}
     if err:
         out["days_4_6_error"] = err
