@@ -2,16 +2,13 @@
 .env
 ambientweather.env.txt
 
-# Personal bulk data — kept local, not in the public repo
-# (raw Ambient/PumpFuse exports + winter creek pull; used for offline calibration)
-imports/*.csv
+# The raw Ambient console export stays local: it carries indoor readings the
+# analysis never uses. imports/station.csv is its rain columns, and is tracked.
+imports/AWN.csv
 
 # Python
 __pycache__/
 *.pyc
-
-# Raw API responses, re-fetched on demand by the analysis scripts
-analysis/cache/
 
 # MRMS store and the copied ecCodes binary — both regenerable
 nowcast/mrms.sqlite

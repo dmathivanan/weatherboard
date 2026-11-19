@@ -58,7 +58,7 @@ pf["cycle_duty"] = pf["dur"] / pf["cycle_s"]
 tl = pd.read_parquet(HERE / "timeline.parquet")
 tl.index = pd.to_datetime(tl.index, utc=True)
 
-awn = pd.read_csv(ROOT / "imports" / "AWN.csv", encoding="utf-8-sig", low_memory=False)
+awn = pd.read_csv(ROOT / "imports" / "station.csv", low_memory=False)
 at = pd.to_datetime(awn["Date"], utc=True, format="ISO8601")
 awn = awn.assign(ts=at).sort_values("ts").drop_duplicates("ts").set_index("ts")
 daily = pd.to_numeric(awn["Daily Rain (in)"], errors="coerce").ffill()

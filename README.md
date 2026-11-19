@@ -14,6 +14,8 @@ clock-time deadlines, all computed in the browser so the sliders are live.
 ```
 config.json            thresholds, pump specs, town stage lines, bias factors, checklist
 analysis/              last winter's data and the fitted models (see analysis/report.md)
+  update_data.py       extends the raw inputs in imports/ and analysis/cache/ to now
+  storm.py             what happened in a storm: rain, creek, sump (see CLAUDE.md)
   export_models.py     -> docs/data/models.json         coefficients the pages run
                        -> docs/data/storms_2025_26.json the calibration catalog
 fetchers.py            one function per feed; raises on failure, isolated by safe()
@@ -102,6 +104,11 @@ alerts cover the pump.
 
 Re-run `python analysis/export_models.py` after any refit (it needs pandas and
 pyarrow and reads `analysis/timeline.parquet` + `events.csv`).
+
+The raw inputs are tracked: station rain (`imports/station.csv`), the pump log
+(`imports/PumpFuse.csv`), Bridge Street stage and the USGS month files.
+`python analysis/update_data.py` brings them up to now; new pump runs come from
+an app export merged with `update_data.py pump <file>`.
 
 ## What was retired
 

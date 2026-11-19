@@ -3,7 +3,8 @@
 Layer 0 — one time-aligned dataset for Nov 2025 through Apr 2026.
 
 Sources and their native resolution:
-  Ambient (imports/AWN.csv)          5 min, console export
+  Ambient (imports/station.csv)      5 min; the console export's rain columns,
+                                     extended from the API by update_data.py
   PumpFuse (imports/PumpFuse.csv)    event rows, one per pump run, 1 s stamps
   Bridge Street (imports/*.csv)      event-based: ~15 min in storms, 12 h when flat
   USGS 11460000                      15 min, instantaneous-values API
@@ -89,12 +90,15 @@ def native_res_min(idx: pd.DatetimeIndex):
 
 
 # --------------------------------------------------------------- loaders
-def load_ambient():
-    df = pd.read_csv(IMPORTS / "AWN.csv", encoding="utf-8-sig", low_memory=False)
-    # 'Date' carries an explicit UTC offset; 'Simple Date' is naive local.
+def load_ambient(since=None):
+    """Station rain. `since` defaults to the winter 2025-26 warm-up start; other
+    callers (storm.py) pass their own so the same loader serves any season."""
+    since = WARMUP_START if since is None else since
+    df = pd.read_csv(IMPORTS / "station.csv", low_memory=False)
+    # 'Date' is UTC (the raw console export carried a local offset).
     t = pd.to_datetime(df["Date"], utc=True, format="ISO8601")
     df = df.assign(ts=t).sort_values("ts").drop_duplicates("ts").set_index("ts")
-    df = df[df.index >= WARMUP_START]
+    df = df[df.index >= since]
 
     out = pd.DataFrame(index=df.index)
     out["rain_rate_inhr"] = pd.to_numeric(df["Rain Rate (in/hr)"], errors="coerce")
@@ -126,7 +130,8 @@ def load_ambient():
     return out, meta
 
 
-def load_pumpfuse():
+def load_pumpfuse(since=None):
+    since = WARMUP_START if since is None else since
     df = pd.read_csv(IMPORTS / "PumpFuse.csv", sep="\t")
     naive = pd.to_datetime(df["Time"])
     # Device stamps wall-clock local time with no offset. DST end (2 Nov 2025)
@@ -134,7 +139,7 @@ def load_pumpfuse():
     # spring-forward stamp rather than dropping runs.
     ts = naive.dt.tz_localize(TZ, ambiguous=True, nonexistent="shift_forward").dt.tz_convert("UTC")
     df = df.assign(ts=ts).sort_values("ts").set_index("ts")
-    df = df[df.index >= WARMUP_START]
+    df = df[df.index >= since]
     df["Duration"] = pd.to_numeric(df["Duration"], errors="coerce")
     meta = dict(runs=len(df), res_min=native_res_min(df.index),
                 gaps=gaps_over(df.index), total_runtime_s=float(df["Duration"].sum()))
@@ -150,14 +155,22 @@ def load_bridge():
     return s, meta
 
 
-def load_usgs():
-    """Instantaneous values, monthly chunks, cached to analysis/cache/."""
+def load_usgs(since=None, months=None, refresh_current=False):
+    """Instantaneous values, monthly chunks, cached to analysis/cache/.
+
+    The default months are winter 2025-26, which the fitted models were built
+    on. A month still in progress is re-fetched only when asked
+    (`refresh_current`), so a read never needs the network once it is cached.
+    """
+    since = WARMUP_START if since is None else since
     frames = []
-    months = pd.date_range("2025-10-01", "2026-04-01", freq="MS")
+    if months is None:
+        months = pd.date_range("2025-10-01", "2026-04-01", freq="MS")
+    this_month = pd.Timestamp.now(tz="UTC").strftime("%Y%m")
     for m in months:
         end = (m + pd.offsets.MonthEnd(1)).strftime("%Y-%m-%d")
         f = CACHE / f"usgs_{m:%Y%m}.json"
-        if not f.exists():
+        if not f.exists() or (refresh_current and f"{m:%Y%m}" == this_month):
             r = requests.get(
                 "https://waterservices.usgs.gov/nwis/iv/",
                 params={"format": "json", "sites": USGS_SITE,
@@ -189,7 +202,7 @@ def load_usgs():
             s = pd.concat(parts).sort_index()
             out[name] = s[~s.index.duplicated()]
     df = pd.DataFrame(out).sort_index()
-    df = df[df.index >= WARMUP_START]
+    df = df[df.index >= since]
     meta = dict(rows=len(df), res_min=native_res_min(df.index),
                 gaps=gaps_over(df.dropna(how="all").index))
     return df, meta
