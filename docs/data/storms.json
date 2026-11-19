@@ -35,5 +35,191 @@
   },
   "notes": ""
  },
- "storms": []
+ "storms": [
+  {
+   "id": "2026-27-01",
+   "season": "2026-27",
+   "name": "Nov 3",
+   "start_local": "2026-11-03T08:00",
+   "end_local": "2026-11-04T00:00",
+   "forecast": {
+    "issued_local": "2026-11-02T22:57",
+    "total_48h_in": 2.24,
+    "peak_1h_inhr": 2.07,
+    "api_in": 0.11,
+    "ar_category": 1,
+    "flood_watch": false,
+    "source": "forecast.json prefill, replayed after the storm"
+   },
+   "predicted": {
+    "bridge_peak_ft": 3.31,
+    "lo_ft": 1.81,
+    "hi_ft": 4.82,
+    "ross_equivalent_ft": 6.87,
+    "sump_run_s": 700,
+    "tier": "emergency"
+   },
+   "actual": {
+    "total_rain_in": 0.8,
+    "peak_1h_in": 0.18,
+    "peak_10min_in": 0.08,
+    "api_at_start": 0.08,
+    "bridge_peak_ft": 1.62,
+    "ross_peak_ft": 4.66,
+    "sump_peak_run_s": 18.0,
+    "sump_peak_inflow_gpm": 4.8,
+    "sump_runs": 39,
+    "tier_reached": "quiet"
+   },
+   "notes": "Actuals from analysis/storm.py. No plan was saved before this storm: the forecast and prediction are the six-hourly forecast of 2026-11-02 22:57 PST run through the planner afterwards. Tier reached is the config ladder applied to the observed creek, run length and 10-minute rain rate. The forecast's peak hour was 2.07 in/hr; 0.18 in fell."
+  },
+  {
+   "id": "2026-27-02",
+   "season": "2026-27",
+   "name": "Nov 13",
+   "start_local": "2026-11-13T02:10",
+   "end_local": "2026-11-13T16:50",
+   "forecast": {
+    "issued_local": "2026-11-12T22:55",
+    "total_48h_in": 0.92,
+    "peak_1h_inhr": 0.42,
+    "api_in": 0.35,
+    "ar_category": 3,
+    "flood_watch": false,
+    "source": "forecast.json prefill, replayed after the storm"
+   },
+   "predicted": {
+    "bridge_peak_ft": 2.16,
+    "lo_ft": 0.66,
+    "hi_ft": 3.67,
+    "ross_equivalent_ft": 5.37,
+    "sump_run_s": 18,
+    "tier": "watch"
+   },
+   "actual": {
+    "total_rain_in": 1.65,
+    "peak_1h_in": 0.63,
+    "peak_10min_in": 0.19,
+    "api_at_start": 0.34,
+    "bridge_peak_ft": 3.38,
+    "ross_peak_ft": 7.08,
+    "sump_peak_run_s": 27.0,
+    "sump_peak_inflow_gpm": 22.4,
+    "sump_runs": 76,
+    "tier_reached": "prepare"
+   },
+   "notes": "Actuals from analysis/storm.py. No plan was saved before this storm: the forecast and prediction are the six-hourly forecast of 2026-11-12 22:55 PST run through the planner afterwards. Tier reached is the config ladder applied to the observed creek, run length and 10-minute rain rate."
+  },
+  {
+   "id": "2026-27-03",
+   "season": "2026-27",
+   "name": "Nov 15",
+   "start_local": "2026-11-15T11:30",
+   "end_local": "2026-11-15T21:20",
+   "forecast": {
+    "issued_local": "2026-11-14T22:45",
+    "total_48h_in": 1.01,
+    "peak_1h_inhr": 0.19,
+    "api_in": 1.87,
+    "ar_category": 3,
+    "flood_watch": false,
+    "source": "forecast.json prefill, replayed after the storm"
+   },
+   "predicted": {
+    "bridge_peak_ft": 2.75,
+    "lo_ft": 1.25,
+    "hi_ft": 4.26,
+    "ross_equivalent_ft": 6.14,
+    "sump_run_s": 16,
+    "tier": "watch"
+   },
+   "actual": {
+    "total_rain_in": 0.66,
+    "peak_1h_in": 0.19,
+    "peak_10min_in": 0.05,
+    "api_at_start": 1.6,
+    "bridge_peak_ft": 1.78,
+    "ross_peak_ft": 4.84,
+    "sump_peak_run_s": 16.0,
+    "sump_peak_inflow_gpm": 5.9,
+    "sump_runs": 34,
+    "tier_reached": "quiet"
+   },
+   "notes": "Actuals from analysis/storm.py. No plan was saved before this storm: the forecast and prediction are the six-hourly forecast of 2026-11-14 22:45 PST run through the planner afterwards. Tier reached is the config ladder applied to the observed creek, run length and 10-minute rain rate."
+  },
+  {
+   "id": "2026-27-04",
+   "season": "2026-27",
+   "name": "Nov 18 morning",
+   "start_local": "2026-11-18T00:50",
+   "end_local": "2026-11-18T10:30",
+   "forecast": {
+    "issued_local": "2026-11-17T23:40",
+    "total_48h_in": 5.35,
+    "peak_1h_inhr": 0.85,
+    "api_in": 2.49,
+    "ar_category": 2,
+    "flood_watch": false,
+    "source": "forecast.json prefill, replayed after the storm"
+   },
+   "predicted": {
+    "bridge_peak_ft": 7,
+    "lo_ft": 5.49,
+    "hi_ft": 8.5,
+    "ross_equivalent_ft": 11.67,
+    "sump_run_s": 27,
+    "tier": "act"
+   },
+   "actual": {
+    "total_rain_in": 3.36,
+    "peak_1h_in": 0.64,
+    "peak_10min_in": 0.17,
+    "api_at_start": 1.76,
+    "bridge_peak_ft": 3.96,
+    "ross_peak_ft": 8.38,
+    "sump_peak_run_s": 30.0,
+    "sump_peak_inflow_gpm": 33.9,
+    "sump_runs": 216,
+    "tier_reached": "prepare"
+   },
+   "notes": "Actuals from analysis/storm.py. No plan was saved before this storm: the forecast and prediction are the six-hourly forecast of 2026-11-17 23:40 PST run through the planner afterwards. Tier reached is the config ladder applied to the observed creek, run length and 10-minute rain rate. Bridge Street sent no reading from 8:34 to 9:57 AM while Ross crested at 9:00 AM; Ross implies about 4.5 ft, so 3.96 is likely low. The 48 h forecast covered this storm and the evening one together."
+  },
+  {
+   "id": "2026-27-05",
+   "season": "2026-27",
+   "name": "Nov 18 evening",
+   "start_local": "2026-11-18T17:40",
+   "end_local": "2026-11-19T06:50",
+   "forecast": {
+    "issued_local": "2026-11-18T12:40",
+    "total_48h_in": 0.78,
+    "peak_1h_inhr": 0.32,
+    "api_in": 5.64,
+    "ar_category": 4,
+    "flood_watch": false,
+    "source": "forecast.json prefill, replayed after the storm"
+   },
+   "predicted": {
+    "bridge_peak_ft": 3.8,
+    "lo_ft": 2.3,
+    "hi_ft": 5.31,
+    "ross_equivalent_ft": 7.51,
+    "sump_run_s": 18,
+    "tier": "watch"
+   },
+   "actual": {
+    "total_rain_in": 0.69,
+    "peak_1h_in": 0.4,
+    "peak_10min_in": 0.25,
+    "api_at_start": 4.83,
+    "bridge_peak_ft": 2.22,
+    "ross_peak_ft": 5.82,
+    "sump_peak_run_s": 39.0,
+    "sump_peak_inflow_gpm": 28.2,
+    "sump_runs": 46,
+    "tier_reached": "act"
+   },
+   "notes": "Actuals from analysis/storm.py. No plan was saved before this storm: the forecast and prediction are the six-hourly forecast of 2026-11-18 12:40 PST run through the planner afterwards. Tier reached is the config ladder applied to the observed creek, run length and 10-minute rain rate. Bridge Street sent no reading from 9:43 to 11:12 PM while Ross crested at 10:15 PM; Ross implies about 2.5 ft. 0.20 in fell in the 5 min ending 9:45 PM. Rain within the last 6 h when this was written (station through 2026-11-19 11:00), so totals can still grow."
+  }
+ ]
 }
