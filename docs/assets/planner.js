@@ -207,6 +207,97 @@ function evaluatePlan(M, inp) {
   return out;
 }
 
+/* ---- planning for a chosen start date ----
+   forecast.py pre-fills the planner from the wettest 48 h inside the next 72 h.
+   planWindow runs the same search (storm_window) over the 72 h that start on a
+   local date the user picks, from forecast.json's hourly table, so a storm later
+   in the week can be planned before it is inside the default window.
+
+   Rain is the hourly table as published: Open-Meteo with the lead-time bias
+   factor out to 72 h and raw beyond that, where the factor was never measured.
+   The alternatives (raw, the 3-day factor held past 72 h, the NWS grid) come
+   back too, for the chips. Wetness is today's index carried to the onset: decayed
+   per day, plus the rain forecast to fall before the storm starts. */
+function planDays(F) {
+  // local dates that still have at least a day of forecast after their midnight
+  const hourly = (F && F.hourly) || [];
+  const has = h => h.omc_in != null || h.om_in != null || h.nws_in != null;
+  const out = [];
+  hourly.forEach((h, i) => {
+    const d = h.t.slice(0, 10);
+    if (out.length && out[out.length - 1].date === d) return;
+    const day = hourly.filter(x => x.t.slice(0, 10) === d && has(x));
+    const ahead = hourly.slice(i).filter(has).length;
+    if (ahead >= 24) out.push({ date: d, rain_in: day.reduce((a, x) => a + (x.omc_in ?? x.nws_in ?? 0), 0), hours: day.length });
+  });
+  return out;
+}
+function planWindow(F, M, fromDate) {
+  const hourly = (F && F.hourly) || [];
+  const P = M.planner || {}, win = P.storm_window_h || 48, span = F.prefill_horizon_h || 72;
+  const bias = (F.qpf && F.qpf.bias) || M.qpf_bias || {};
+  const i0 = hourly.findIndex(h => h.t >= fromDate + "T00:00");
+  if (i0 < 0) return null;
+  const rows = hourly.slice(i0, i0 + span);
+  const useOM = rows.some(h => h.omc_in != null);
+  if (!useOM && !rows.some(h => h.nws_in != null)) return null;
+  const key = useOM ? "omc_in" : "nws_in";
+  const ratio = P.nws_peak_1h_over_6h_mean || 2.5;
+  const thr = (P.rain_threshold_in ?? 0.02) / (useOM ? 1 : ratio);   // NWS hours are 6-h means
+  const vals = rows.map(h => h[key] || 0);
+  const w = Math.min(win, vals.length);
+  let bestI = 0, bestS = -1;
+  for (let i = 0; i + w <= vals.length; i++) {
+    let sum = 0;
+    for (let k = i; k < i + w; k++) sum += vals[k];
+    if (sum > bestS + 1e-9) { bestS = sum; bestI = i; }
+  }
+  const sumOf = (arr, f) => arr.reduce((a, h) => a + (f(h) || 0), 0);
+  const held = h => {   // the lead factor, with the 72 h value held beyond 72 h
+    const a = bias.lead_24h || 1, b = bias.lead_72h || 1, L = h.lead_h;
+    return (h.om_in || 0) * (L <= 24 ? a : L <= 72 ? a + (b - a) * (L - 24) / 48 : b);
+  };
+  const nwsPeak = seg => {   // heaviest 6 h / 6 x last winter's peak-hour ratio, as forecast.py nws_peak
+    let best = 0;
+    for (let i = 0; i < Math.max(1, seg.length - 5); i++) best = Math.max(best, sumOf(seg.slice(i, i + 6), h => h.nws_in));
+    return best / 6 * ratio;
+  };
+  const decay = (M.wetness && M.wetness.decay_per_day) || 0.9;
+  const apiToday = (F.wetness && F.wetness.api_in != null) ? F.wetness.api_in : ((F.prefill || {}).api_in || 0);
+  const apiAt = lead => apiToday * Math.pow(decay, lead / 24)
+    + hourly.filter(h => h.lead_h < lead).reduce((a, h) => a + (h[key] || 0) * Math.pow(decay, (lead - h.lead_h) / 24), 0);
+  const base = { from: fromDate, source: useOM ? "open_meteo_corrected" : "nws_grid", hours: rows.length,
+                 api_today: apiToday, held_factor: bias.lead_72h || 1 };
+
+  const seg0 = vals.slice(bestI, bestI + w);
+  const wet = seg0.map((v, i) => v >= thr ? i : -1).filter(i => i >= 0);
+  if (!wet.length) {
+    return { ...base, dry: true, total_48h_in: +Math.max(0, bestS).toFixed(2), peak_1h_inhr: 0, onset: null, peak_at: null, end: null,
+             api_in: +apiAt(rows[0].lead_h).toFixed(2), beyond_h: rows.filter(h => h.lead_h > 72).length, alt: {}, peak_alt: {} };
+  }
+  const onset = bestI + wet[0];
+  let pk = bestI, end = bestI + wet[wet.length - 1];
+  seg0.forEach((v, i) => { if (v > vals[pk]) pk = bestI + i; });
+  for (let j = bestI + w; j < vals.length && vals[j] >= thr; j++) end = j;   // rain running past the window
+  const seg = rows.slice(onset, onset + win);
+  const probs = seg.filter(h => h.prob != null && (h[key] || 0) >= thr).map(h => h.prob);
+  const max = f => seg.reduce((a, h) => Math.max(a, f(h) || 0), 0);
+  const r2 = v => +v.toFixed(2);
+  const nwsPk = nwsPeak(seg);
+  return {
+    ...base, dry: false,
+    total_48h_in: r2(sumOf(seg, h => h[key])),
+    peak_1h_inhr: r2(useOM ? vals[pk] : nwsPk),
+    onset: rows[onset].t, peak_at: rows[pk].t, end: rows[end].t,
+    api_in: r2(apiAt(rows[onset].lead_h)),
+    pop_mean_pct: probs.length ? Math.round(probs.reduce((a, b) => a + b, 0) / probs.length) : null,
+    hours_in_window: seg.length,
+    beyond_h: seg.filter(h => h.lead_h > 72).length,      // hours with no measured bias factor
+    alt: { published: r2(sumOf(seg, h => h.omc_in)), raw: r2(sumOf(seg, h => h.om_in)), held: r2(sumOf(seg, held)), nws: r2(sumOf(seg, h => h.nws_in)) },
+    peak_alt: { published: r2(max(h => h.omc_in)), raw: r2(max(h => h.om_in)), held: r2(max(held)), nws: r2(nwsPk), nws_even: r2(max(h => h.nws_in)) },
+  };
+}
+
 /* Tier the forecast itself implies (for the header chip on pages without sliders). */
 function tierFromForecast(M, F) {
   const p = (F && F.prefill) || {};

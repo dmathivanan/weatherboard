@@ -87,6 +87,14 @@ All from `models.json`:
   rain onset or the creek crest (heaviest hour + the median 0.8 h lag) with an
   offset in hours and a minimum tier.
 
+**Plan the 3 days starting** moves the pre-fill from the next 72 h to the 72 h
+that begin on a chosen date (a date box, one chip per forecast day, or
+`planner.html?from=YYYY-MM-DD`), for a storm later in the week. `planWindow` in
+`planner.js` runs the job's wettest-48-h search over `forecast.json`'s hourly
+table for those days. Hours more than 3 days out carry no bias factor, so the
+page says how many there are and offers the 3-day factor as a chip; wetness is
+today's index decayed to the onset plus the rain forecast before it.
+
 **Save this plan** stores the inputs and outputs in the browser; `storms.html`
 lists saved plans under the storm tables. The tables themselves need no hand
 entry: `data/storms.json` holds one row per storm of 0.10 in or more this
