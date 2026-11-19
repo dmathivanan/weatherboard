@@ -101,6 +101,8 @@ def water_year_start(today):
 def update_ledger(ledger, errors):
     """Refresh the per-day station rain. Bootstraps `ledger_days` on first run,
     then re-reads the last three days each run so partial days get completed.
+    If earlier runs could not reach the station, it re-reads back to the last
+    run that did, so a day left partial or model-filled is put right.
     Days the station cannot supply are filled from Open-Meteo's analysis and
     marked, so the wetness page can say which days are model, not gauge."""
     today = datetime.now(TZ).date()
@@ -110,10 +112,19 @@ def update_ledger(ledger, errors):
     want = W.get("ledger_days", 35)
     have = [d for d in days if src.get(d) == "ambient"]
     need = want if not have else 3
+    if have:
+        # station_ok_utc is the last run that read the station. A ledger from
+        # before that stamp existed is re-read in full once.
+        try:
+            ok_day = datetime.fromisoformat(ledger["station_ok_utc"]).astimezone(TZ).date()
+            need = min(want, max(need, (today - ok_day).days + 1))
+        except (KeyError, TypeError, ValueError):
+            need = want
     # Cover the water year for the season total when the ledger is young.
     wys = water_year_start(today)
     need = max(need, min((today - wys).days + 1, 120)) if not have else need
 
+    now_utc = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     amb, err = safe(F.fetch_ambient_daily, need)
     if err:
         errors["ambient_daily"] = err
@@ -121,6 +132,10 @@ def update_ledger(ledger, errors):
         for d, v in amb["days"].items():
             days[d] = v
             src[d] = "ambient"
+        if amb.get("complete", True):
+            ledger["station_ok_utc"] = now_utc
+        else:
+            errors["ambient_daily"] = f"read {len(amb['days'])} of {need} days; the rest next run"
 
     # Fill gaps (or everything, if the station is down) from Open-Meteo past days.
     missing = [(today - timedelta(days=i)).isoformat() for i in range(want)]
@@ -143,7 +158,7 @@ def update_ledger(ledger, errors):
         if d < keep:
             days.pop(d, None)
             src.pop(d, None)
-    ledger["updated_utc"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    ledger["updated_utc"] = now_utc
     return ledger
 
 
@@ -198,6 +213,10 @@ def wetness_from_ledger(ledger, usgs, models):
         "baseflow_cfs": base_cfs, "baseflow_stage_ft": base_ft,
         "baseflow_implied_api_in": r3(implied),
         "source": source, "gauge_days_in_window": gauge_days,
+        # The ledger keeps its last values when the station cannot be read, so
+        # say when it was last read in full and whether this run managed to.
+        "station_rain_read_utc": ledger.get("station_ok_utc"),
+        "station_rain_stale": ledger.get("station_ok_utc") != ledger.get("updated_utc"),
     }
 
 

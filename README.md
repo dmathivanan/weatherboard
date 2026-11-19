@@ -50,8 +50,10 @@ Pulls, each isolated so one dead feed never blanks the file:
 Then it computes the **ground wetness index**: the antecedent precipitation index
 (API, 0.9/day decay) that both creek models were fitted on, rebuilt from the
 station's daily totals. `rain_daily.json` is a ledger that grows through the
-season; the job re-reads the last three days each run and fills any gap from
-Open-Meteo's analysis, marking those days as model. Ross baseflow gives a loose
+season; the job re-reads the last three days each run (further back if earlier
+runs could not read the station) and fills any gap from Open-Meteo's analysis,
+marking those days as model. When a run cannot read the station the ledger keeps
+its last values and `wetness.station_rain_stale` says so. Ross baseflow gives a loose
 cross-check (`baseflow_to_api`, R² 0.50) and is the fallback when the station is
 unreachable. `saturated_api_in` (5.2 in, the index when the January 2026 storm
 began) sets 100 % on the wetness bar.

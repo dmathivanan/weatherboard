@@ -93,13 +93,71 @@ def _ambient_keys():
     return {"applicationKey": app, "apiKey": key}
 
 
+# Ambient allows one request per second per API key and answers a faster one
+# with 429. The job calls Ambient from two fetchers (the snapshot, then the daily
+# ledger), and how far apart they land depends on how quickly the feeds between
+# them answer. So every Ambient request goes through _ambient_get, which keeps
+# AMBIENT_GAP_S between requests whichever fetcher made the last one, and waits
+# and retries if a 429 comes back anyway, or if the request times out.
+AMBIENT_GAP_S = 1.1
+_ambient_last = None     # time.monotonic() of the last Ambient request
+_ambient_mac = None      # for request URLs only; never returned or published
+
+
+def _ambient_get(url, params, tries=4):
+    global _ambient_last
+    for i in range(tries):
+        if _ambient_last is not None:
+            wait = _ambient_last + AMBIENT_GAP_S - time.monotonic()
+            if wait > 0:
+                time.sleep(wait)
+        last_try = i == tries - 1
+        try:
+            r = requests.get(url, params=params, headers=UA, timeout=25)
+        except (requests.Timeout, requests.ConnectionError):
+            if last_try:
+                raise
+            time.sleep(1 + 2 * i)
+            continue
+        finally:
+            _ambient_last = time.monotonic()
+        if r.status_code == 429 and not last_try:
+            time.sleep(1 + 2 * i)
+            continue
+        r.raise_for_status()
+        return r.json()
+
+
+def _ambient_devices():
+    """The account's device list (one request). Remembers the station's MAC so
+    the daily fetch does not have to ask for the list a second time."""
+    global _ambient_mac
+    devices = _ambient_get("https://rt.ambientweather.net/v1/devices", _ambient_keys())
+    _ambient_mac = devices[0]["macAddress"]
+    return devices
+
+
+def day_total(counter):
+    """A local day's rain from its dailyrainin readings, oldest first.
+
+    The counter climbs through the day and resets at local midnight, but the
+    reset can land one record late: the 00:00 reading sometimes still shows the
+    whole of the previous day (0.66 in on 2026-11-16, a day with 0.03 in). So
+    the total is the highest reading after the last time the counter dropped,
+    not the highest reading of the day."""
+    start = 0
+    for i in range(1, len(counter)):
+        if counter[i] < counter[i - 1]:
+            start = i
+    return max(counter[start:])
+
+
 def fetch_ambient():
     """Current station snapshot: rain counters, temperature, wind, pressure.
 
     The result is published as forecast.json's `station` block, so it carries
     readings only: no station name, MAC address or other device identifier."""
-    devices = get("https://rt.ambientweather.net/v1/devices", params=_ambient_keys())
-    d = devices[0]["lastData"]
+    d = _ambient_devices()[0]["lastData"]
     return {
         "observed_utc": d.get("date"),
         "rain_rate_inhr": d.get("hourlyrainin"),
@@ -120,15 +178,17 @@ def fetch_ambient_daily(days, mac=None):
     """Station rain per LOCAL calendar day for the last `days` days, ending today.
 
     Ambient's dailyrainin counter resets at local midnight, so the day's total is
-    the maximum of the counter inside that local day. One 288-record page (a
-    full day at 5 min) is pulled per day, newest first, at the 1 request/s the
-    API allows. Returns {"days": {"YYYY-MM-DD": inches}}. The MAC is used for the
-    request only and is never returned: the caller publishes what it gets back.
+    read off the counter inside that local day (see day_total). One 288-record page (a
+    full day at 5 min) is pulled per day, newest first, paced by _ambient_get.
+    Returns {"days": {"YYYY-MM-DD": inches}, "complete": bool}. If a request
+    fails part-way, the days already read (the newest) are returned with
+    complete False instead of being thrown away; it raises only when nothing was
+    read. The MAC is used for the request only and is never returned: the
+    caller publishes what it gets back.
     """
     keys = _ambient_keys()
-    if mac is None:
-        mac = get("https://rt.ambientweather.net/v1/devices", params=keys)[0]["macAddress"]
-        time.sleep(1.1)
+    mac = mac or _ambient_mac or _ambient_devices()[0]["macAddress"]
+    spare = 2 + days // 4        # repeat requests allowed for empty answers
     today = datetime.now(TZ).date()
     out = {}
     for i in range(days):
@@ -137,8 +197,23 @@ def fetch_ambient_daily(days, mac=None):
         if i == 0:
             end_local = datetime.now(TZ)
         end_ms = int(end_local.timestamp() * 1000)
-        recs = get(f"https://rt.ambientweather.net/v1/devices/{mac}",
-                   params={**keys, "limit": 288, "endDate": end_ms})
+        page = (f"https://rt.ambientweather.net/v1/devices/{mac}",
+                {**keys, "limit": 288, "endDate": end_ms})
+        # Ambient now and then answers 200 with an empty list for a day it has
+        # (about 1 request in 12); asking again gets the records. Up to two
+        # repeats a day, from a budget so a station that is really offline
+        # does not triple the run. A day still empty is left out.
+        try:
+            recs = _ambient_get(*page)
+            for _ in range(2):
+                if recs or spare <= 0:
+                    break
+                spare -= 1
+                recs = _ambient_get(*page)
+        except Exception:  # noqa: BLE001
+            if not out:
+                raise
+            return {"days": out, "complete": False}
         vals = []
         for r in recs:
             try:
@@ -146,11 +221,12 @@ def fetch_ambient_daily(days, mac=None):
             except Exception:  # noqa: BLE001
                 continue
             if t.date() == day and r.get("dailyrainin") is not None:
-                vals.append(float(r["dailyrainin"]))
+                vals.append((t, float(r["dailyrainin"])))
         if vals:
-            out[day.isoformat()] = round(max(vals), 3)
-        time.sleep(1.1)
-    return {"days": out}
+            out[day.isoformat()] = round(day_total([v for _, v in sorted(vals)]), 3)
+    if not out:
+        raise RuntimeError(f"Ambient returned no records for the last {days} days")
+    return {"days": out, "complete": True}
 
 
 # ---------------------------------------------------------------- creek gauges

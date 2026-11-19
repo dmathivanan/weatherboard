@@ -89,7 +89,10 @@ details summary{cursor:pointer;color:var(--gold-dark);font-weight:500;font-size:
   $("api").innerHTML = fmt(api) + "<small>in</small>";
   $("cat").textContent = w.category || "–";
   $("meter").style.width = pct + "%";
-  $("wsrc").textContent = w.source ? "from " + w.source + (w.gauge_days_in_window != null ? ` · ${w.gauge_days_in_window} gauge days` : "") : "";
+  const staleNote = !w.station_rain_stale ? ""
+    : " · station rain not fully read this run" + (w.station_rain_read_utc
+      ? ", last full read " + new Date(w.station_rain_read_utc).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "");
+  $("wsrc").textContent = w.source ? "from " + w.source + (w.gauge_days_in_window != null ? ` · ${w.gauge_days_in_window} gauge days` : "") + staleNote : "";
   $("explain").innerHTML = `The index is the antecedent precipitation index both creek models were fitted on: every day's rain, decayed by ${W.decay_per_day}× per day. `
     + `${W.saturated_api_in} in is the reading when the January 2026 storm began — the wettest start last winter — and sets the right end of the bar. `
     + `Now at <b>${pct.toFixed(0)}%</b> of that.`;
