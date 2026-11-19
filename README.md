@@ -41,7 +41,7 @@ Pulls, each isolated so one dead feed never blanks the file:
 | Source | What | Notes |
 |---|---|---|
 | NWS grid | QPF periods + active alerts for the house | `api.weather.gov` |
-| Open-Meteo | hourly rain, 7 days, plus ECMWF / GFS / HRRR 24 h | **bias-corrected per `qpf_bias`**: ×1.35 for the first 24 h, sliding to ×2.0 at 72 h |
+| Open-Meteo | hourly rain, 7 days, plus ECMWF / GFS / HRRR 24 h | **bias-corrected per `qpf_bias`**: ×1.35 for the first 24 h, sliding to ×2.0 at 72 h and held at ×2.0 beyond (extrapolated: the factors were measured at 1 and 3 days) |
 | CNRFC | 6-hourly point QPF, days 1–6 | no Marin point exists; Napa (`APC`) and Venado (`VENC1`) bracket the house |
 | CW3E | maximum forecast AR Scale at the coast off Marin | the JSON behind the AR Scale plume map, points 38.0N/123.0W and 37.5N/122.5W |
 | USGS 11460000 | Ross stage and flow, last 7 days | baseflow = 10th percentile of the week |
@@ -91,9 +91,14 @@ All from `models.json`:
 that begin on a chosen date (a date box, one chip per forecast day, or
 `planner.html?from=YYYY-MM-DD`), for a storm later in the week. `planWindow` in
 `planner.js` runs the job's wettest-48-h search over `forecast.json`'s hourly
-table for those days. Hours more than 3 days out carry no bias factor, so the
-page says how many there are and offers the 3-day factor as a chip; wetness is
-today's index decayed to the onset plus the rain forecast before it.
+table for those days. Start dates stop at today + 5, the last one for which a
+7-day forecast still holds a full 48-hour storm. Hours past 3 days use the
+3-day bias factor, and the page says how many there are.
+
+In every view the wetness the models see is the index **at the storm's onset**:
+today's value decayed 0.9× a day, plus the corrected rain forecast to fall
+before then (`forecast.py api_at_lead`, mirrored in `planWindow`). The wetness
+page still shows today's index.
 
 **Save this plan** stores the inputs and outputs in the browser; `storms.html`
 lists saved plans under the storm tables. The tables themselves need no hand

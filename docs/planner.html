@@ -151,7 +151,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   </section>
 </main>
 
-<script src="assets/planner.js?v=14"></script>
+<script src="assets/planner.js?v=15"></script>
 <script>
 (async () => {
   renderNav("planner");
@@ -188,7 +188,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
         : nwsSrc ? ` · pre-filled from the NWS grid's wettest 48 h inside the next ${span} h (rain from ${whenStr(parseLocal(sw.onset))})`
         : ` · pre-filled from the wettest 48 h inside the next ${span} h (rain from ${whenStr(parseLocal(sw.onset))}${sw.pop_mean_pct != null ? ", " + sw.pop_mean_pct + " % chance" : ""}; NWS grid has ${fmt(sw.nws_total_in_window)}" there)`;
     }
-    const olTxt = !win && ol.onset && !ol.dry ? ` · outlook beyond 3 days: ${fmt(ol.total_48h_in)}" raw around ${whenStr(parseLocal(ol.onset))}${ol.pop_mean_pct != null ? ", " + ol.pop_mean_pct + " % chance" : ""}, NWS ${fmt(ol.nws_total_in_window)}", not pre-filled: pick its date below to plan for it` : "";
+    const olTxt = !win && ol.onset && !ol.dry ? ` · outlook beyond 3 days: ${fmt(ol.total_48h_in)}" around ${whenStr(parseLocal(ol.onset))}${ol.pop_mean_pct != null ? ", " + ol.pop_mean_pct + " % chance" : ""}, NWS ${fmt(ol.nws_total_in_window)}", not pre-filled: pick its date below to plan for it` : "";
     st.textContent = `Forecast inputs from ${whenStr(Date.parse(F.generated_utc))} (${age.toFixed(1)} h ago)` + winTxt + olTxt
       + (Object.keys(F.errors || {}).length ? " · feeds down: " + Object.keys(F.errors).join(", ") : "");
     st.classList.toggle("stale", age > 9);
@@ -240,16 +240,14 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   function paintChips() {
     if (win && !win.dry) {
       // the same sources, summed over the chosen window instead of the next 48 h
-      const a = win.alt, pk = win.peak_alt, far = win.beyond_h > 0, x = `×${fmt(win.held_factor, 1)}`;
+      const a = win.alt, pk = win.peak_alt;
       $("totalchips").innerHTML =
-        chip(far ? "Open-Meteo as published" : "Open-Meteo ×bias", a.published, "total") +
+        chip("Open-Meteo ×bias", a.corrected, "total") +
         chip("Open-Meteo raw", a.raw, "total") +
-        (far ? chip(`Open-Meteo ${x} (3-day factor)`, a.held, "total") : "") +
         chip("NWS grid", a.nws, "total");
       $("peakchips").innerHTML =
-        chip(far ? "Open-Meteo as published" : "Open-Meteo ×bias", pk.published, "peak") +
+        chip("Open-Meteo ×bias", pk.corrected, "peak") +
         chip("Open-Meteo raw", pk.raw, "peak") +
-        (far ? chip(`Open-Meteo ${x} (3-day factor)`, pk.held, "peak") : "") +
         chip("NWS grid (est. peak hour)", pk.nws, "peak") +
         chip("Last winter's max", M.observed_maxima.peak_1h_in, "peak");
       return;
@@ -272,21 +270,21 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   });
 
   // ---- which three days to plan ----
-  const days = F._missing ? [] : planDays(F);
+  const days = F._missing ? [] : planDays(F, M);
   const fromEl = $("planfrom");
   if (days.length) { fromEl.min = days[0].date; fromEl.max = days[days.length - 1].date; }
   else { fromEl.disabled = true; $("fromnext").disabled = true; }
   function paintFrom() {
     fromEl.value = win ? win.from : "";
     $("daychips").innerHTML = days.map(d =>
-      `<button class="chip${win && win.from === d.date ? " on" : ""}" data-day="${d.date}" title="forecast rain that day, as published">${dayStr(d.date).replace(",", "")} <b>${fmt(d.rain_in, 2)}"</b></button>`).join("");
+      `<button class="chip${win && win.from === d.date ? " on" : ""}" data-day="${d.date}" title="forecast rain that day, bias-corrected">${dayStr(d.date).replace(",", "")} <b>${fmt(d.rain_in, 2)}"</b></button>`).join("");
     const notes = [];
     if (!win) {
-      if (days.length) notes.push("Showing the next 3 days. Pick a date, or tap a day (with its forecast rain), to plan a storm further out.");
+      if (days.length) notes.push(`Showing the next 3 days. Pick a date, or tap a day (with its forecast rain), to plan a storm up to ${days.length - 1} days out.`
+        + (pre.api_today_in != null && pre.onset ? ` Wetness is today's ${fmt(pre.api_today_in)} in carried forward to the onset.` : ""));
     } else {
-      if (win.hours < (F.prefill_horizon_h || 72)) notes.push(`The forecast reaches only ${win.hours} h past the start of ${dayStr(win.from)}, so this window is cut short.`);
-      if (!win.dry && win.beyond_h > 0) notes.push(`${win.beyond_h} of this storm's ${win.hours_in_window} forecast hours are over 3 days out, where Open-Meteo has no bias factor; last winter it caught about half the rain at 3 days. The ×${fmt(win.held_factor, 1)} chip applies the 3-day factor. Peak rates this far out are multi-hour averages and read low.`);
-      notes.push(`Wetness: today's ${fmt(win.api_today)} in carried forward to ${win.dry ? "that date" : "the onset"} (${M.wetness.decay_per_day}× a day, plus rain forecast before then).`);
+      if (!win.dry && win.beyond_h > 0) notes.push(`${win.beyond_h} of this storm's ${win.hours_in_window} forecast hours are over 3 days out. They use the 3-day bias factor (×${fmt(win.far_factor, 1)}), which was not measured that far ahead. Peak rates this far out are multi-hour averages and read low.`);
+      notes.push(`Wetness: today's ${fmt(win.api_today)} in carried forward to ${win.dry ? "that date" : "the onset"} (${M.wetness.decay_per_day}× a day, plus the corrected rain forecast before then).`);
     }
     $("fromnote").innerHTML = notes.join("<br>");
   }
@@ -433,7 +431,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
   // ---- sources ----
   const src = [];
   if (!F._missing) {
-    src.push(`<b>Open-Meteo</b> hourly at ${M.lat}, ${M.lon} (52 Woodland), bias-corrected ×${M.qpf_bias.lead_24h} (≤24 h) sliding to ×${M.qpf_bias.lead_72h} at 72 h, uncorrected beyond: ${fmt(q.omc_48h_in)}" / 48 h (raw ${fmt(q.om_48h_in)}"), ${fmt(q.om_7d_in)}" raw over 7 days.`);
+    src.push(`<b>Open-Meteo</b> hourly at ${M.lat}, ${M.lon} (52 Woodland), bias-corrected ×${M.qpf_bias.lead_24h} (≤24 h) sliding to ×${M.qpf_bias.lead_72h} at 72 h and held there beyond (extrapolated): ${fmt(q.omc_48h_in)}" / 48 h (raw ${fmt(q.om_48h_in)}"), ${fmt(q.om_7d_in)}" raw over 7 days.`);
     src.push(`<b>NWS grid QPF</b> ${fmt(q.nws_48h_in)}" / 48 h${q.nws_grid_updated ? ", issued " + whenStr(Date.parse(q.nws_grid_updated)) : ""}.`);
     const cn = q.cnrfc_points || {};
     src.push(`<b>CNRFC point QPF</b> (no Marin point; Napa and Venado bracket us): Napa ${fmt((cn.APC || {}).qpf_48h_in)}", Venado ${fmt((cn.VENC1 || {}).qpf_48h_in)}" / 48 h.`);

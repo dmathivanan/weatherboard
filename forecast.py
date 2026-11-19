@@ -42,18 +42,33 @@ HORIZON_H = 168
 
 # ---------------------------------------------------------------- helpers
 
-PREFILL_H = 72   # the bias factors were measured at 1- and 3-day leads; beyond that is outlook
+PREFILL_H = 72   # the default prefill looks this far; later hours are the outlook
 
 
 def lead_factor(lead_h):
-    """Open-Meteo bias factor by lead: flat to 24 h, linear to 72 h. Beyond 72 h
-    the correction is unmeasured, so the factor is 1 and the hours are outlook."""
+    """Open-Meteo bias factor by lead: flat to 24 h, linear to 72 h, and the 72 h
+    factor held beyond. The factors were measured at 1- and 3-day leads only, so
+    past 72 h this is an extrapolation: the forecast ran drier the further out it
+    looked, and leaving those hours uncorrected under-read every large storm."""
     a, b = BIAS["lead_24h"], BIAS["lead_72h"]
     if lead_h <= 24:
         return a
     if lead_h <= 72:
         return a + (b - a) * (lead_h - 24) / 48.0
-    return 1.0
+    return b
+
+
+def api_at_lead(hourly, api_today, lead_h, key="omc_in"):
+    """The wetness index carried forward to `lead_h` hours from now: today's value
+    decayed per day, plus each forecast hour of rain before then, decayed from
+    when it falls. The creek and sump models take the index at the storm's
+    onset, not today's. planner.js planWindow does the same sum for a chosen date."""
+    decay = W.get("decay_per_day", 0.9)
+    api = (api_today or 0) * decay ** (lead_h / 24.0)
+    for h in hourly:
+        if h["lead_h"] < lead_h:
+            api += (h.get(key) or 0) * decay ** ((lead_h - h["lead_h"]) / 24.0)
+    return api
 
 
 def local_hour_str(dt):
@@ -370,12 +385,18 @@ def main():
     if window is not None:
         window["source"] = source
         window["bias_corrected"] = source == "open_meteo_corrected"
-    outlook = storm_window(hourly, key="om_in", lo_h=PREFILL_H, hi_h=HORIZON_H)   # days 4-7, raw: shown, not prefilled
+    outlook = storm_window(hourly, lo_h=PREFILL_H, hi_h=HORIZON_H)   # days 4-7: shown, planned by picking its date
     if outlook and not outlook.get("dry"):
         cn_pts = (cnrfc or {}).get("points") or {}
         outlook["cnrfc_6d_in"] = {k: v.get("qpf_6d_in") for k, v in cn_pts.items()}
-        outlook["_note"] = ("Beyond 72 h. Open-Meteo raw, no bias correction (unmeasured at this lead), "
-                            "with the mean chance of rain over the wet hours. Not used to pre-fill the planner.")
+        outlook["_note"] = ("Beyond 72 h. Open-Meteo x the 3-day bias factor, held past the lead it was "
+                            "measured at, with the mean chance of rain over the wet hours. The planner "
+                            "pre-fills from it when its start date is picked.")
+    # Wetness the models should see: the index at the storm's onset, not today's.
+    api_onset = wet.get("api_in")
+    if window and window.get("window_start_lead_h") is not None and api_onset is not None:
+        api_onset = r3(api_at_lead(hourly, api_onset, window["window_start_lead_h"],
+                                   "omc_in" if source == "open_meteo_corrected" else "nws_in"))
     alerts = (nws or {}).get("alerts", [])
     events = [(a.get("event") or "").lower() for a in alerts]
     flood_watch = any("flood watch" in e for e in events)
@@ -430,7 +451,8 @@ def main():
             "peak_1h_inhr": (window or {}).get("peak_1h_inhr"),
             "onset": (window or {}).get("onset"), "peak_at": (window or {}).get("peak_at"),
             "end": (window or {}).get("end"),
-            "api_in": wet.get("api_in"), "season_rain_in": wet.get("season_rain_in"),
+            "api_in": api_onset, "api_today_in": wet.get("api_in"),
+            "season_rain_in": wet.get("season_rain_in"),
             "ar_category": (cw3e or {}).get("ar_category"),
             "flood_watch": flood_watch,
             "window_start_lead_h": (window or {}).get("window_start_lead_h"),
