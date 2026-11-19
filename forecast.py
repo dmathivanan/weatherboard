@@ -98,11 +98,13 @@ def water_year_start(today):
     return today.replace(year=y, month=m, day=1)
 
 
-def update_ledger(ledger, errors):
+def update_ledger(ledger, errors, mac=None):
     """Refresh the per-day station rain. Bootstraps `ledger_days` on first run,
     then re-reads the last three days each run so partial days get completed.
     Days the station cannot supply are filled from Open-Meteo's analysis and
-    marked, so the wetness page can say which days are model, not gauge."""
+    marked, so the wetness page can say which days are model, not gauge.
+    `mac` (from this run's fetch_ambient) wins over the one stored in the
+    ledger; either saves a second /v1/devices call against the rate limit."""
     today = datetime.now(TZ).date()
     days = ledger.setdefault("days", {})
     src = ledger.setdefault("source", {})
@@ -113,7 +115,7 @@ def update_ledger(ledger, errors):
     wys = water_year_start(today)
     need = max(need, min((today - wys).days + 1, 120)) if not have else need
 
-    amb, err = safe(F.fetch_ambient_daily, need)
+    amb, err = safe(F.fetch_ambient_daily, need, mac=mac or ledger.get("mac"))
     if err:
         errors["ambient_daily"] = err
     else:
@@ -327,7 +329,7 @@ def main():
     ambient, errors["ambient"] = safe(F.fetch_ambient)
     model_qpf, errors["model_qpf"] = safe(F.fetch_model_qpf)
 
-    ledger = update_ledger(load_ledger(), errors)
+    ledger = update_ledger(load_ledger(), errors, mac=(ambient or {}).get("mac"))
     LEDGER.write_text(json.dumps(ledger, indent=1, sort_keys=True), encoding="utf-8")
     wet = wetness_from_ledger(ledger, usgs, models)
 

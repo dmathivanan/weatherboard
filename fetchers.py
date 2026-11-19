@@ -115,17 +115,35 @@ def fetch_ambient():
     }
 
 
+def _ambient_get(url, params, pause=2.0):
+    """GET from Ambient, retrying once after a pause on 429. The API allows one
+    request per second per API key, shared by every call in the run."""
+    r = requests.get(url, headers=UA, timeout=25, params=params)
+    if r.status_code == 429:
+        try:
+            wait = min(float(r.headers.get("Retry-After", pause)), 10.0)
+        except ValueError:
+            wait = pause
+        time.sleep(max(wait, pause))
+        r = requests.get(url, headers=UA, timeout=25, params=params)
+    r.raise_for_status()
+    return r.json()
+
+
 def fetch_ambient_daily(days, mac=None):
     """Station rain per LOCAL calendar day for the last `days` days, ending today.
 
     Ambient's dailyrainin counter resets at local midnight, so the day's total is
     the maximum of the counter inside that local day. One 288-record page (a
     full day at 5 min) is pulled per day, newest first, at the 1 request/s the
-    API allows. Returns {"YYYY-MM-DD": inches} plus the mac used.
+    API allows. Pass the station's `mac` (from fetch_ambient or the ledger) to
+    skip the /v1/devices lookup. Returns {"YYYY-MM-DD": inches} plus the mac used.
     """
     keys = _ambient_keys()
-    if mac is None:
-        mac = get("https://rt.ambientweather.net/v1/devices", params=keys)[0]["macAddress"]
+    # fetch_ambient has usually just spent this second's request on /v1/devices.
+    time.sleep(1.1)
+    if not mac:
+        mac = _ambient_get("https://rt.ambientweather.net/v1/devices", keys)[0]["macAddress"]
         time.sleep(1.1)
     today = datetime.now(TZ).date()
     out = {}
@@ -135,8 +153,8 @@ def fetch_ambient_daily(days, mac=None):
         if i == 0:
             end_local = datetime.now(TZ)
         end_ms = int(end_local.timestamp() * 1000)
-        recs = get(f"https://rt.ambientweather.net/v1/devices/{mac}",
-                   params={**keys, "limit": 288, "endDate": end_ms})
+        recs = _ambient_get(f"https://rt.ambientweather.net/v1/devices/{mac}",
+                            {**keys, "limit": 288, "endDate": end_ms})
         vals = []
         for r in recs:
             try:
