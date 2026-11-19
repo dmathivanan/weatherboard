@@ -9,10 +9,10 @@ inflow basis  : runtime x 84 GPM (config primary_pump.rated_gpm)
 RESOLUTION PER SOURCE
 ------------------------------------------------------------------------------
 source              native   rows/runs  how it lands on the 10-min grid
-Ambient              5 min      95,810  5 min -> 2 obs per bin. Genuine 10-min resolution.
-PumpFuse             event       3,664  one row per run, 1 s stamps -> exact per-bin totals. Genuine.
+Ambient              5 min     118,492  5 min -> 2 obs per bin. Genuine 10-min resolution.
+PumpFuse             event       4,088  one row per run, 1 s stamps -> exact per-bin totals. Genuine.
 USGS 11460000       15 min      20,319  15 min -> most bins hold no reading; interpolated between.
-Bridge Street        event       1,029  ~4-15 min in storms, 720 min when flat. Effectively 30 min+ off-storm.
+Bridge Street        event       1,553  ~4-15 min in storms, 720 min when flat. Effectively 30 min+ off-storm.
 
   PumpFuse and Bridge Street are event sources: 'native' is not a sampling
   rate. For PumpFuse a gap means the pump did not run. For Bridge Street the
@@ -29,15 +29,15 @@ Bridge Street        event       1,029  ~4-15 min in storms, 720 min when flat. 
 ------------------------------------------------------------------------------
 RAINFALL RECONSTRUCTION (Ambient cumulative counters)
 ------------------------------------------------------------------------------
-  Daily Rain  resets handled :    59  (local midnight)
-  Event Rain  resets handled :    28  (dry-spell reset)
+  Daily Rain  resets handled :    71  (local midnight)
+  Event Rain  resets handled :    38  (dry-spell reset)
   Yearly Rain resets handled :     1  (Jan 1)
   suspect steps zeroed       :     0  (> 0.5 in per 5 min)
 
-  season total from Daily  counter :    35.56 in   <- primary
-  season total from Yearly counter :    35.78 in   <- independent check
-  season total from Event  counter :    35.58 in
-  Daily vs Yearly disagreement     :     0.22 in  (0.61%)
+  season total from Daily  counter :    43.05 in   <- primary
+  season total from Yearly counter :    43.32 in   <- independent check
+  season total from Event  counter :    43.07 in
+  Daily vs Yearly disagreement     :     0.27 in  (0.62%)
   window rain (Nov-Apr)            :    34.47 in
 
 ------------------------------------------------------------------------------
@@ -46,14 +46,14 @@ GAPS LONGER THAN 1 HOUR (in the source's own observations)
   Ambient           1 gaps > 1 h
                     2025-11-18 12:55 -> 2025-11-18 14:34  (   1.6 h)
   PumpFuse        184 gaps  (a gap here means 'pump did not run', not missing data)
-  Bridge Street   510 gaps > 1 h
+  Bridge Street   511 gaps > 1 h
                     2026-02-28 19:32 -> 2026-03-02 07:32  (  36.0 h)
                     2025-11-03 07:32 -> 2025-11-04 07:32  (  24.0 h)
                     2026-03-23 19:32 -> 2026-03-24 19:32  (  24.0 h)
                     2025-11-20 17:54 -> 2025-11-21 07:32  (  13.6 h)
                     2025-11-15 19:32 -> 2025-11-16 07:33  (  12.0 h)
                     2025-11-01 07:32 -> 2025-11-01 19:32  (  12.0 h)
-                    ... and 504 shorter ones
+                    ... and 505 shorter ones
   USGS              3 gaps > 1 h
                     2026-02-22 06:30 -> 2026-02-22 08:00  (   1.5 h)
                     2026-02-20 22:15 -> 2026-02-20 23:30  (   1.2 h)
