@@ -94,7 +94,10 @@ def _ambient_keys():
 
 
 def fetch_ambient():
-    """Current station snapshot: rain counters, temperature, wind, pressure."""
+    """Current station snapshot: rain counters, temperature, wind, pressure.
+
+    The result is published as forecast.json's `station` block, so it carries
+    readings only: no station name, MAC address or other device identifier."""
     devices = get("https://rt.ambientweather.net/v1/devices", params=_ambient_keys())
     d = devices[0]["lastData"]
     return {
@@ -110,8 +113,6 @@ def fetch_ambient():
         "humidity_pct": d.get("humidity"),
         "wind_mph": d.get("windspeedmph"),
         "wind_gust_mph": d.get("windgustmph"),
-        "device": devices[0].get("info", {}).get("name"),
-        "mac": devices[0].get("macAddress"),
     }
 
 
@@ -121,7 +122,8 @@ def fetch_ambient_daily(days, mac=None):
     Ambient's dailyrainin counter resets at local midnight, so the day's total is
     the maximum of the counter inside that local day. One 288-record page (a
     full day at 5 min) is pulled per day, newest first, at the 1 request/s the
-    API allows. Returns {"YYYY-MM-DD": inches} plus the mac used.
+    API allows. Returns {"days": {"YYYY-MM-DD": inches}}. The MAC is used for the
+    request only and is never returned: the caller publishes what it gets back.
     """
     keys = _ambient_keys()
     if mac is None:
@@ -148,7 +150,7 @@ def fetch_ambient_daily(days, mac=None):
         if vals:
             out[day.isoformat()] = round(max(vals), 3)
         time.sleep(1.1)
-    return {"days": out, "mac": mac}
+    return {"days": out}
 
 
 # ---------------------------------------------------------------- creek gauges

@@ -106,6 +106,7 @@ def update_ledger(ledger, errors):
     today = datetime.now(TZ).date()
     days = ledger.setdefault("days", {})
     src = ledger.setdefault("source", {})
+    ledger.pop("mac", None)   # older runs stored the station's MAC here; the ledger is public
     want = W.get("ledger_days", 35)
     have = [d for d in days if src.get(d) == "ambient"]
     need = want if not have else 3
@@ -120,7 +121,6 @@ def update_ledger(ledger, errors):
         for d, v in amb["days"].items():
             days[d] = v
             src[d] = "ambient"
-        ledger["mac"] = amb.get("mac")
 
     # Fill gaps (or everything, if the station is down) from Open-Meteo past days.
     missing = [(today - timedelta(days=i)).isoformat() for i in range(want)]
