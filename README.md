@@ -45,6 +45,7 @@ Pulls, each isolated so one dead feed never blanks the file:
 | CNRFC | 6-hourly point QPF, days 1–6 | no Marin point exists; Napa (`APC`) and Venado (`VENC1`) bracket the house |
 | CW3E | maximum forecast AR Scale at the coast off Marin | the JSON behind the AR Scale plume map, points 38.0N/123.0W and 37.5N/122.5W |
 | USGS 11460000 | Ross stage and flow, last 7 days | baseflow = 10th percentile of the week |
+| NOAA CO-OPS 9414290 | predicted Bay high and low tides, 8 days (San Francisco, ft above MLLW) | shown beside the creek crest; not in any model |
 | Ambient | station rain per local day | needs `AMBIENT_APP_KEY` / `AMBIENT_API_KEY` |
 
 Then it computes the **ground wetness index**: the antecedent precipitation index
@@ -99,6 +100,14 @@ In every view the wetness the models see is the index **at the storm's onset**:
 today's value decayed 0.9× a day, plus the corrected rain forecast to fall
 before then (`forecast.py api_at_lead`, mirrored in `planWindow`). The wetness
 page still shows today's index.
+
+**Bay high tides** lists the predicted high tides around the planned storm,
+how far each falls from the expected creek crest, and any NWS coastal flood
+alert. It is information for the lower creek and the low bayside roads, and is
+deliberately in neither the crest model nor the tier ladder:
+`analysis/tide_check.py` compares a year of San Francisco tides with the two
+gauges and finds no tidal signal (dry-weather Ross moves 0.004 in per foot of
+tide, and sat flat through the October 2026 king tides).
 
 **Save this plan** stores the inputs and outputs in the browser; `storms.html`
 lists saved plans under the storm tables. The tables themselves need no hand

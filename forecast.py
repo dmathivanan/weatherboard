@@ -360,6 +360,7 @@ def main():
     bridge, errors["bridge_street"] = safe(F.fetch_bridge_street)
     ambient, errors["ambient"] = safe(F.fetch_ambient)
     model_qpf, errors["model_qpf"] = safe(F.fetch_model_qpf)
+    tides, errors["tides"] = safe(F.fetch_tides)
 
     ledger = update_ledger(load_ledger(), errors)
     LEDGER.write_text(json.dumps(ledger, indent=1, sort_keys=True), encoding="utf-8")
@@ -429,6 +430,7 @@ def main():
         "outlook": outlook,
         "prefill_horizon_h": PREFILL_H,
         "ar": cw3e,
+        "tides": tides,
         "alerts": alerts, "flood_watch": flood_watch, "flood_warning": flood_warning,
         "wetness": wet,
         "creek_now": {

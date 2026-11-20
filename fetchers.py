@@ -12,6 +12,7 @@ Sources
   USGS 11460000        Corte Madera Creek at Ross, stage + flow, last 7 days
   NWPS SBSC1 / CMDC1   Bridge Street and Ross gauges with NWS flood categories
   NWS api.weather.gov  gridded QPF + active alerts for the house
+  NOAA CO-OPS          predicted Bay tides (api.tidesandcurrents.noaa.gov)
   Open-Meteo           hourly rain, past days + 7-day forecast, per-model too
   CNRFC                6-hourly point QPF, days 1-6 (nearest points, see config)
   CW3E                 maximum forecast AR Scale at the nearest coastal points
@@ -402,6 +403,30 @@ def fetch_cnrfc_qpf():
             "peak_6h_in": max((v for _, v in vals), default=0),
         }
     return out
+
+
+# ---------------------------------------------------------------- tides
+
+def fetch_tides(days=8):
+    """Predicted high and low tides for the next `days` days at the NOAA station
+    in config.json (San Francisco), in local time and feet above its datum.
+    Predictions only: they are the astronomical tide, and a storm adds to them."""
+    cfg = CFG.get("tides", {})
+    today = datetime.now(TZ).date()
+    j = get("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter", params={
+        "product": "predictions", "interval": "hilo", "station": cfg["station"],
+        "datum": cfg.get("datum", "MLLW"), "time_zone": "lst_ldt", "units": "english",
+        "format": "json", "application": "floodboard",
+        "begin_date": today.strftime("%Y%m%d"),
+        "end_date": (today + timedelta(days=days)).strftime("%Y%m%d")})
+    if "predictions" not in j:
+        raise RuntimeError(f"tides: {str((j.get('error') or {}).get('message', j))[:120]}")
+    return {
+        "station": cfg["station"], "name": cfg.get("name"), "datum": cfg.get("datum", "MLLW"),
+        "notable_high_ft": cfg.get("notable_high_ft"), "max_surge_ft": cfg.get("max_surge_ft"),
+        "tides": [{"t": x["t"].replace(" ", "T"), "ft": round(float(x["v"]), 2), "type": x["type"]}
+                  for x in j["predictions"]],
+    }
 
 
 # ---------------------------------------------------------------- CW3E

@@ -136,6 +136,13 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
         <div class="secondary" id="sumpthr"></div>
         <div class="warn" id="swarn"></div>
       </section>
+
+      <section class="card">
+        <h2>Bay high tides <span class="sub" id="tidesub"></span></h2>
+        <div class="lines" id="tidelines"></div>
+        <div class="warn" id="tidewarn"></div>
+        <p class="note" id="tidenote" style="margin-bottom:0"></p>
+      </section>
     </div>
   </div>
 
@@ -390,6 +397,8 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     }
     $("swarn").textContent = s.extrapolated ? `Peak rate above anything recorded here (${M.observed_maxima.peak_1h_in} in/hr); the sump model has no data in this regime.` : "";
 
+    paintTides(inp, out);
+
     // checklist
     const now = Date.now();
     $("checksub").textContent = inp.onset ? `rain ${whenStr(inp.onset)} → crest ${out.crestMs ? whenStr(out.crestMs) : "?"}` : "";
@@ -399,6 +408,49 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
         <span class="due">${c.due == null ? "–" : whenStr(c.due)}<small>${rel}</small></span>
         <span>${c.task}<br><span class="need">${c.when === "crest" ? "before crest" : "before rain"} ${Math.abs(c.offset_h)} h · ${c.needLabel}+</span></span></li>`;
     }).join("");
+  }
+  /* Bay tides beside the creek crest. Information only: a year of record shows no
+     tidal signal at Ross or Bridge Street (analysis/tide_check.py), so the tide is
+     in neither the crest nor the tier. It matters for the lower creek and the low
+     bayside roads, which are worst when a storm's runoff meets a very high tide. */
+  function paintTides(inp, out) {
+    const T = F.tides || {}, all = (T.tides || []).filter(x => x.type === "H");
+    const coastal = (F.alerts || []).filter(a => /coastal flood/i.test(a.event || ""));
+    const alertTxt = coastal.map(a => `<b>${a.event}</b>${a.headline ? ": " + a.headline.replace(/^Coastal Flood \w+ /, "") : ""}`).join("<br>");
+    if (!all.length) {
+      $("tidesub").textContent = "";
+      $("tidelines").innerHTML = "";
+      $("tidewarn").innerHTML = alertTxt;
+      $("tidenote").textContent = "No tide predictions in the forecast file yet (they arrive with the next 6-hour run).";
+      return;
+    }
+    const H = 3600e3, hi = T.notable_high_ft;
+    const from = inp.onset != null ? inp.onset - 24 * H : Date.now();   // the high tide before the rain counts too
+    const to = Math.max(inp.end || 0, out.crestMs || 0, from + 60 * H) + 12 * H;
+    // the day's higher high is the one that floods; the lower high is listed only when notable
+    const byDay = {};
+    all.forEach(x => { const d = x.t.slice(0, 10); if (!byDay[d] || x.ft > byDay[d].ft) byDay[d] = x; });
+    const show = all.filter(x => byDay[x.t.slice(0, 10)] === x || (hi != null && x.ft >= hi))
+      .map(x => ({ ...x, ms: parseLocal(x.t) })).filter(x => x.ms >= from && x.ms <= to);
+    $("tidesub").textContent = `${T.name || "NOAA " + T.station} · predicted, ft above ${T.datum || "MLLW"}`;
+    const rel = x => {
+      if (out.crestMs == null) return "";
+      const h = (x.ms - out.crestMs) / H, a = Math.abs(h);
+      return a < 1 ? "at the creek crest" : `${a.toFixed(0)} h ${h < 0 ? "before" : "after"} the creek crest`;
+    };
+    $("tidelines").innerHTML = show.length ? show.map(x =>
+      `<div class="row"><span>${whenStr(x.ms)}${hi != null && x.ft >= hi ? ' <span class="chip on" style="cursor:default">very high</span>' : ""}`
+      + ` <span class="u">${rel(x)}</span></span><span class="v">${fmt(x.ft, 1)}<span class="u">ft</span></span></div>`).join("")
+      : `<div class="row"><span>No high tide predicted in this window</span><span class="v">–</span></div>`;
+    const near = out.crestMs == null || hi == null ? null
+      : show.filter(x => x.ft >= hi && Math.abs(x.ms - out.crestMs) <= 3 * H).sort((a, b) => b.ft - a.ft)[0];
+    const warns = [];
+    if (near) warns.push(`The creek is expected to crest within 3 h of a ${fmt(near.ft, 1)} ft tide (${whenStr(near.ms)}). That does not raise the crest here, but the lower creek and low bayside roads are at their worst when the two meet.`);
+    if (alertTxt) warns.push(alertTxt);
+    $("tidewarn").innerHTML = warns.join("<br>");
+    $("tidenote").innerHTML = `Not part of the crest or the tier: over a year of record the tide moved neither Ross nor Bridge Street. `
+      + (hi != null ? `"Very high" is ${fmt(hi, 1)} ft or more, reached on about 1 day in 16. ` : "")
+      + (T.max_surge_ft ? `These are astronomical predictions; storms have lifted the Bay as much as ${fmt(T.max_surge_ft, 1)} ft above them.` : "");
   }
   function relTime(ms) {
     const h = ms / 3600e3;
@@ -437,6 +489,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     src.push(`<b>CNRFC point QPF</b> (no Marin point; Napa and Venado bracket us): Napa ${fmt((cn.APC || {}).qpf_48h_in)}", Venado ${fmt((cn.VENC1 || {}).qpf_48h_in)}" / 48 h.`);
     const mq = q.models_24h || {};
     src.push(`<b>Per-model 24 h</b>: ECMWF ${fmt(mq.qpf_ecmwf_24h_in)}", GFS ${fmt(mq.qpf_gfs_24h_in)}", HRRR 6 h ${fmt(mq.qpf_hrrr_6h_in)}".`);
+    if (F.tides) src.push(`<b>Bay tides</b>: NOAA predictions for ${F.tides.name || F.tides.station} (station ${F.tides.station}), high and low water for 8 days.`);
     src.push(`<b>CW3E AR scale</b> at the coast off Marin: ${F.ar ? F.ar.ar_category : "–"}${F.ar && F.ar.file_modified ? " (file " + F.ar.file_modified + ")" : ""}.`);
     const w = F.wetness || {};
     src.push(`<b>Wetness</b> API ${fmt(w.api_in)}" (${w.category}, from ${w.source}); Ross baseflow ${fmt(w.baseflow_cfs)} cfs; season ${fmt(w.season_rain_in)}" since ${w.season_start}.`);

@@ -112,6 +112,14 @@
     "lead_72h": 2.0,
     "_how_applied": "forecast.py multiplies each forecast hour by a factor of its lead time: lead_24h for the first 24 h, a straight line from lead_24h at 24 h to lead_72h at 72 h, and lead_72h beyond."
   },
+  "tides": {
+    "_note": "Predicted Bay tides, shown on the planner next to the creek crest. NOAA has no station in Corte Madera Creek with observations; San Francisco (9414290) is the reference station and the creek mouth runs close to it. Heights are feet above MLLW. notable_high_ft marks the unusually high tides: over Oct 2025-Nov 2026 the predicted daily high reached 6.8 ft on 26 of 426 days. The tide is NOT in the crest model or the tier ladder: analysis/tide_check.py found no tidal signal at Ross or Bridge Street (dry-weather Ross moves 0.004 in per ft of tide; storm crests show nothing robust).",
+    "station": "9414290",
+    "name": "San Francisco",
+    "datum": "MLLW",
+    "notable_high_ft": 6.8,
+    "max_surge_ft": 1.8
+  },
   "cnrfc": {
     "_note": "CNRFC has no Marin forecast point. The 6-hourly point QPF products HD8RSA (days 1-3) and HD4RSA (days 4-6) are parsed for the nearest points: APC (Napa, 14 ft, drier than San Anselmo) and VENC1 (Venado, Sonoma hills, 1260 ft, wetter). Treat them as regional bracketing, not a house forecast. The old restricted/graphicalRVF_csv.php endpoint returns 401 and was dropped 2026-10-14.",
     "points": [

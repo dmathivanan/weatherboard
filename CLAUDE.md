@@ -57,6 +57,7 @@ For anything `storm.py` does not print, read the same files with pandas (below).
 | `analysis/cache/usgs_YYYYMM.json` | Ross stage and flow, 15 min, one file per month | `update_data.py usgs` |
 | `analysis/cache/fcst_daily.csv`, `openmeteo_prevruns.json` | last winter's archived forecasts, for the forecast-skill work | fixed |
 | `analysis/cache/fcst_daily_2026_27.csv` | this season's archived Open-Meteo forecasts per day (one file per season) | `update_data.py forecast` |
+| `analysis/cache/tide_sf_hourly.csv` | San Francisco tide, hourly, observed and predicted (ft above MLLW) | `tide_check.py --fetch` |
 
 **The storms page** (`docs/storms.html`) shows this season in the same table as last winter.
 Its rows are `docs/data/storms.json`, written by `storm.py` (`build_catalog`) at the end of
@@ -64,6 +65,11 @@ every `update_data.py` run and by `python analysis/storm.py catalog`: one row pe
 0.10 in or more this water year. Do not edit it by hand; a new storm appears the next time
 the data is refreshed and pushed. Its forecast columns stay blank until `update_data.py
 forecast` has read Open-Meteo's archive for those days.
+
+**Tides** are shown on the planner (the Bay high tides card, from `fetchers.fetch_tides`)
+but are not a model input. `python analysis/tide_check.py` is the evidence: no tidal signal
+at Ross or Bridge Street over the record. Re-run it with `--fetch` before proposing to put
+the tide into the crest model or the tiers.
 
 **New pump runs** arrive only when Deepak exports them from the PumpFuse app. Save what he
 sends (an attached file, or rows pasted into the chat) as a file and run
@@ -120,8 +126,8 @@ running out-of-sample check: this season's storms were not in the fit.
 - Setup script (it runs before the repo is cloned, so packages are named explicitly):
   `pip install requests python-dotenv pandas pyarrow numpy markdown`
 - Hosts the environment must allow: api.weather.gov, api.open-meteo.com, www.cnrfc.noaa.gov,
-  cw3e.ucsd.edu, waterservices.usgs.gov, api.water.noaa.gov, rt.ambientweather.net
-  (`forecast.py`), marin.onerain.com (`update_data.py bridge`),
+  cw3e.ucsd.edu, waterservices.usgs.gov, api.water.noaa.gov, rt.ambientweather.net,
+  api.tidesandcurrents.noaa.gov (`forecast.py`), marin.onerain.com (`update_data.py bridge`),
   previous-runs-api.open-meteo.com (`update_data.py forecast`) and dmathivanan.github.io
   (to check the live site after a push). A blocked host shows up as one failed source; the
   others still update.
