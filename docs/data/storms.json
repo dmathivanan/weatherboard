@@ -10,8 +10,8 @@
    "duration_h": 0.3,
    "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 0.0,
+    "three_day_total_in": 0.0,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -45,8 +45,8 @@
    "duration_h": 16.0,
    "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 0.27,
+    "three_day_total_in": 0.1,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -80,8 +80,8 @@
    "duration_h": 14.7,
    "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 0.5,
+    "three_day_total_in": 0.39,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -115,8 +115,8 @@
    "duration_h": 9.8,
    "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 0.57,
+    "three_day_total_in": 0.47,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -150,8 +150,8 @@
    "duration_h": 9.7,
    "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 3.97,
+    "three_day_total_in": 1.66,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -183,10 +183,10 @@
    "start_local": "2026-11-18T17:40",
    "end_local": "2026-11-19T06:50",
    "duration_h": 13.2,
-   "in_progress": true,
+   "in_progress": false,
    "forecast": {
-    "day_ahead_total_in": null,
-    "three_day_total_in": null,
+    "day_ahead_total_in": 4.24,
+    "three_day_total_in": 2.02,
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
@@ -210,7 +210,7 @@
     "sump_peak_runs_per_15min": 11,
     "sump_gallons": 1186.0
    },
-   "notes": "Rain within the last 6 h of the station record: totals can still grow. Pump log ends Thu Nov 19 09:34: sump columns may be short until a new PumpFuse export."
+   "notes": "Pump log ends Thu Nov 19 09:34: sump columns may be short until a new PumpFuse export."
   }
  ]
 }
