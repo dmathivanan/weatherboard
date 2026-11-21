@@ -343,6 +343,40 @@ def fetch_model_qpf():
     return out
 
 
+MODEL_HOURLY = (("ecmwf", "ecmwf_ifs025", "ECMWF IFS"), ("ecmwf_aifs", "ecmwf_aifs025_single", "ECMWF AIFS"),
+                ("gfs", "gfs_seamless", "GFS"), ("icon", "icon_seamless", "ICON"), ("gem", "gem_seamless", "GEM"))
+
+
+def fetch_model_hourly(days=7):
+    """Each global model's own hourly rain at the house for the next `days` days,
+    raw (the bias factors were measured on Open-Meteo's blend, not per model).
+    One request per model so an unknown or late model costs only itself. Hours
+    are local, starting at `t0` (local midnight today); a model that stops short
+    of the horizon is padded with nulls."""
+    out = {"t0": None, "hours": 0, "models": {}, "labels": {}}
+    for key, model, label in MODEL_HOURLY:
+        try:
+            j = get("https://api.open-meteo.com/v1/forecast", params={
+                "latitude": LAT, "longitude": LON, "models": model,
+                "hourly": "precipitation", "precipitation_unit": "inch",
+                "timezone": CFG["timezone"], "forecast_days": days})
+            t, pr = j["hourly"]["time"], j["hourly"]["precipitation"]
+            if not any(v is not None for v in pr):
+                raise RuntimeError("no hours returned")
+            if out["t0"] is None:
+                out["t0"], out["hours"] = t[0], len(t)
+            elif t[0] != out["t0"]:
+                raise RuntimeError(f"starts {t[0]}, expected {out['t0']}")
+            vals = [None if v is None else round(v, 3) for v in pr][:out["hours"]]
+            out["models"][key] = vals + [None] * (out["hours"] - len(vals))
+            out["labels"][key] = label
+        except Exception as e:  # noqa: BLE001
+            out.setdefault("errors", {})[key] = err_text(e, 120)
+    if not out["models"]:
+        raise RuntimeError("no model returned hourly rain: " + "; ".join(out.get("errors", {}).values())[:150])
+    return out
+
+
 # ---------------------------------------------------------------- CNRFC
 
 _BR = re.compile(r"\.BR RSA (\d{8}) Z /DC\d+")
