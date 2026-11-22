@@ -1,6 +1,6 @@
 {
- "generated_utc": "2026-11-22T19:25:52+00:00",
- "generated_local": "2026-11-22 11:25 PST",
+ "generated_utc": "2026-11-22T19:49:23+00:00",
+ "generated_local": "2026-11-22 11:49 PST",
  "site": "52 Woodland",
  "qpf": {
   "om_24h_in": 0,
@@ -3645,13 +3645,13 @@
   "baseflow_implied_api_in": 0.0,
   "source": "ambient",
   "gauge_days_in_window": 35,
-  "station_rain_read_utc": "2026-11-22T19:25:48+00:00",
+  "station_rain_read_utc": "2026-11-22T19:49:20+00:00",
   "station_rain_stale": false
  },
  "creek_now": {
   "ross_stage_ft": 4.36,
   "ross_flow_cfs": 3.59,
-  "ross_observed": "2026-11-22T10:30:00.000-08:00",
+  "ross_observed": "2026-11-22T11:30:00.000-08:00",
   "ross_nws_forecast_peak_ft": null,
   "bridge_stage_ft": 1.44,
   "bridge_observed": "2026-11-22T12:15:00Z",
@@ -3664,18 +3664,18 @@
   }
  },
  "station": {
-  "observed_utc": "2026-11-22T19:24:00.000Z",
+  "observed_utc": "2026-11-22T19:48:00.000Z",
   "rain_rate_inhr": 0,
   "rain_event_in": 0.2,
   "rain_daily_in": 0,
   "rain_weekly_in": 0,
   "rain_monthly_in": 7.63,
   "rain_yearly_in": 7.91,
-  "baro_inhg": 30.088,
-  "temp_f": 52.5,
-  "humidity_pct": 88,
-  "wind_mph": 2.01,
-  "wind_gust_mph": 2.91
+  "baro_inhg": 30.079,
+  "temp_f": 52.9,
+  "humidity_pct": 85,
+  "wind_mph": 0,
+  "wind_gust_mph": 1.12
  },
  "prefill": {
   "source": "open_meteo_corrected",
