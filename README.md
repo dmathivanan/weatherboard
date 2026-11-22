@@ -46,6 +46,8 @@ Pulls, each isolated so one dead feed never blanks the file:
 | CW3E | maximum forecast AR Scale at the coast off Marin | the JSON behind the AR Scale plume map, points 38.0N/123.0W and 37.5N/122.5W |
 | USGS 11460000 | Ross stage and flow, last 7 days | baseflow = 10th percentile of the week |
 | NOAA CO-OPS 9414290 | predicted Bay high and low tides, 8 days (San Francisco, ft above MLLW) | shown beside the creek crest; not in any model |
+| Open-Meteo, per model | ECMWF IFS and AIFS, GFS, ICON, GEM: each model's own hourly rain, up to 16 days | raw, for comparison (`model_hourly`); not in any model |
+| NOAA CPC | 6-10 day, 8-14 day and monthly outlooks at the house (lean and probability) | read from NOAA's map service (`cpc_outlook`) |
 | Ambient | station rain per local day | needs `AMBIENT_APP_KEY` / `AMBIENT_API_KEY` |
 
 Then it computes the **ground wetness index**: the antecedent precipitation index
@@ -108,6 +110,12 @@ deliberately in neither the crest model nor the tier ladder:
 `analysis/tide_check.py` compares a year of San Francisco tides with the two
 gauges and finds no tidal signal (dry-weather Ross moves 0.004 in per foot of
 tide, and sat flat through the October 2026 king tides).
+
+**The next two weeks** sets each model's own daily rain side by side (raw),
+next to the NWS grid and the planner's corrected figure, with NOAA's 6-10 day,
+8-14 day and monthly outlooks for the house underneath. It is for seeing what
+is coming and how far the models agree; none of it feeds the crest, the sump
+numbers or the tier.
 
 **Save this plan** stores the inputs and outputs in the browser; `storms.html`
 lists saved plans under the storm tables. The tables themselves need no hand

@@ -13,6 +13,7 @@ Sources
   NWPS SBSC1 / CMDC1   Bridge Street and Ross gauges with NWS flood categories
   NWS api.weather.gov  gridded QPF + active alerts for the house
   NOAA CO-OPS          predicted Bay tides (api.tidesandcurrents.noaa.gov)
+  NOAA CPC             6-10 day, 8-14 day and monthly outlooks at the house
   Open-Meteo           hourly rain, past days + 7-day forecast, per-model too
   CNRFC                6-hourly point QPF, days 1-6 (nearest points, see config)
   CW3E                 maximum forecast AR Scale at the nearest coastal points
@@ -347,12 +348,14 @@ MODEL_HOURLY = (("ecmwf", "ecmwf_ifs025", "ECMWF IFS"), ("ecmwf_aifs", "ecmwf_ai
                 ("gfs", "gfs_seamless", "GFS"), ("icon", "icon_seamless", "ICON"), ("gem", "gem_seamless", "GEM"))
 
 
-def fetch_model_hourly(days=7):
+def fetch_model_hourly(days=16):
     """Each global model's own hourly rain at the house for the next `days` days,
     raw (the bias factors were measured on Open-Meteo's blend, not per model).
     One request per model so an unknown or late model costs only itself. Hours
-    are local, starting at `t0` (local midnight today); a model that stops short
-    of the horizon is padded with nulls."""
+    are local, starting at `t0` (local midnight today). The models run out at
+    different leads (ICON about 7 days, GEM 10, ECMWF 15, GFS 16) and are padded
+    with nulls after that; past a week each is a single run with little skill in
+    the amounts, so read the later days for the pattern."""
     out = {"t0": None, "hours": 0, "models": {}, "labels": {}}
     for key, model, label in MODEL_HOURLY:
         try:
@@ -461,6 +464,57 @@ def fetch_tides(days=8):
         "tides": [{"t": x["t"].replace(" ", "T"), "ft": round(float(x["v"]), 2), "type": x["type"]}
                   for x in j["predictions"]],
     }
+
+
+# ---------------------------------------------------------------- CPC outlooks
+
+CPC_MAPS = "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks"
+CPC_PERIODS = (   # key, label, {element: (service, layer)}
+    ("d6_10", "6-10 day", {"precip": ("cpc_6_10_day_outlk", 1), "temp": ("cpc_6_10_day_outlk", 0)}),
+    ("d8_14", "8-14 day", {"precip": ("cpc_8_14_day_outlk", 1), "temp": ("cpc_8_14_day_outlk", 0)}),
+    ("month", "month", {"precip": ("cpc_mthly_precip_outlk", 0), "temp": ("cpc_mthly_temp_outlk", 0)}),
+)
+
+
+def _cpc_at_house(service, layer):
+    """The outlook polygon over the house on one NOAA map layer, or None where the
+    map is unshaded there (no tilt either way)."""
+    j = get(f"{CPC_MAPS}/{service}/MapServer/{layer}/query", params={
+        "geometry": f"{LON},{LAT}", "geometryType": "esriGeometryPoint", "inSR": 4326,
+        "spatialRel": "esriSpatialRelIntersects", "outFields": "*", "returnGeometry": "false", "f": "json"})
+    if "features" not in j:
+        raise RuntimeError(f"cpc {service}/{layer}: {str((j.get('error') or {}).get('message', j))[:100]}")
+    return j["features"][0]["attributes"] if j["features"] else None
+
+
+def fetch_cpc_outlook():
+    """NOAA Climate Prediction Center outlooks at the house: which way the 6-10
+    day, 8-14 day and next-month maps lean for rain and temperature (Above /
+    Below / Normal) and with what probability. They say whether a period leans
+    wet or dry against normal for the date, not how much rain."""
+    day = lambda ms: None if ms is None else datetime.fromtimestamp(ms / 1000, timezone.utc).strftime("%Y-%m-%d")
+    out = {"source": "NOAA CPC via mapservices.weather.noaa.gov", "periods": []}
+    for key, label, layers in CPC_PERIODS:
+        row = {"key": key, "label": label}
+        for element, (service, layer) in layers.items():
+            try:
+                a = _cpc_at_house(service, layer)
+            except Exception as e:  # noqa: BLE001
+                out.setdefault("errors", {})[f"{key}_{element}"] = err_text(e, 120)
+                continue
+            row[element] = None if a is None else {"cat": a.get("cat"), "prob": a.get("prob")}
+            if a:
+                row.setdefault("issued", day(a.get("fcst_date")))
+                if a.get("start_date") is not None:
+                    row.setdefault("start", day(a["start_date"]))
+                    row.setdefault("end", day(a.get("end_date")))
+                if a.get("valid_seas"):
+                    row.setdefault("valid", a["valid_seas"])
+        if "precip" in row or "temp" in row:
+            out["periods"].append(row)
+    if not out["periods"]:
+        raise RuntimeError("cpc: no outlook layer answered: " + "; ".join(out.get("errors", {}).values())[:150])
+    return out
 
 
 # ---------------------------------------------------------------- CW3E

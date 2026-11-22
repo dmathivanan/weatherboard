@@ -43,6 +43,15 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
 .meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin:8px 0 2px}
 .meter i{display:block;height:100%;background:var(--water)}
 .tier-reasons{font-size:.9rem;opacity:.95}
+.tw{overflow-x:auto}
+table.mdl{border-collapse:collapse;width:100%;font-size:.85rem;font-variant-numeric:tabular-nums}
+table.mdl th,table.mdl td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+table.mdl th{font-weight:600;color:var(--mute);font-size:.74rem;text-transform:uppercase;letter-spacing:.03em}
+table.mdl th:first-child,table.mdl td:first-child{text-align:left}
+table.mdl td.z{color:var(--mute)}
+table.mdl td.wet{font-weight:600}
+table.mdl td.day button{font:inherit;color:var(--water);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+table.mdl tr.sel td{background:rgba(37,99,235,.07)}
 </style>
 </head>
 <body>
@@ -150,6 +159,14 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     <h2>Preparedness checklist <span class="sub" id="checksub"></span></h2>
     <ul class="check" id="check"></ul>
     <p class="note">Deadlines follow the storm timing above. Items dimmed are below this plan's tier; they still show so the order is visible.</p>
+  </section>
+
+  <section class="card">
+    <h2>The next two weeks <span class="sub" id="twosub"></span></h2>
+    <div class="tw"><table class="mdl" id="mdl"></table></div>
+    <p class="note" id="mdlnote"></p>
+    <div class="lines" id="cpclines"></div>
+    <p class="note" id="cpcnote" style="margin-bottom:0"></p>
   </section>
 
   <section class="card">
@@ -311,7 +328,7 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
       if (w) u.searchParams.set("from", w.from); else u.searchParams.delete("from");
       history.replaceState(null, "", u);
     } catch {}
-    paintStamp(); paintChips(); paintFrom(); fromForecast();
+    paintStamp(); paintChips(); paintFrom(); fromForecast(); paintTwoWeeks();
   }
   fromEl.addEventListener("change", () => setFrom(fromEl.value || null));
   $("fromnext").addEventListener("click", () => setFrom(null));
@@ -490,6 +507,8 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     const mq = q.models_24h || {};
     src.push(`<b>Per-model 24 h</b>: ECMWF ${fmt(mq.qpf_ecmwf_24h_in)}", GFS ${fmt(mq.qpf_gfs_24h_in)}", HRRR 6 h ${fmt(mq.qpf_hrrr_6h_in)}".`);
     if (F.tides) src.push(`<b>Bay tides</b>: NOAA predictions for ${F.tides.name || F.tides.station} (station ${F.tides.station}), high and low water for 8 days.`);
+    if (F.model_hourly) src.push(`<b>Per-model rain</b>: ${Object.values(F.model_hourly.labels || {}).join(", ")} from Open-Meteo, raw, up to 16 days.`);
+    if (F.cpc_outlook) src.push(`<b>NOAA CPC outlooks</b>: 6-10 day, 8-14 day and monthly, read at the house from NOAA's map service.`);
     src.push(`<b>CW3E AR scale</b> at the coast off Marin: ${F.ar ? F.ar.ar_category : "–"}${F.ar && F.ar.file_modified ? " (file " + F.ar.file_modified + ")" : ""}.`);
     const w = F.wetness || {};
     src.push(`<b>Wetness</b> API ${fmt(w.api_in)}" (${w.category}, from ${w.source}); Ross baseflow ${fmt(w.baseflow_cfs)} cfs; season ${fmt(w.season_rain_in)}" since ${w.season_start}.`);
@@ -498,6 +517,56 @@ ul.check .need{font-size:.74rem;color:var(--mute)}
     if ((F.alerts || []).length) src.push(`<b>NWS alerts</b>: ${F.alerts.map(a => a.event).join(", ")}.`);
   }
   $("sources").innerHTML = src.join("<br>") || "–";
+
+  // ---- the next two weeks: each model's own rain per day, and NOAA's outlooks ----
+  function paintTwoWeeks() {
+    const mh = F.model_hourly || {}, keys = Object.keys(mh.models || {});
+    const byDay = {}, order = [];
+    const add = (d, col, v) => { if (!byDay[d]) { byDay[d] = {}; order.push(d); } const c = byDay[d][col] || (byDay[d][col] = { sum: 0, n: 0 }); c.sum += v; c.n++; };
+    if (mh.t0) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2})/.exec(mh.t0), base = Date.UTC(+m[1], m[2] - 1, +m[3], +m[4]);
+      for (let i = 0; i < mh.hours; i++) {
+        const d = new Date(base + i * 3600e3).toISOString().slice(0, 10);
+        keys.forEach(k => { const v = mh.models[k][i]; if (v != null) add(d, k, v); });
+      }
+    }
+    (F.hourly || []).forEach(h => {
+      const d = h.t.slice(0, 10);
+      if (h.nws_in != null) add(d, "nws", h.nws_in);
+      const c = correctedRain(F, M, h); if (c != null) add(d, "plan", c);
+    });
+    order.sort();
+    const today = order.find(d => (F.hourly || []).some(h => h.t.slice(0, 10) === d)) || order[0];
+    const cols = keys.map(k => ({ k, label: (mh.labels || {})[k] || k }))
+      .concat([{ k: "nws", label: "NWS grid" }, { k: "plan", label: "Planner ×bias" }]);
+    const pickable = new Set(days.map(d => d.date));
+    const cell = (d, k) => {
+      const c = byDay[d][k];
+      // today's planner and NWS hours start now, not at midnight, so a short day is still shown for them
+      const need = (k === "nws" || k === "plan") && d === today ? 1 : 24;
+      if (!c || c.n < need) return '<td class="z">–</td>';
+      return `<td class="${c.sum < 0.005 ? "z" : c.sum >= 0.5 ? "wet" : ""}">${c.sum.toFixed(2)}</td>`;
+    };
+    const rows = order.filter(d => d >= today);
+    $("mdl").innerHTML = !rows.length ? "" : "<thead><tr><th>Day</th>" + cols.map(c => `<th>${c.label}</th>`).join("") + "</tr></thead><tbody>"
+      + rows.map(d => `<tr class="${win && win.from === d ? "sel" : ""}"><td class="day">`
+        + (pickable.has(d) ? `<button data-day="${d}" title="plan the 3 days from here">${dayStr(d).replace(",", "")}</button>` : dayStr(d).replace(",", ""))
+        + "</td>" + cols.map(c => cell(d, c.k)).join("") + "</tr>").join("") + "</tbody>";
+    $("twosub").textContent = rows.length ? "inches of rain per day, each model's own run" : "";
+    $("mdlnote").textContent = !rows.length ? "No per-model forecast in the file yet (it arrives with the next 6-hour run)."
+      : "Model columns are raw, with no bias correction; the planner column is the Open-Meteo blend with the correction, for 7 days. "
+        + "Each model stops at its own range, and past a week these are single runs: read the pattern, not the amounts. Bold is half an inch or more. Tap a day to plan from it.";
+    const P = (F.cpc_outlook || {}).periods || [];
+    const lean = (x, wet, dry) => !x ? "no tilt either way" : x.cat === "Above" ? `${wet} than normal favoured, ${fmt(x.prob, 0)}%`
+      : x.cat === "Below" ? `${dry} than normal favoured, ${fmt(x.prob, 0)}%` : `near normal favoured, ${fmt(x.prob, 0)}%`;
+    const span = p => p.valid ? p.valid : p.start ? `${dayStr(p.start).replace(/^\w+, /, "")} – ${dayStr(p.end).replace(/^\w+, /, "")}` : "";
+    $("cpclines").innerHTML = P.map(p => `<div class="row"><span>NOAA ${p.key === "month" ? "monthly" : p.label} outlook <span class="u">${span(p)}</span></span>`
+      + `<span class="v" style="font-size:.9rem;text-align:right">${"precip" in p ? lean(p.precip, "wetter", "drier") : "–"}`
+      + `<br><span class="u">${"temp" in p ? lean(p.temp, "warmer", "colder") : ""}</span></span></div>`).join("");
+    $("cpcnote").textContent = P.length ? `Climate Prediction Center outlooks for this location${P[0].issued ? ", issued " + dayStr(P[0].issued).replace(/^\w+, /, "") : ""}. `
+      + "They say which way a period leans against normal for the date, not how much rain; a third each way is no signal." : "";
+  }
+  $("mdl").addEventListener("click", e => { const c = e.target.closest("[data-day]"); if (c) { setFrom(c.dataset.day); window.scrollTo({ top: 0, behavior: "smooth" }); } });
 
   // ?from=YYYY-MM-DD reopens the planner on that start date
   const want = new URLSearchParams(location.search).get("from");

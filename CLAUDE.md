@@ -71,6 +71,14 @@ but are not a model input. `python analysis/tide_check.py` is the evidence: no t
 at Ross or Bridge Street over the record. Re-run it with `--fetch` before proposing to put
 the tide into the crest model or the tiers.
 
+**"What does the Euro say" and "what is the outlook"** are answered from
+`docs/data/forecast.json`, which the six-hourly job fills (cloud sessions usually cannot ask
+Open-Meteo themselves): `model_hourly` holds each model's own hourly rain for up to 16 days
+(ECMWF IFS and AIFS, GFS, ICON, GEM; raw, local hours from `t0`), and `cpc_outlook` holds
+NOAA's 6-10 day, 8-14 day and monthly lean at the house. If the file is hours old, run the
+`forecast` workflow first. The reasoning behind the outlook is in the CPC discussion at
+www.cpc.ncep.noaa.gov/products/predictions/610day/fxus06.html.
+
 **New pump runs** arrive only when Deepak exports them from the PumpFuse app. Save what he
 sends (an attached file, or rows pasted into the chat) as a file and run
 `python analysis/update_data.py pump <file>`. It matches rows by shape, so pasted text
@@ -127,7 +135,8 @@ running out-of-sample check: this season's storms were not in the fit.
   `pip install requests python-dotenv pandas pyarrow numpy markdown`
 - Hosts the environment must allow: api.weather.gov, api.open-meteo.com, www.cnrfc.noaa.gov,
   cw3e.ucsd.edu, waterservices.usgs.gov, api.water.noaa.gov, rt.ambientweather.net,
-  api.tidesandcurrents.noaa.gov (`forecast.py`), marin.onerain.com (`update_data.py bridge`),
+  api.tidesandcurrents.noaa.gov, mapservices.weather.noaa.gov (`forecast.py`),
+  www.cpc.ncep.noaa.gov (the outlook discussion), marin.onerain.com (`update_data.py bridge`),
   previous-runs-api.open-meteo.com (`update_data.py forecast`) and dmathivanan.github.io
   (to check the live site after a push). A blocked host shows up as one failed source; the
   others still update.

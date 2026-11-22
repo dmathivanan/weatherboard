@@ -362,6 +362,7 @@ def main():
     model_qpf, errors["model_qpf"] = safe(F.fetch_model_qpf)
     tides, errors["tides"] = safe(F.fetch_tides)
     model_hourly, errors["model_hourly"] = safe(F.fetch_model_hourly)
+    cpc, errors["cpc"] = safe(F.fetch_cpc_outlook)
 
     ledger = update_ledger(load_ledger(), errors)
     LEDGER.write_text(json.dumps(ledger, indent=1, sort_keys=True), encoding="utf-8")
@@ -433,6 +434,7 @@ def main():
         "ar": cw3e,
         "tides": tides,
         "model_hourly": model_hourly,
+        "cpc_outlook": cpc,
         "alerts": alerts, "flood_watch": flood_watch, "flood_warning": flood_warning,
         "wetness": wet,
         "creek_now": {
