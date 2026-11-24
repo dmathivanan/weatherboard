@@ -211,6 +211,76 @@
     "sump_gallons": 1186.0
    },
    "notes": "Pump log ends Thu Nov 19 09:34: sump columns may be short until a new PumpFuse export."
+  },
+  {
+   "id": "2026-27-07",
+   "season": "2026-27",
+   "start_local": "2026-11-20T01:10",
+   "end_local": "2026-11-20T06:30",
+   "duration_h": 5.3,
+   "in_progress": false,
+   "forecast": {
+    "day_ahead_total_in": 0.02,
+    "three_day_total_in": 0.0,
+    "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
+   },
+   "predicted": {
+    "bridge_peak_ft": 2.95,
+    "kind": "hindcast",
+    "_note": "event_peak model applied to the ACTUAL total and API"
+   },
+   "actual": {
+    "total_rain_in": 0.15,
+    "peak_1h_in": 0.08,
+    "peak_10min_in": 0.02,
+    "peak_30min_in": 0.04,
+    "peak_6h_in": 0.15,
+    "api_at_start": 4.85,
+    "bridge_peak_ft": 1.69,
+    "ross_peak_ft": 4.73,
+    "ross_peak_cfs": 22.0,
+    "sump_peak_inflow_gpm": null,
+    "sump_runs": null,
+    "sump_peak_run_s": null,
+    "sump_peak_runs_per_15min": null,
+    "sump_gallons": null
+   },
+   "notes": "Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
+  },
+  {
+   "id": "2026-27-08",
+   "season": "2026-27",
+   "start_local": "2026-11-21T16:00",
+   "end_local": "2026-11-21T22:30",
+   "duration_h": 6.5,
+   "in_progress": false,
+   "forecast": {
+    "day_ahead_total_in": 0.2,
+    "three_day_total_in": 0.18,
+    "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
+   },
+   "predicted": {
+    "bridge_peak_ft": 2.79,
+    "kind": "hindcast",
+    "_note": "event_peak model applied to the ACTUAL total and API"
+   },
+   "actual": {
+    "total_rain_in": 0.21,
+    "peak_1h_in": 0.12,
+    "peak_10min_in": 0.04,
+    "peak_30min_in": 0.07,
+    "peak_6h_in": 0.2,
+    "api_at_start": 4.21,
+    "bridge_peak_ft": 1.71,
+    "ross_peak_ft": 4.68,
+    "ross_peak_cfs": 19.0,
+    "sump_peak_inflow_gpm": null,
+    "sump_runs": null,
+    "sump_peak_run_s": null,
+    "sump_peak_runs_per_15min": null,
+    "sump_gallons": null
+   },
+   "notes": "Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
   }
  ]
 }
