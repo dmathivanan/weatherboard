@@ -281,6 +281,41 @@
     "sump_gallons": null
    },
    "notes": "Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
+  },
+  {
+   "id": "2026-27-09",
+   "season": "2026-27",
+   "start_local": "2026-11-24T19:10",
+   "end_local": "2026-11-24T20:50",
+   "duration_h": 1.7,
+   "in_progress": true,
+   "forecast": {
+    "day_ahead_total_in": 0.02,
+    "three_day_total_in": 0.26,
+    "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
+   },
+   "predicted": {
+    "bridge_peak_ft": 2.36,
+    "kind": "hindcast",
+    "_note": "event_peak model applied to the ACTUAL total and API"
+   },
+   "actual": {
+    "total_rain_in": 0.11,
+    "peak_1h_in": 0.06,
+    "peak_10min_in": 0.02,
+    "peak_30min_in": 0.04,
+    "peak_6h_in": 0.11,
+    "api_at_start": 3.19,
+    "bridge_peak_ft": null,
+    "ross_peak_ft": null,
+    "ross_peak_cfs": null,
+    "sump_peak_inflow_gpm": null,
+    "sump_runs": null,
+    "sump_peak_run_s": null,
+    "sump_peak_runs_per_15min": null,
+    "sump_gallons": null
+   },
+   "notes": "Rain within the last 6 h of the station record: totals can still grow. Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
   }
  ]
 }
