@@ -67,7 +67,7 @@
    {
     "lo": 0.0,
     "hi": 0.1,
-    "n": 1732,
+    "n": 1762,
     "median_s": 15.0,
     "p90_s": 17.0,
     "max_s": 22.0,
@@ -77,7 +77,7 @@
    {
     "lo": 0.1,
     "hi": 0.25,
-    "n": 1227,
+    "n": 1255,
     "median_s": 16.0,
     "p90_s": 18.0,
     "max_s": 21.0,
@@ -87,7 +87,7 @@
    {
     "lo": 0.25,
     "hi": 0.5,
-    "n": 714,
+    "n": 719,
     "median_s": 18.0,
     "p90_s": 20.0,
     "max_s": 24.0,
@@ -97,9 +97,9 @@
    {
     "lo": 0.5,
     "hi": 0.75,
-    "n": 264,
+    "n": 269,
     "median_s": 19.0,
-    "p90_s": 22.700000000000017,
+    "p90_s": 23.0,
     "max_s": 33.0,
     "pct_ge35": 0.0,
     "pct_ge93": 0.0
@@ -107,9 +107,9 @@
    {
     "lo": 0.75,
     "hi": 1.0,
-    "n": 72,
+    "n": 76,
     "median_s": 21.0,
-    "p90_s": 26.9,
+    "p90_s": 26.5,
     "max_s": 29.0,
     "pct_ge35": 0.0,
     "pct_ge93": 0.0
@@ -154,7 +154,7 @@
    "max_observed_10min_inhr": 1.62,
    "max_observed_5min_inhr": 2.4,
    "longest_run_s": 134,
-   "runs_in_record": 4054,
+   "runs_in_record": 4126,
    "_note": "rate = station rain in the 10 min ending 5 min after the run starts, in/hr. Continuous running never observed."
   },
   "tail": {
@@ -426,6 +426,6 @@
   "moderate": 16.3,
   "major": 17.8
  },
- "generated": "2026-11-19T18:01:34Z",
+ "generated": "2026-11-25T16:32:47Z",
  "_source": "analysis/export_models.py"
 }

@@ -9,10 +9,10 @@ inflow basis  : runtime x 84 GPM (config primary_pump.rated_gpm)
 RESOLUTION PER SOURCE
 ------------------------------------------------------------------------------
 source              native   rows/runs  how it lands on the 10-min grid
-Ambient              5 min     118,492  5 min -> 2 obs per bin. Genuine 10-min resolution.
-PumpFuse             event       4,088  one row per run, 1 s stamps -> exact per-bin totals. Genuine.
+Ambient              5 min     120,204  5 min -> 2 obs per bin. Genuine 10-min resolution.
+PumpFuse             event       4,160  one row per run, 1 s stamps -> exact per-bin totals. Genuine.
 USGS 11460000       15 min      20,319  15 min -> most bins hold no reading; interpolated between.
-Bridge Street        event       1,553  ~4-15 min in storms, 720 min when flat. Effectively 30 min+ off-storm.
+Bridge Street        event       1,590  ~4-15 min in storms, 720 min when flat. Effectively 30 min+ off-storm.
 
   PumpFuse and Bridge Street are event sources: 'native' is not a sampling
   rate. For PumpFuse a gap means the pump did not run. For Bridge Street the
@@ -29,15 +29,15 @@ Bridge Street        event       1,553  ~4-15 min in storms, 720 min when flat. 
 ------------------------------------------------------------------------------
 RAINFALL RECONSTRUCTION (Ambient cumulative counters)
 ------------------------------------------------------------------------------
-  Daily Rain  resets handled :    71  (local midnight)
-  Event Rain  resets handled :    38  (dry-spell reset)
+  Daily Rain  resets handled :    76  (local midnight)
+  Event Rain  resets handled :    40  (dry-spell reset)
   Yearly Rain resets handled :     1  (Jan 1)
   suspect steps zeroed       :     0  (> 0.5 in per 5 min)
 
-  season total from Daily  counter :    43.05 in   <- primary
-  season total from Yearly counter :    43.32 in   <- independent check
-  season total from Event  counter :    43.07 in
-  Daily vs Yearly disagreement     :     0.27 in  (0.62%)
+  season total from Daily  counter :    44.26 in   <- primary
+  season total from Yearly counter :    44.53 in   <- independent check
+  season total from Event  counter :    44.27 in
+  Daily vs Yearly disagreement     :     0.27 in  (0.61%)
   window rain (Nov-Apr)            :    34.47 in
 
 ------------------------------------------------------------------------------
