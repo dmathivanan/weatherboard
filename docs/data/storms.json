@@ -205,12 +205,12 @@
     "ross_peak_ft": 5.82,
     "ross_peak_cfs": 129.0,
     "sump_peak_inflow_gpm": 28.2,
-    "sump_runs": 46,
+    "sump_runs": 47,
     "sump_peak_run_s": 39.0,
     "sump_peak_runs_per_15min": 11,
-    "sump_gallons": 1186.0
+    "sump_gallons": 1207.0
    },
-   "notes": "Pump log ends Thu Nov 19 09:34: sump columns may be short until a new PumpFuse export."
+   "notes": ""
   },
   {
    "id": "2026-27-07",
@@ -239,13 +239,13 @@
     "bridge_peak_ft": 1.69,
     "ross_peak_ft": 4.73,
     "ross_peak_cfs": 22.0,
-    "sump_peak_inflow_gpm": null,
-    "sump_runs": null,
-    "sump_peak_run_s": null,
-    "sump_peak_runs_per_15min": null,
-    "sump_gallons": null
+    "sump_peak_inflow_gpm": 1.5,
+    "sump_runs": 8,
+    "sump_peak_run_s": 16.0,
+    "sump_peak_runs_per_15min": 1,
+    "sump_gallons": 169.0
    },
-   "notes": "Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
+   "notes": ""
   },
   {
    "id": "2026-27-08",
@@ -274,20 +274,20 @@
     "bridge_peak_ft": 1.71,
     "ross_peak_ft": 4.68,
     "ross_peak_cfs": 19.0,
-    "sump_peak_inflow_gpm": null,
-    "sump_runs": null,
-    "sump_peak_run_s": null,
-    "sump_peak_runs_per_15min": null,
-    "sump_gallons": null
+    "sump_peak_inflow_gpm": 4.4,
+    "sump_runs": 10,
+    "sump_peak_run_s": 16.0,
+    "sump_peak_runs_per_15min": 3,
+    "sump_gallons": 216.0
    },
-   "notes": "Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
+   "notes": ""
   },
   {
    "id": "2026-27-09",
    "season": "2026-27",
    "start_local": "2026-11-24T19:10",
-   "end_local": "2026-11-24T20:50",
-   "duration_h": 1.7,
+   "end_local": "2026-11-25T02:50",
+   "duration_h": 7.7,
    "in_progress": true,
    "forecast": {
     "day_ahead_total_in": 0.02,
@@ -295,27 +295,27 @@
     "_note": "Open-Meteo previous-run archive, summed over the storm's local days"
    },
    "predicted": {
-    "bridge_peak_ft": 2.36,
+    "bridge_peak_ft": 3.03,
     "kind": "hindcast",
     "_note": "event_peak model applied to the ACTUAL total and API"
    },
    "actual": {
-    "total_rain_in": 0.11,
-    "peak_1h_in": 0.06,
-    "peak_10min_in": 0.02,
-    "peak_30min_in": 0.04,
-    "peak_6h_in": 0.11,
+    "total_rain_in": 0.83,
+    "peak_1h_in": 0.37,
+    "peak_10min_in": 0.14,
+    "peak_30min_in": 0.25,
+    "peak_6h_in": 0.81,
     "api_at_start": 3.19,
-    "bridge_peak_ft": null,
-    "ross_peak_ft": null,
-    "ross_peak_cfs": null,
-    "sump_peak_inflow_gpm": null,
-    "sump_runs": null,
-    "sump_peak_run_s": null,
-    "sump_peak_runs_per_15min": null,
-    "sump_gallons": null
+    "bridge_peak_ft": 2.42,
+    "ross_peak_ft": 5.54,
+    "ross_peak_cfs": 95.0,
+    "sump_peak_inflow_gpm": 16.7,
+    "sump_runs": 51,
+    "sump_peak_run_s": 23.0,
+    "sump_peak_runs_per_15min": 9,
+    "sump_gallons": 1177.0
    },
-   "notes": "Rain within the last 6 h of the station record: totals can still grow. Pump log ends Thu Nov 19 09:34, before this storm: sump columns need a new PumpFuse export."
+   "notes": "Rain within the last 6 h of the station record: totals can still grow. Pump log ends Wed Nov 25 05:17: sump columns may be short until a new PumpFuse export."
   }
  ]
 }
